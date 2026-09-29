@@ -53,6 +53,15 @@ docker compose down -v           # stop and wipe volumes
 
 `src/{app,components,lib,hooks,types,styles}`, `server/{services,repositories,jobs,adapters}`, `worker/`, `prisma/`, `tests/{unit,integration,e2e}`, `docs/`, `docker/`.
 
+## Gotchas (learned the hard way)
+
+- Card/list grids: always set `grid-cols-1` on the base breakpoint. An implicit `auto` track expands to min-content and overflows narrow screens.
+- Do not put `inline-flex` (or any `display` utility) in a shared class string that is also combined with `hidden` / `lg:hidden`; the order in the CSS decides and the control leaks onto the wrong breakpoints.
+- Only animate transform/opacity, and wait for animations and pending transitions before axe scans or screenshots (dimmed/fading UI blends colours).
+- Playwright: use `gotoReady()` from `tests/e2e/helpers.ts` (waits for hydration); scope locators (`getByRole('combobox', { name })`, `main header`), since selects also have the combobox role.
+- Full-page screenshots show sticky/fixed elements (navbar, tray) floating mid-page. That is a capture artifact, not a layout bug.
+- Data access goes through `server/repositories/*`. Never import the demo dataset from UI code.
+
 ## Status
 
-Step 0 and Phase 1 (brand, design system, homepage on demo data) complete. Next: Phase 2 (model directory) after user go-ahead. Pending housekeeping: docs/PROMPT.md (needs source path), GitHub remote.
+Step 0, Phase 1 and Phase 2 (model directory + profiles on demo data through the repository layer) complete. Next: Phase 3 (Prisma schema, migrations, REST API + OpenAPI, Redis cache, sourced seed data) after user go-ahead. Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).

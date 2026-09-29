@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { ComparisonTray } from '@/components/comparison/comparison-tray';
 import { Footer } from '@/components/layout/footer';
 import { Navbar } from '@/components/layout/navbar';
 import { PaletteProvider } from '@/components/layout/command-palette';
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Navbar />
             <main id="main">{children}</main>
             <Footer />
+            <ComparisonTray />
           </PaletteProvider>
         </ThemeProvider>
       </body>

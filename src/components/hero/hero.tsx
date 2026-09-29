@@ -5,13 +5,13 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ButtonLink } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/badges';
 import { LogoMark } from '@/components/ui/logo';
-import { demoModels, demoProviders } from '@/lib/demo-data';
 import { fadeUp, reducedFade, stagger } from '@/lib/motion';
+import type { GraphSeed } from './graph';
 import { HeroScroll } from './hero-scroll';
 import { HeroVisual } from './hero-visual';
 import { StaticNetwork } from './static-network';
 
-export function Hero() {
+export function Hero({ seed }: { seed: GraphSeed }) {
   const reduce = useReducedMotion();
   const item = reduce ? reducedFade : fadeUp;
 
@@ -25,8 +25,8 @@ export function Hero() {
         <div aria-hidden className="bg-ambient absolute inset-0 -z-10" />
         <div aria-hidden className="bg-grid absolute inset-0 -z-10" />
         <div data-hero-visual className="absolute inset-0 -z-10 opacity-70">
-          <StaticNetwork className="absolute inset-0 size-full" />
-          <HeroVisual />
+          <StaticNetwork seed={seed} className="absolute inset-0 size-full" />
+          <HeroVisual seed={seed} />
         </div>
         {/* Soft vignette keeps text legible over the network */}
         <div
@@ -82,16 +82,19 @@ export function Hero() {
           className="sr-only-focusable border-line-strong bg-elevated absolute bottom-4 left-4 z-20 max-h-[40vh] max-w-[calc(100%-2rem)] overflow-auto rounded-xl border p-4 text-sm shadow-[var(--shadow-pop)]"
         >
           <ul className="flex flex-wrap gap-x-4 gap-y-1">
-            {demoProviders.map((p) => (
+            {seed.providers.map((p) => (
               <li key={p.slug}>
                 <Link href="/providers" className="text-fg underline-offset-4 hover:underline">
                   {p.name}
                 </Link>
               </li>
             ))}
-            {demoModels.map((m) => (
+            {seed.models.map((m) => (
               <li key={m.slug}>
-                <Link href="/models" className="text-fg-2 underline-offset-4 hover:underline">
+                <Link
+                  href={`/models/${m.slug}`}
+                  className="text-fg-2 underline-offset-4 hover:underline"
+                >
                   {m.name}
                 </Link>
               </li>

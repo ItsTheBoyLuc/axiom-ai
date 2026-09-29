@@ -46,7 +46,6 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
  * (see app/[slug]/page.tsx) instead of a 404. Remove a slug when its phase ships.
  */
 export const pendingRoutes: Record<string, { title: string; phase: string }> = {
-  models: { title: 'Models', phase: 'Phase 2' },
   providers: { title: 'Providers', phase: 'Phase 6' },
   compare: { title: 'Compare', phase: 'Phase 4' },
   benchmarks: { title: 'Benchmarks', phase: 'Phase 5' },

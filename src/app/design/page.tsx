@@ -16,7 +16,7 @@ import { Card } from '@/components/ui/card';
 import { Logo } from '@/components/ui/logo';
 import { Container } from '@/components/ui/section';
 import { Skeleton } from '@/components/ui/skeleton';
-import { demoModels } from '@/lib/demo-data';
+import { getModelRepository } from '../../../server/repositories/model-repository';
 import { distance, duration, ease, spring, staggerDelay } from '@/lib/motion';
 import { VERIFICATION_STATUSES } from '@/lib/verification';
 
@@ -51,10 +51,23 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-export default function DesignPage() {
+export default async function DesignPage() {
   // Dev-only: hidden in production unless explicitly enabled.
   if (process.env.NODE_ENV === 'production' && process.env.ENABLE_DESIGN_PAGE !== 'true')
     notFound();
+
+  const { items: models } = await getModelRepository().list({
+    q: '',
+    provider: [],
+    category: [],
+    capability: [],
+    deployment: [],
+    pricing: [],
+    sort: 'recent',
+    benchmark: null,
+    page: 1,
+    pageSize: 4,
+  });
 
   return (
     <Container className="py-16">
@@ -132,8 +145,8 @@ export default function DesignPage() {
       </Block>
 
       <Block title="Cards">
-        <div className="grid gap-5 md:grid-cols-2">
-          <ModelCard model={demoModels[0]!} />
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <ModelCard model={models[0]!} />
           <Card className="p-5">
             <h3 className="t-h3">Generic card</h3>
             <p className="text-fg-2 mt-2">
@@ -148,7 +161,7 @@ export default function DesignPage() {
           <BarChart
             title="Context window"
             unit="tokens"
-            data={demoModels.slice(0, 4).map((m) => ({ label: m.name, value: m.contextWindow }))}
+            data={models.map((m) => ({ label: m.name, value: m.contextWindow ?? 0 }))}
             valueFormat="tokens"
             footnote="Demo values for layout testing."
           />
@@ -156,7 +169,7 @@ export default function DesignPage() {
       </Block>
 
       <Block title="States">
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           <div aria-busy="true" className="border-line bg-card rounded-2xl border p-5">
             <Skeleton className="h-5 w-2/3" />
             <Skeleton className="mt-3 h-4 w-full" />

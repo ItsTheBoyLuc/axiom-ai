@@ -22,14 +22,49 @@ const formatters: Record<ValueFormat, (v: number) => string> = {
   tokens: formatTokens,
 };
 
+/** `label` may contain "\n" to render a second, dimmer line on the axis (e.g. evaluation type). */
 export type BarDatum = { label: string; value: number };
 
 /** Bar fills. Meaning never relies on color alone: every bar has an axis label, and the table view lists values. */
 const fills = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)', 'var(--text-2)'];
 
+const plain = (s: string) => s.replaceAll('\n', ' · ');
+
 function toCsv(rows: BarDatum[], valueHeader: string) {
   const esc = (s: string) => `"${s.replaceAll('"', '""')}"`;
-  return ['Label,' + esc(valueHeader), ...rows.map((r) => `${esc(r.label)},${r.value}`)].join('\n');
+  return [
+    'Label,' + esc(valueHeader),
+    ...rows.map((r) => `${esc(plain(r.label))},${r.value}`),
+  ].join('\n');
+}
+
+/** Two-line axis tick: first line normal, second line dimmer. */
+function AxisTick({
+  x = 0,
+  y = 0,
+  payload,
+}: {
+  x?: number;
+  y?: number;
+  payload?: { value: string };
+}) {
+  const lines = String(payload?.value ?? '').split('\n');
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text textAnchor="end" fill="var(--text-2)" fontSize={12}>
+        {lines.map((l, i) => (
+          <tspan
+            key={i}
+            x={-4}
+            dy={i === 0 ? (lines.length > 1 ? '-0.1em' : '0.32em') : '1.25em'}
+            fillOpacity={i === 0 ? 1 : 0.75}
+          >
+            {l}
+          </tspan>
+        ))}
+      </text>
+    </g>
+  );
 }
 
 /**
@@ -42,17 +77,25 @@ export function BarChart({
   data,
   footnote,
   valueFormat = 'number',
+  showTableToggle = true,
+  yAxisWidth = 124,
+  rowHeader = 'Model',
 }: {
   title: string;
   unit: string;
   data: BarDatum[];
   footnote: React.ReactNode;
   valueFormat?: ValueFormat;
+  /** Hide the built-in chart/table switch when the parent provides its own table. */
+  showTableToggle?: boolean;
+  yAxisWidth?: number;
+  rowHeader?: string;
 }) {
   const formatValue = formatters[valueFormat];
   const [view, setView] = useState<'chart' | 'table'>('chart');
   const id = useId();
-  const summary = `${title}. ${data.map((d) => `${d.label}: ${formatValue(d.value)} ${unit}`).join('; ')}.`;
+  const summary = `${title}. ${data.map((d) => `${plain(d.label)}: ${formatValue(d.value)} ${unit}`).join('; ')}.`;
+  const height = Math.max(224, data.length * 52 + 48);
 
   const download = () => {
     const blob = new Blob([toCsv(data, `${title} (${unit})`)], { type: 'text/csv;charset=utf-8' });
@@ -74,18 +117,20 @@ export function BarChart({
           {title} <span className="text-muted font-normal">({unit})</span>
         </figcaption>
         <div className="flex gap-2">
-          <button
-            type="button"
-            className={btn}
-            onClick={() => setView(view === 'chart' ? 'table' : 'chart')}
-          >
-            {view === 'chart' ? (
-              <Table2 size={14} aria-hidden />
-            ) : (
-              <BarChart3 size={14} aria-hidden />
-            )}
-            {view === 'chart' ? 'Table view' : 'Chart view'}
-          </button>
+          {showTableToggle && (
+            <button
+              type="button"
+              className={btn}
+              onClick={() => setView(view === 'chart' ? 'table' : 'chart')}
+            >
+              {view === 'chart' ? (
+                <Table2 size={14} aria-hidden />
+              ) : (
+                <BarChart3 size={14} aria-hidden />
+              )}
+              {view === 'chart' ? 'Table view' : 'Chart view'}
+            </button>
+          )}
           <button type="button" className={btn} onClick={download}>
             <Download size={14} aria-hidden />
             CSV
@@ -94,7 +139,7 @@ export function BarChart({
       </div>
 
       {view === 'chart' ? (
-        <div role="img" aria-label={summary} className="h-56 w-full">
+        <div role="img" aria-label={summary} className="w-full" style={{ height }}>
           <ResponsiveContainer width="100%" height="100%">
             <RBarChart
               data={data}
@@ -111,13 +156,15 @@ export function BarChart({
               <YAxis
                 type="category"
                 dataKey="label"
-                width={124}
+                width={yAxisWidth}
+                interval={0}
                 stroke="var(--text-muted)"
-                tick={{ fill: 'var(--text-2)', fontSize: 12 }}
+                tick={<AxisTick />}
               />
               <Tooltip
                 cursor={{ fill: 'var(--border)' }}
                 formatter={(v) => [`${formatValue(Number(v))} ${unit}`, title]}
+                labelFormatter={(l) => plain(String(l))}
                 contentStyle={{
                   background: 'var(--bg-elevated)',
                   border: '1px solid var(--border-strong)',
@@ -137,7 +184,7 @@ export function BarChart({
                 strokeWidth={2}
               >
                 {data.map((d, i) => (
-                  <Cell key={d.label} fill={fills[i % fills.length]} />
+                  <Cell key={`${d.label}-${i}`} fill={fills[i % fills.length]} />
                 ))}
               </Bar>
             </RBarChart>
@@ -148,7 +195,7 @@ export function BarChart({
           <thead>
             <tr className="border-line text-fg-2 border-b text-left">
               <th scope="col" className="py-2 font-medium">
-                Model
+                {rowHeader}
               </th>
               <th scope="col" className="py-2 text-right font-medium">
                 {unit}
@@ -156,10 +203,10 @@ export function BarChart({
             </tr>
           </thead>
           <tbody>
-            {data.map((d) => (
-              <tr key={d.label} className="border-line/60 border-b">
+            {data.map((d, i) => (
+              <tr key={`${d.label}-${i}`} className="border-line/60 border-b">
                 <th scope="row" className="text-fg py-2 text-left font-normal">
-                  {d.label}
+                  {plain(d.label)}
                 </th>
                 <td className="text-fg py-2 text-right font-mono">{formatValue(d.value)}</td>
               </tr>

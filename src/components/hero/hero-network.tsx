@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { buildGraph, type GraphNode } from './graph';
+import { buildGraph, type GraphNode, type GraphSeed } from './graph';
 
 /** Tunables for the network. Kept together so they are easy to adjust. */
 export const networkConfig = {
@@ -23,12 +23,12 @@ type Tip = { node: GraphNode; x: number; y: number } | null;
  * reduced motion is off. Pauses when off-screen or tab hidden. Purely presentational:
  * links are also exposed as a real list in the hero for keyboard/screen-reader users.
  */
-export default function HeroNetwork() {
+export default function HeroNetwork({ seed }: { seed: GraphSeed }) {
   const router = useRouter();
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [tip, setTip] = useState<Tip>(null);
-  const graph = useMemo(() => buildGraph(), []);
+  const graph = useMemo(() => buildGraph(seed), [seed]);
 
   useEffect(() => {
     const el = canvas.current;

@@ -7,13 +7,15 @@ import { Card } from '@/components/ui/card';
 import { Counter } from '@/components/ui/counter';
 import { Container, Section } from '@/components/ui/section';
 import { RevealGroup, RevealItem, Reveal } from '@/components/ui/reveal';
-import { demoModels, demoNews, demoProviders, demoReleases, providerBySlug } from '@/lib/demo-data';
+import { demoNews, demoReleases, providerBySlug } from '@/lib/demo-data';
 import { formatDate } from '@/lib/format';
+import { getModelRepository } from '../../../server/repositories/model-repository';
+import { listProviders } from '../../../server/repositories/provider-repository';
 import { getStats } from '../../../server/services/stats';
 import { ComparisonPreview } from './comparison-preview';
 
-export function StatsSection() {
-  const s = getStats();
+export async function StatsSection() {
+  const s = await getStats();
   const items = [
     { label: 'Models', value: s.totalModels },
     { label: 'Providers', value: s.providers },
@@ -49,7 +51,8 @@ export function StatsSection() {
   );
 }
 
-export function FeaturedModels() {
+export async function FeaturedModels() {
+  const models = await getModelRepository().featured(6);
   return (
     <Section
       id="featured"
@@ -63,8 +66,8 @@ export function FeaturedModels() {
         </ButtonLink>
       }
     >
-      <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {demoModels.map((m) => (
+      <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {models.map((m) => (
           <RevealItem key={m.slug}>
             <ModelCard model={m} />
           </RevealItem>
@@ -74,7 +77,8 @@ export function FeaturedModels() {
   );
 }
 
-export function ProvidersOverview() {
+export async function ProvidersOverview() {
+  const providers = await listProviders();
   return (
     <Section
       id="providers"
@@ -87,8 +91,8 @@ export function ProvidersOverview() {
         </ButtonLink>
       }
     >
-      <RevealGroup as="ul" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {demoProviders.map((p) => (
+      <RevealGroup as="ul" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {providers.map((p) => (
           <RevealItem as="li" key={p.slug}>
             <Card className="flex h-full items-start gap-4 p-5">
               <Monogram letter={p.monogram} size={44} />
@@ -116,7 +120,8 @@ export function ProvidersOverview() {
   );
 }
 
-export function ComparisonSection() {
+export async function ComparisonSection() {
+  const models = await getModelRepository().featured(6);
   return (
     <Section
       id="compare"
@@ -126,7 +131,7 @@ export function ComparisonSection() {
       demo={<DemoBadge />}
     >
       <Reveal>
-        <ComparisonPreview />
+        <ComparisonPreview models={models} />
       </Reveal>
     </Section>
   );
@@ -183,9 +188,10 @@ export function LatestNews() {
         </ButtonLink>
       }
     >
-      <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {demoNews.map((n) => (
-          <RevealItem key={n.id}>
+      <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {demoNews.map((n, i) => (
+          // First story is featured: spans both columns at md so the 2-col grid (sm and up) has no orphan.
+          <RevealItem key={n.id} className={i === 0 ? 'sm:col-span-2 lg:col-span-1' : undefined}>
             <Card as="article" className="flex h-full flex-col p-5">
               <div className="mb-4 flex flex-wrap gap-2">
                 {n.isOfficial ? <OfficialBadge /> : <IndependentBadge />}

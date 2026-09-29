@@ -1,5 +1,3 @@
-import { demoModels, demoProviders } from '@/lib/demo-data';
-
 export type GraphNode = {
   id: string;
   label: string;
@@ -12,6 +10,12 @@ export type GraphNode = {
 };
 export type GraphEdge = { a: number; b: number };
 export type Graph = { nodes: GraphNode[]; edges: GraphEdge[] };
+
+/** What the hero needs to know about the data (fetched through the repository by the page). */
+export type GraphSeed = {
+  providers: { slug: string; name: string }[];
+  models: { slug: string; name: string; providerSlug: string }[];
+};
 
 /** Small seeded PRNG (mulberry32) so server, static fallback and canvas agree on the layout. */
 function rng(seed: number) {
@@ -26,15 +30,15 @@ function rng(seed: number) {
 
 /**
  * Providers sit on an ellipse; each model orbits its provider. Extra provider-to-provider
- * edges make it read as a network. All labels come from demo data (flagged in the UI).
+ * edges make it read as a network. Labels come from the seed (demo data is flagged in the UI).
  */
-export function buildGraph(): Graph {
+export function buildGraph(seed: GraphSeed): Graph {
   const rand = rng(7);
   const nodes: GraphNode[] = [];
   const edges: GraphEdge[] = [];
-  const n = demoProviders.length;
+  const n = seed.providers.length;
 
-  demoProviders.forEach((p, i) => {
+  seed.providers.forEach((p, i) => {
     const ang = (i / n) * Math.PI * 2 - Math.PI / 2 + (rand() - 0.5) * 0.35;
     nodes.push({
       id: p.slug,
@@ -47,7 +51,7 @@ export function buildGraph(): Graph {
     });
   });
 
-  demoModels.forEach((m) => {
+  seed.models.forEach((m) => {
     const pi = nodes.findIndex((nd) => nd.id === m.providerSlug);
     const parent = nodes[pi];
     if (!parent) return;
@@ -57,7 +61,7 @@ export function buildGraph(): Graph {
       id: m.slug,
       label: m.name,
       kind: 'model',
-      href: '/models',
+      href: `/models/${m.slug}`,
       x: Math.min(0.96, Math.max(0.04, parent.x + Math.cos(ang) * dist)),
       y: Math.min(0.94, Math.max(0.06, parent.y + Math.sin(ang) * dist)),
       radius: 3.2,
@@ -65,7 +69,7 @@ export function buildGraph(): Graph {
     edges.push({ a: pi, b: nodes.length - 1 });
   });
 
-  for (let i = 0; i < n; i++) edges.push({ a: i, b: (i + 1) % n });
-  edges.push({ a: 0, b: 3 }, { a: 1, b: 4 });
+  if (n > 1) for (let i = 0; i < n; i++) edges.push({ a: i, b: (i + 1) % n });
+  if (n > 4) edges.push({ a: 0, b: 3 }, { a: 1, b: 4 });
   return { nodes, edges };
 }

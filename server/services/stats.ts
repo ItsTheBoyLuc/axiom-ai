@@ -1,4 +1,5 @@
-import { demoModels, demoProviders } from '../../src/lib/demo-data';
+import { getModelRepository } from '../repositories/model-repository';
+import { listProviders } from '../repositories/provider-repository';
 
 export type PlatformStats = {
   totalModels: number;
@@ -11,19 +12,16 @@ export type PlatformStats = {
   lastDataUpdate: string | null;
 };
 
-/**
- * Platform statistics. Phase 1 derives them from demo data; Phase 3 replaces this with
- * database queries behind the same signature.
- */
-export function getStats(): PlatformStats {
-  const benchmarkNames = new Set(demoModels.flatMap((m) => m.benchmarks.map((b) => b.name)));
+/** Platform statistics, derived through the repository layer (demo data until Phase 3). */
+export async function getStats(now = new Date()): Promise<PlatformStats> {
+  const [s, providers] = await Promise.all([getModelRepository().stats(now), listProviders()]);
   return {
-    totalModels: demoModels.length,
-    providers: demoProviders.length,
-    releasedThisMonth: 1, // demo placeholder
-    benchmarks: benchmarkNames.size,
-    recentlyUpdated: 3, // demo placeholder
-    isDemo: true,
-    lastDataUpdate: null, // no database yet: footer shows "No data loaded yet"
+    totalModels: s.total,
+    providers: providers.length,
+    releasedThisMonth: s.releasedThisMonth,
+    benchmarks: s.benchmarks,
+    recentlyUpdated: s.recentlyUpdated,
+    isDemo: s.isDemo,
+    lastDataUpdate: s.lastDataUpdate,
   };
 }

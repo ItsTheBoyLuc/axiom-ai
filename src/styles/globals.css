@@ -73,6 +73,10 @@
 /* ---------- Base ---------- */
 html {
   background: var(--bg-primary);
+  /* Keep focused elements and anchor targets clear of the fixed navbar (top) and the
+     comparison tray (bottom): WCAG 2.2 "focus not obscured". */
+  scroll-padding-top: 5rem;
+  scroll-padding-bottom: 8rem;
   scroll-behavior: auto; /* Lenis handles smooth scrolling; disabled under reduced motion */
 }
 

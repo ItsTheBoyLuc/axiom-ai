@@ -1,11 +1,11 @@
-import { buildGraph } from './graph';
+import { buildGraph, type GraphSeed } from './graph';
 
 /**
  * Static SVG rendition of the hero network. Rendered on the server for every visitor as the
  * base layer (fast first paint) and shown alone under prefers-reduced-motion.
  */
-export function StaticNetwork({ className = '' }: { className?: string }) {
-  const { nodes, edges } = buildGraph();
+export function StaticNetwork({ seed, className = '' }: { seed: GraphSeed; className?: string }) {
+  const { nodes, edges } = buildGraph(seed);
   const W = 1000;
   const H = 640;
   return (

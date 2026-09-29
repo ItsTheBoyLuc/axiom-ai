@@ -10,6 +10,7 @@ import {
   Building2,
   type LucideIcon,
 } from 'lucide-react';
+import type { EvaluationType } from '@/types/model';
 import { verificationLabel, type VerificationStatus } from '@/lib/verification';
 
 const base =
@@ -81,4 +82,14 @@ export function Tag({ children }: { children: React.ReactNode }) {
       {children}
     </span>
   );
+}
+
+/** Independent vs provider-reported vs community: icon + label + color (docs/PROMPT.md 2, 7.6). */
+export function EvaluationBadge({ type }: { type: EvaluationType }) {
+  const status = {
+    INDEPENDENT: 'INDEPENDENTLY_EVALUATED',
+    PROVIDER_REPORTED: 'PROVIDER_REPORTED',
+    COMMUNITY: 'COMMUNITY_REPORTED',
+  } as const;
+  return <VerificationBadge status={status[type]} />;
 }

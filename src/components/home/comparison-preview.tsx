@@ -5,9 +5,11 @@ import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { providerBySlug, demoModels } from '@/lib/demo-data';
 import { formatDate, formatTokens } from '@/lib/format';
+import { latestBenchmarkResult } from '@/lib/models/benchmarks';
+import { modalitiesText, pricingSummary } from '@/lib/models/display';
 import { NOT_DISCLOSED } from '@/lib/verification';
+import type { ModelListItem } from '@/types/model';
 
 /** Recharts is heavy: load it as its own chunk, client-side only. */
 const BarChart = dynamic(() => import('@/components/charts/bar-chart').then((m) => m.BarChart), {
@@ -16,24 +18,29 @@ const BarChart = dynamic(() => import('@/components/charts/bar-chart').then((m) 
 });
 
 const MAX = 4;
-const money = (n: number) => `$${n.toFixed(2)}`;
 
 /**
- * Homepage comparison preview: pick up to 4 demo models, see a compact table and a chart.
- * Benchmarks are listed separately (never blended) and labelled provider-reported/independent.
+ * Homepage comparison preview: pick up to 4 models, see a compact table and a chart.
+ * Benchmarks are listed separately (never blended) and labelled with their evaluation type.
  */
-export function ComparisonPreview() {
-  const [selected, setSelected] = useState<string[]>(demoModels.slice(0, 3).map((m) => m.slug));
-  const models = demoModels.filter((m) => selected.includes(m.slug));
+export function ComparisonPreview({ models: all }: { models: ModelListItem[] }) {
+  const [selected, setSelected] = useState<string[]>(all.slice(0, 3).map((m) => m.slug));
+  const models = all.filter((m) => selected.includes(m.slug));
 
   const toggle = (slug: string) =>
     setSelected((cur) =>
       cur.includes(slug) ? cur.filter((s) => s !== slug) : cur.length < MAX ? [...cur, slug] : cur,
     );
 
-  const benchNames = [...new Set(models.flatMap((m) => m.benchmarks.map((b) => b.name)))];
+  const benchmarks = [
+    ...new Map(
+      models.flatMap((m) => m.benchmarks.map((b) => [b.benchmarkSlug, b.benchmarkName] as const)),
+    ),
+  ];
   const th = 'px-4 py-3 text-left text-xs font-medium tracking-wide text-muted uppercase';
   const rowHead = 'px-4 py-3 text-left text-sm font-normal text-fg-2';
+  const chartModels = models.filter((m) => m.contextWindow !== null);
+  const undisclosed = models.filter((m) => m.contextWindow === null);
 
   return (
     <div>
@@ -42,7 +49,7 @@ export function ComparisonPreview() {
         aria-label={`Choose up to ${MAX} models to compare`}
         className="mb-6 flex flex-wrap gap-2"
       >
-        {demoModels.map((m) => {
+        {all.map((m) => {
           const on = selected.includes(m.slug);
           const full = !on && selected.length >= MAX;
           return (
@@ -73,8 +80,13 @@ export function ComparisonPreview() {
           Select at least one model to see the comparison.
         </p>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
-          <div className="border-line bg-card overflow-x-auto rounded-2xl border">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_1fr]">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Comparison table"
+            className="border-line bg-card overflow-x-auto rounded-2xl border"
+          >
             <table className="w-full min-w-[520px] border-collapse text-sm">
               <caption className="sr-only">Comparison of selected demo models</caption>
               <thead>
@@ -89,9 +101,7 @@ export function ComparisonPreview() {
                       className="text-fg px-4 py-3 text-left font-medium"
                     >
                       {m.name}
-                      <span className="text-muted block text-xs font-normal">
-                        {providerBySlug(m.providerSlug)?.name}
-                      </span>
+                      <span className="text-muted block text-xs font-normal">{m.providerName}</span>
                     </th>
                   ))}
                 </tr>
@@ -113,7 +123,11 @@ export function ComparisonPreview() {
                   </th>
                   {models.map((m) => (
                     <td key={m.slug} className="text-fg px-4 py-3 font-mono">
-                      {formatTokens(m.contextWindow)}
+                      {m.contextWindow === null ? (
+                        <span className="text-fg-2 font-sans">{NOT_DISCLOSED}</span>
+                      ) : (
+                        formatTokens(m.contextWindow)
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -123,23 +137,27 @@ export function ComparisonPreview() {
                   </th>
                   {models.map((m) => (
                     <td key={m.slug} className="text-fg px-4 py-3">
-                      {m.modalities.join(', ')}
+                      {modalitiesText(m).join(', ')}
                     </td>
                   ))}
                 </tr>
                 <tr>
                   <th scope="row" className={rowHead}>
-                    Price in / out
+                    Pricing
                   </th>
-                  {models.map((m) => (
-                    <td key={m.slug} className="text-fg px-4 py-3 font-mono">
-                      {m.pricing ? (
-                        `${money(m.pricing.input)} / ${money(m.pricing.output)}`
-                      ) : (
-                        <span className="text-fg-2 font-sans">{NOT_DISCLOSED}</span>
-                      )}
-                    </td>
-                  ))}
+                  {models.map((m) => {
+                    const p = pricingSummary(m);
+                    return (
+                      <td key={m.slug} className="text-fg px-4 py-3">
+                        {p.lines.map((l) => (
+                          <span key={l} className="block font-mono text-[13px] leading-5">
+                            {l}
+                          </span>
+                        ))}
+                        {p.note && <span className="text-muted block text-xs">{p.note}</span>}
+                      </td>
+                    );
+                  })}
                 </tr>
                 <tr>
                   <th scope="row" className={rowHead}>
@@ -151,8 +169,8 @@ export function ComparisonPreview() {
                     </td>
                   ))}
                 </tr>
-                {benchNames.map((name) => (
-                  <tr key={name}>
+                {benchmarks.map(([slug, name]) => (
+                  <tr key={slug}>
                     <th scope="row" className={rowHead}>
                       {name}
                       <span className="text-muted block text-xs">
@@ -160,14 +178,21 @@ export function ComparisonPreview() {
                       </span>
                     </th>
                     {models.map((m) => {
-                      const b = m.benchmarks.find((x) => x.name === name);
+                      const b = latestBenchmarkResult(m.benchmarks, slug);
                       return (
                         <td key={m.slug} className="text-fg px-4 py-3">
                           {b ? (
                             <>
-                              <span className="font-mono">{b.score}</span>
+                              <span className="font-mono">
+                                {b.score}
+                                {b.scoreUnit}
+                              </span>
                               <span className="text-muted block text-xs">
-                                {b.type === 'INDEPENDENT' ? 'Independent' : 'Provider reported'}
+                                {b.evaluationType === 'INDEPENDENT'
+                                  ? 'Independent'
+                                  : b.evaluationType === 'COMMUNITY'
+                                    ? 'Community reported'
+                                    : 'Provider reported'}
                               </span>
                             </>
                           ) : (
@@ -182,13 +207,23 @@ export function ComparisonPreview() {
             </table>
           </div>
 
-          <BarChart
-            title="Context window"
-            unit="tokens"
-            data={models.map((m) => ({ label: m.name, value: m.contextWindow }))}
-            valueFormat="tokens"
-            footnote="Demo values for layout testing. Real figures, sources and dates arrive with the verified dataset."
-          />
+          {chartModels.length > 0 ? (
+            <BarChart
+              title="Context window"
+              unit="tokens"
+              data={chartModels.map((m) => ({ label: m.name, value: m.contextWindow ?? 0 }))}
+              valueFormat="tokens"
+              footnote={`Demo values for layout testing.${
+                undisclosed.length
+                  ? ` Not shown (${NOT_DISCLOSED.toLowerCase()}): ${undisclosed.map((m) => m.name).join(', ')}.`
+                  : ''
+              }`}
+            />
+          ) : (
+            <p className="border-line-strong text-fg-2 self-start rounded-2xl border border-dashed p-8 text-center text-sm">
+              Context window: {NOT_DISCLOSED.toLowerCase()} for the selected models.
+            </p>
+          )}
         </div>
       )}
 
