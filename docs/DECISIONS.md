@@ -13,3 +13,16 @@ Format: date - decision - reason. Locked choices from the master prompt (section
 - **Postgres and Redis ports bound to 127.0.0.1** so the compose stack is not exposed on the LAN.
 - **CSP deferred to Phase 10:** other security headers are set now in `next.config.ts`.
 - **`docs/PROMPT.md` not saved automatically:** the master prompt was pasted in chat. Save it there manually if you want it in the repo.
+
+## 2026-09-29 - Phase 1
+
+- **"Not built yet" pages for future routes:** the spec mandates nav items, hero CTAs and footer links to routes built in later phases. Rather than 404 (or hide required CTAs), `app/[slug]/page.tsx` renders an honest placeholder (`noindex`) for slugs listed in `lib/routes.ts` `pendingRoutes`. Delete a slug when its phase ships.
+- **Account menu omitted from navbar:** auth is Phase 9; rendering it now would be dead UI.
+- **Command palette is a page-navigation shell:** no category chips, recent searches or "see all results" until Phase 7 wires real search.
+- **`--text-muted` lightened to `#8A93A6` in dark theme:** the spec value `#747D90` measures ~4.2:1 on `--bg-card`, failing WCAG AA. Light-theme accents and status colors were darkened for the same reason (axe verified).
+- **Demo data uses fictional names** ("Demo Provider A", "Sample Model 1") with invented values, all `isDemo: true` and badged. No real provider/model facts are used before Phase 3.
+- **`/design` is dev-only:** returns 404 in production unless `ENABLE_DESIGN_PAGE=true` (read per request). Playwright sets it.
+- **Theme:** custom `useSyncExternalStore` provider + inline pre-paint script instead of `next-themes` (fewer dependencies, no flash).
+- **Charts:** `BarChart` takes a serializable `valueFormat` key, not a function, so server components can use it. Recharts is loaded via `next/dynamic` on the homepage.
+- **GSAP + ScrollTrigger** are dynamically imported inside `HeroScroll` (homepage only) and skipped under reduced motion.
+- **Windows gotcha:** PowerShell 5.1 `Set-Content -Encoding utf8` writes a BOM, which broke the CSS build once. Use the editor tools or `utf8NoBOM`-safe methods.

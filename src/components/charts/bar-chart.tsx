@@ -1,0 +1,173 @@
+'use client';
+
+import { useId, useState } from 'react';
+import {
+  Bar,
+  BarChart as RBarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { formatTokens } from '@/lib/format';
+import { Download, Table2, BarChart3 } from 'lucide-react';
+
+/** Serializable format key (functions cannot cross the server/client boundary). */
+export type ValueFormat = 'number' | 'tokens';
+
+const formatters: Record<ValueFormat, (v: number) => string> = {
+  number: (v) => v.toLocaleString('en-US'),
+  tokens: formatTokens,
+};
+
+export type BarDatum = { label: string; value: number };
+
+/** Bar fills. Meaning never relies on color alone: every bar has an axis label, and the table view lists values. */
+const fills = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)', 'var(--text-2)'];
+
+function toCsv(rows: BarDatum[], valueHeader: string) {
+  const esc = (s: string) => `"${s.replaceAll('"', '""')}"`;
+  return ['Label,' + esc(valueHeader), ...rows.map((r) => `${esc(r.label)},${r.value}`)].join('\n');
+}
+
+/**
+ * Themed horizontal bar chart (Recharts) with units, tooltip, source/methodology footnote,
+ * a table alternative, CSV download and a text summary for screen readers.
+ */
+export function BarChart({
+  title,
+  unit,
+  data,
+  footnote,
+  valueFormat = 'number',
+}: {
+  title: string;
+  unit: string;
+  data: BarDatum[];
+  footnote: React.ReactNode;
+  valueFormat?: ValueFormat;
+}) {
+  const formatValue = formatters[valueFormat];
+  const [view, setView] = useState<'chart' | 'table'>('chart');
+  const id = useId();
+  const summary = `${title}. ${data.map((d) => `${d.label}: ${formatValue(d.value)} ${unit}`).join('; ')}.`;
+
+  const download = () => {
+    const blob = new Blob([toCsv(data, `${title} (${unit})`)], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.toLowerCase().replace(/\W+/g, '-')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const btn =
+    'inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-2.5 text-xs text-fg-2 hover:border-line-strong hover:text-fg';
+
+  return (
+    <figure aria-labelledby={`${id}-t`} className="border-line bg-card rounded-2xl border p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <figcaption id={`${id}-t`} className="text-fg text-sm font-medium">
+          {title} <span className="text-muted font-normal">({unit})</span>
+        </figcaption>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className={btn}
+            onClick={() => setView(view === 'chart' ? 'table' : 'chart')}
+          >
+            {view === 'chart' ? (
+              <Table2 size={14} aria-hidden />
+            ) : (
+              <BarChart3 size={14} aria-hidden />
+            )}
+            {view === 'chart' ? 'Table view' : 'Chart view'}
+          </button>
+          <button type="button" className={btn} onClick={download}>
+            <Download size={14} aria-hidden />
+            CSV
+          </button>
+        </div>
+      </div>
+
+      {view === 'chart' ? (
+        <div role="img" aria-label={summary} className="h-56 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <RBarChart
+              data={data}
+              layout="vertical"
+              margin={{ left: 8, right: 16, top: 4, bottom: 4 }}
+            >
+              <CartesianGrid horizontal={false} stroke="var(--border)" />
+              <XAxis
+                type="number"
+                stroke="var(--text-muted)"
+                tick={{ fill: 'var(--text-2)', fontSize: 12 }}
+                tickFormatter={formatValue}
+              />
+              <YAxis
+                type="category"
+                dataKey="label"
+                width={104}
+                stroke="var(--text-muted)"
+                tick={{ fill: 'var(--text-2)', fontSize: 12 }}
+              />
+              <Tooltip
+                cursor={{ fill: 'var(--border)' }}
+                formatter={(v) => [`${formatValue(Number(v))} ${unit}`, title]}
+                contentStyle={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-strong)',
+                  borderRadius: 10,
+                  color: 'var(--text)',
+                }}
+                labelStyle={{ color: 'var(--text)' }}
+                itemStyle={{ color: 'var(--text-2)' }}
+              />
+              <Bar
+                dataKey="value"
+                radius={[0, 6, 6, 0]}
+                isAnimationActive
+                animationDuration={700}
+                animationEasing="ease-out"
+                stroke="var(--bg-card)"
+                strokeWidth={2}
+              >
+                {data.map((d, i) => (
+                  <Cell key={d.label} fill={fills[i % fills.length]} />
+                ))}
+              </Bar>
+            </RBarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-line text-fg-2 border-b text-left">
+              <th scope="col" className="py-2 font-medium">
+                Model
+              </th>
+              <th scope="col" className="py-2 text-right font-medium">
+                {unit}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((d) => (
+              <tr key={d.label} className="border-line/60 border-b">
+                <th scope="row" className="text-fg py-2 text-left font-normal">
+                  {d.label}
+                </th>
+                <td className="text-fg py-2 text-right font-mono">{formatValue(d.value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <p className="text-muted mt-3 text-xs">{footnote}</p>
+    </figure>
+  );
+}

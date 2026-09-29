@@ -1,12 +1,217 @@
 @import 'tailwindcss';
 
-/* Design tokens arrive in Phase 1. Minimal base so the foundation renders sanely. */
-:root {
+/* ---------- Design tokens (docs/PROMPT.md section 5). Dark is the default theme. ---------- */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
   --bg-primary: #08090c;
+  --bg-secondary: #0d0f14;
+  --bg-elevated: #12151c;
+  --bg-card: #151821;
+  --accent: #5685ff;
+  --accent-2: #43d9f5;
+  --accent-3: #9b7bff;
+  --accent-fg: #06080f; /* text on solid accent */
   --text: #f5f7fa;
+  --text-2: #a0a7b7;
+  --text-muted: #8a93a6; /* spec value #747D90 fails AA on cards; lightened, see DECISIONS.md */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 24px 60px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-strong);
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --grid-line: rgba(255, 255, 255, 0.035);
+}
+
+/* Light theme: same hues, adjusted for WCAG AA on off-white. */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg-primary: #f7f8fa;
+  --bg-secondary: #eff1f5;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --accent: #2350cf;
+  --accent-2: #0e6577;
+  --accent-3: #5b36c9;
+  --accent-fg: #ffffff;
+  --text: #0b0d12;
+  --text-2: #444b5c;
+  --text-muted: #5a6376;
+  --border: rgba(11, 13, 18, 0.1);
+  --border-strong: rgba(11, 13, 18, 0.18);
+  --shadow-card: 0 1px 2px rgba(11, 13, 18, 0.05), 0 8px 24px -14px rgba(11, 13, 18, 0.18);
+  --shadow-pop: 0 24px 60px -24px rgba(11, 13, 18, 0.35), 0 0 0 1px var(--border-strong);
+  --ok: #166534;
+  --warn: #854d0e;
+  --danger: #b91c1c;
+  --grid-line: rgba(11, 13, 18, 0.05);
+}
+
+@theme inline {
+  --color-bg: var(--bg-primary);
+  --color-bg-2: var(--bg-secondary);
+  --color-elevated: var(--bg-elevated);
+  --color-card: var(--bg-card);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+  --color-accent-fg: var(--accent-fg);
+  --color-fg: var(--text);
+  --color-fg-2: var(--text-2);
+  --color-muted: var(--text-muted);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* ---------- Base ---------- */
+html {
+  background: var(--bg-primary);
+  scroll-behavior: auto; /* Lenis handles smooth scrolling; disabled under reduced motion */
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fluid type scale */
+.t-display {
+  font-size: clamp(2.5rem, 1.2rem + 5.6vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+.t-h2 {
+  font-size: clamp(1.75rem, 1.1rem + 2.4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+.t-h3 {
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+.t-lead {
+  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--text-2);
+}
+.t-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Faint grid + noise texture and ambient gradients */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 75%);
+}
+.bg-ambient {
+  background:
+    radial-gradient(
+      60% 50% at 50% 0%,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40% 40% at 90% 20%,
+      color-mix(in srgb, var(--accent-3) 9%, transparent),
+      transparent 70%
+    );
+}
+.bg-noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Focus ring: always visible for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Card spotlight follows the cursor via --mx/--my set from JS */
+.spotlight {
+  position: relative;
+}
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    transparent 70%
+  );
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 25%,
+    color-mix(in srgb, var(--text) 6%, var(--bg-elevated)) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Reduced motion: keep only short opacity fades */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.12s !important;
+    scroll-behavior: auto !important;
+  }
+  .skeleton {
+    animation: none;
+  }
 }

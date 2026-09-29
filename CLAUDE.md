@@ -1,5 +1,7 @@
 # AXIOM AI - project instructions
 
+> **Source of truth:** `docs/PROMPT.md` holds the full master prompt (all specs, routes, data model, API, phases). Read it before starting any phase. If this file and the prompt disagree, the prompt wins unless `docs/DECISIONS.md` records an override. The sections below are a condensed working summary.
+
 Premium web platform for discovering, researching, benchmarking and comparing AI models. Tagline: "The Intelligence Standard." Quality bar: Linear / Vercel / Stripe. Not a template.
 
 ## 1. Operating rules
@@ -52,4 +54,4 @@ docker compose down -v           # stop and wipe volumes
 
 ## Status
 
-Step 0 (foundation) complete. Next: Phase 1 (brand + design system + homepage) after user go-ahead.
+Step 0 and Phase 1 (brand, design system, homepage on demo data) complete. Next: Phase 2 (model directory) after user go-ahead. Pending housekeeping: docs/PROMPT.md (needs source path), GitHub remote.

@@ -1,4 +1,4 @@
-﻿# Local full stack: `docker compose up -d --build`. Requires a .env (copy .env.example).
+# Local full stack: `docker compose up -d --build`. Requires a .env (copy .env.example).
 name: axiom-ai
 
 x-app-env: &app-env
