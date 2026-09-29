@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+/* Design tokens arrive in Phase 1. Minimal base so the foundation renders sanely. */
+:root {
+  --bg-primary: #08090c;
+  --text: #f5f7fa;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text);
+}

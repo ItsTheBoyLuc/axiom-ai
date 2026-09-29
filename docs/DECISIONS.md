@@ -1,0 +1,15 @@
+# Decisions log
+
+Format: date - decision - reason. Locked choices from the master prompt (section 3) are not repeated here.
+
+## 2026-09-29 - Step 0
+
+- **Repo location:** `axiom-ai/` subfolder of the VSC workspace, with its own git repo, so it stays isolated from the other projects there.
+- **Next.js 16 / React 19 / Tailwind 4 / Zod 4 / Prisma 7:** latest stable resolved by npm at scaffold time. Prisma CLI pinned to `^7` to match `@prisma/client` (npm had resolved the CLI to an 8.0 release candidate).
+- **Prisma 7 config:** connection URL lives in `prisma.config.ts`; the schema is a stub until Phase 3.
+- **Health check uses `pg` directly:** avoids needing the Prisma client/adapter before the schema exists. Phase 3 will reuse `pg` via `@prisma/adapter-pg`.
+- **Worker runs through `tsx` in production:** the worker shares `src/lib` and `server/` TypeScript with the web app, so this avoids a second build pipeline. `tsx` is a runtime dependency. Revisit (esbuild bundle) in Phase 10 if image size matters.
+- **One Dockerfile, two targets (`web`, `worker`):** shared dependency layers, non-root users, healthchecks on both.
+- **Postgres and Redis ports bound to 127.0.0.1** so the compose stack is not exposed on the LAN.
+- **CSP deferred to Phase 10:** other security headers are set now in `next.config.ts`.
+- **`docs/PROMPT.md` not saved automatically:** the master prompt was pasted in chat. Save it there manually if you want it in the repo.

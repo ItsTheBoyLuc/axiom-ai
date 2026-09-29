@@ -1,0 +1,59 @@
+﻿# Local full stack: `docker compose up -d --build`. Requires a .env (copy .env.example).
+name: axiom-ai
+
+x-app-env: &app-env
+  NODE_ENV: production
+  APP_URL: ${APP_URL:-http://localhost:3000}
+  DATABASE_URL: postgresql://${POSTGRES_USER:-axiom}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-axiom}
+  REDIS_URL: redis://redis:6379
+  AUTH_SECRET: ${AUTH_SECRET:-}
+  WORKER_HEALTH_PORT: ${WORKER_HEALTH_PORT:-3001}
+
+services:
+  web:
+    build: { context: ., dockerfile: docker/Dockerfile, target: web }
+    ports: ['${WEB_PORT:-3000}:3000']
+    environment: *app-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    restart: unless-stopped
+
+  worker:
+    build: { context: ., dockerfile: docker/Dockerfile, target: worker }
+    environment: *app-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-axiom}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-axiom}
+    volumes: ['pgdata:/var/lib/postgresql/data']
+    ports: ['127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432'] # loopback only
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes: ['redisdata:/data']
+    ports: ['127.0.0.1:${REDIS_HOST_PORT:-6379}:6379'] # loopback only
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:

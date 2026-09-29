@@ -1,0 +1,9 @@
+// Full data model (docs section 9) lands in Phase 3. Step 0 only wires the toolchain.
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
