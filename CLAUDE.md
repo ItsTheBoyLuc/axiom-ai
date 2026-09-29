@@ -14,6 +14,7 @@ Premium web platform for discovering, researching, benchmarking and comparing AI
 6. Update this file when a decision changes; log decisions in `docs/DECISIONS.md`.
 7. Ask only when blocked; otherwise pick the conventional option and record it.
 8. Windows 11 host: cross-platform npm scripts, LF line endings, PowerShell for shell examples.
+   **All files must be UTF-8 without BOM.** Windows PowerShell 5.1 `Set-Content`/`Out-File -Encoding utf8` adds a BOM, which has already broken the CSS build and polluted `.env`. Create and edit files with the Write/Edit tools (or Bash `sed`), never PowerShell 5.1 `Set-Content`; if unavoidable, use `[System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding $false))`. Check with `grep -rlI $'^\xEF\xBB\xBF' --exclude-dir=node_modules --exclude-dir=.next .`.
 9. Small files. Business logic in `server/` and `src/lib/`, presentation in `src/components/`.
 
 ## 2. Data integrity (non-negotiable)

@@ -111,7 +111,7 @@ export function BarChart({
               <YAxis
                 type="category"
                 dataKey="label"
-                width={104}
+                width={124}
                 stroke="var(--text-muted)"
                 tick={{ fill: 'var(--text-2)', fontSize: 12 }}
               />

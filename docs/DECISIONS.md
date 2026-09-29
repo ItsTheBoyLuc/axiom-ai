@@ -26,3 +26,12 @@ Format: date - decision - reason. Locked choices from the master prompt (section
 - **Charts:** `BarChart` takes a serializable `valueFormat` key, not a function, so server components can use it. Recharts is loaded via `next/dynamic` on the homepage.
 - **GSAP + ScrollTrigger** are dynamically imported inside `HeroScroll` (homepage only) and skipped under reduced motion.
 - **Windows gotcha:** PowerShell 5.1 `Set-Content -Encoding utf8` writes a BOM, which broke the CSS build once. Use the editor tools or `utf8NoBOM`-safe methods.
+
+## 2026-09-29 - npm audit fix (CI)
+
+- **Finding:** `npm audit --audit-level=high` failed with 4 high advisories, all transitive via `prisma@7.10.0` (the CLI, which `@prisma/client` also pulls in): `deepmerge-ts <8` (stack exhaustion on recursive objects, via `@prisma/config`) and `mysql2 <=3.23.0` (credential leak on auth-plugin downgrade; zlib decompression bomb). Not a direct dependency. `npm audit --omit=dev` also flagged them, because `prisma` is installed as a dependency of `@prisma/client`.
+- **Reachability:** we use PostgreSQL only and never load the MySQL driver. `deepmerge-ts` only merges our own trusted `prisma.config.ts`. Real-world exposure is very low, but a fix was available so we took it instead of relaxing the audit.
+- **Fix:** `overrides` in `package.json` pin `mysql2@^3.24.4` (same major) and `deepmerge-ts@^8.0.2` (major bump). No upstream 7.x release fixes this: `prisma@7.10.0` is the latest 7.x and pins the old versions exactly. `npm audit fix` (without `--force`) could not resolve it, and `--force` would downgrade Prisma to 6.x, which is out of policy (keep ^7).
+- **Verified:** `npm audit` reports 0 vulnerabilities. `prisma --version`, `prisma validate` and `prisma generate` all work, and the CLI loads `prisma.config.ts` (the `deepmerge-ts` code path) correctly. Re-verify with `prisma migrate` in Phase 3.
+- **Remove the overrides when:** a Prisma 7.x release ships with `deepmerge-ts >=8` and `mysql2 >3.23` itself. Review at the start of Phase 3 and Phase 10, whichever comes first (time limit: 2026-12-31).
+- **CI:** `actions/checkout` and `actions/setup-node` bumped to v7 (current majors), which also clears the Node 20 deprecation warning.

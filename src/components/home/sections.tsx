@@ -183,7 +183,7 @@ export function LatestNews() {
         </ButtonLink>
       }
     >
-      <RevealGroup className="grid gap-5 md:grid-cols-3">
+      <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {demoNews.map((n) => (
           <RevealItem key={n.id}>
             <Card as="article" className="flex h-full flex-col p-5">
