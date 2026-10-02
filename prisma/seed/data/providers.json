@@ -89,5 +89,70 @@
     "verifiedAt": "2026-10-02T19:45:00Z",
     "collectedAt": "2026-10-02T19:45:00Z",
     "isDemo": false
+  },
+  {
+    "slug": "microsoft",
+    "name": "Microsoft",
+    "monogram": "M",
+    "description": "Microsoft AI builds the in-house MAI model family, offered through Microsoft Foundry and Microsoft products.",
+    "officialWebsite": "https://microsoft.ai",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://microsoft.ai/news/introducing-mai-thinking-1/",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "nvidia",
+    "name": "NVIDIA",
+    "monogram": "N",
+    "description": "NVIDIA publishes the Nemotron family of open models, released with open checkpoints and technical reports.",
+    "officialWebsite": "https://www.nvidia.com",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://research.nvidia.com/labs/nemotron/Nemotron-3-Ultra/",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "alibaba",
+    "name": "Alibaba (Qwen)",
+    "monogram": "Q",
+    "description": "Alibaba's Qwen team builds the Qwen model family, served through Alibaba Cloud Model Studio and QwenCloud, with open-weight releases on Hugging Face.",
+    "officialWebsite": "https://qwen.ai",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://qwen.ai/blog?id=qwen3.8",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "cohere",
+    "name": "Cohere",
+    "monogram": "C",
+    "description": "Enterprise AI company that builds the Command family of language models, plus embedding, rerank and speech models, with a focus on private and sovereign deployment.",
+    "officialWebsite": "https://cohere.com",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://docs.cohere.com/docs/models",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "amazon",
+    "name": "Amazon",
+    "monogram": "A",
+    "description": "Amazon builds the Nova family of foundation models, offered through Amazon Bedrock.",
+    "officialWebsite": "https://aws.amazon.com/nova/",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://docs.aws.amazon.com/nova/latest/nova2-userguide/what-is-nova-2.html",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
   }
 ]

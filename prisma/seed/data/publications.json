@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "provider": "cohere",
+    "title": "Command A: An Enterprise-Ready Large Language Model",
+    "url": "https://arxiv.org/abs/2504.00698",
+    "publishedAt": "2025-04-01",
+    "venue": "arXiv",
+    "sourceUrl": "https://arxiv.org/abs/2504.00698",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "provider": "amazon",
+    "title": "Amazon Nova Premier: Technical report and model card",
+    "url": "https://www.amazon.science/publications/amazon-nova-premier-technical-report-and-model-card",
+    "publishedAt": "2025-04-30",
+    "venue": "Amazon Technical Reports",
+    "sourceUrl": "https://www.amazon.science/publications/amazon-nova-premier-technical-report-and-model-card",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "provider": "nvidia",
+    "title": "NVIDIA Nemotron 3 Ultra Technical Report",
+    "url": "https://research.nvidia.com/labs/nemotron/files/NVIDIA-Nemotron-3-Ultra-Technical-Report.pdf",
+    "publishedAt": "2026-06-04",
+    "venue": "NVIDIA technical report",
+    "sourceUrl": "https://research.nvidia.com/labs/nemotron/files/NVIDIA-Nemotron-3-Ultra-Technical-Report.pdf",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "provider": "deepseek",
+    "title": "DeepSeek V4 Technical Documentation",
+    "url": "https://fe-static.deepseek.com/chat/transparency/deepseek-V4-model-card-EN.pdf",
+    "publishedAt": "2026-04-27",
+    "venue": "DeepSeek technical documentation",
+    "sourceUrl": "https://fe-static.deepseek.com/chat/transparency/deepseek-V4-model-card-EN.pdf",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "provider": "openai",
+    "title": "GPT-6 Astra System Card",
+    "url": "https://deploymentsafety.openai.com/gpt-6-astra",
+    "publishedAt": "2026-09-03",
+    "venue": "OpenAI system card",
+    "sourceUrl": "https://deploymentsafety.openai.com/gpt-6-astra",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "provider": "google-deepmind",
+    "title": "Gemini 3.8 Flash model card",
+    "url": "https://deepmind.google/models/model-cards/gemini-3-8-flash/",
+    "publishedAt": "2026-09-02",
+    "venue": "Google DeepMind model card",
+    "sourceUrl": "https://deepmind.google/models/model-cards/gemini-3-8-flash/",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  }
+]

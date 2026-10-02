@@ -1887,5 +1887,534 @@
     "verifiedAt": "2026-10-02T19:45:00Z",
     "collectedAt": "2026-10-02T19:45:00Z",
     "isDemo": false
+  },
+  {
+    "architecture": "Sparse mixture of experts, about 1T total parameters with 35B active.",
+    "trainingInfo": "Trained without distillation from third-party models, per Microsoft.",
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": ["Public preview"],
+    "notableFeatures": [
+      "Encrypted chain-of-thought",
+      "Developer instructions and function calling",
+      "Foundry evaluation, safety and observability"
+    ],
+    "useCases": ["Enterprise reasoning", "Software engineering", "Mathematical reasoning"],
+    "maxOutputTokens": 64000,
+    "slug": "mai-thinking-1",
+    "provider": "microsoft",
+    "name": "MAI-Thinking-1",
+    "family": "MAI",
+    "version": null,
+    "description": "Microsoft AI's first reasoning model: a medium-sized sparse mixture-of-experts model for complex enterprise tasks, mathematics and software engineering, in public preview on Microsoft Foundry.",
+    "categories": ["llm", "reasoning", "coding"],
+    "releaseDate": "2026-08-12",
+    "contextWindow": 256000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure",
+    "apiAvailability": "Microsoft Foundry (public preview), OpenAI Chat Completions compatible; global deployment.",
+    "purpose": "Microsoft reasoning model for enterprise, maths and coding work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://microsoft.ai/news/introducing-mai-thinking-1/",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "LatentMoE hybrid of Mamba-2, mixture-of-experts and attention layers with multi-token prediction; 550B total, 55B active parameters.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": null,
+    "functionCalling": null,
+    "limitations": [],
+    "notableFeatures": [
+      "OpenMDW-1.1 licence",
+      "Up to 1M-token context",
+      "Technical report published"
+    ],
+    "useCases": ["Agentic workflows", "Long-context analysis", "Code, maths and science reasoning"],
+    "maxOutputTokens": null,
+    "slug": "nemotron-3-ultra",
+    "provider": "nvidia",
+    "name": "Nemotron 3 Ultra",
+    "family": "Nemotron",
+    "version": "3",
+    "description": "NVIDIA's most capable open language model: a 550B-parameter hybrid Mamba-Transformer mixture-of-experts model pre-trained in NVFP4, built for multi-step agents and long-context reasoning.",
+    "categories": ["llm", "reasoning", "coding"],
+    "releaseDate": "2026-06-04",
+    "contextWindow": 1000000,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["local", "open-weights"],
+    "pricingKind": "free",
+    "inputModalities": ["text"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://research.nvidia.com/labs/nemotron/Nemotron-3-Ultra/",
+    "apiAvailability": "Open checkpoints on Hugging Face under the OpenMDW-1.1 licence; model card on build.nvidia.com.",
+    "purpose": "Open model for complex multi-step agents and high-accuracy reasoning over code, maths and science.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Hybrid of Mamba-2, mixture-of-experts and attention layers; 30B total, 3B active parameters.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": null,
+    "functionCalling": null,
+    "limitations": [],
+    "notableFeatures": ["OpenMDW-1.1 licence", "256K context on a single H100, up to 1M in total"],
+    "useCases": ["Agentic tasks", "Domain adaptation and post-training"],
+    "maxOutputTokens": null,
+    "slug": "nemotron-3-5-lightning",
+    "provider": "nvidia",
+    "name": "Nemotron 3.5 Lightning",
+    "family": "Nemotron",
+    "version": "3.5",
+    "description": "Fast open 30B-parameter mixture-of-experts model (3B active) for specialised agentic tasks, released with several speculative-decoding methods.",
+    "categories": ["llm", "reasoning", "coding"],
+    "releaseDate": "2026-08-11",
+    "contextWindow": 1000000,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["local", "open-weights"],
+    "pricingKind": "free",
+    "inputModalities": ["text"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+    "apiAvailability": "Open checkpoints on Hugging Face (BF16 reference weights, quantised variants) under the OpenMDW-1.1 licence.",
+    "purpose": "Fast open model for specialised agentic tasks.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Mixture of experts with 2.4T total parameters and 95B active; the open variant has 512 experts, 10 active per token.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": null,
+    "functionCalling": null,
+    "limitations": [
+      "The open-weight Qwen3.8-2.4T-A95B is text-only with mandatory thinking and a 262,144-token native context; the hosted Max adds vision, non-thinking mode, 1M context and built-in tools"
+    ],
+    "notableFeatures": [
+      "First Qwen Max-class model with open weights",
+      "Reasoning effort xhigh, medium or low on the open variant"
+    ],
+    "useCases": ["Agentic coding", "Cowork tasks", "Research", "Long-horizon tasks"],
+    "maxOutputTokens": null,
+    "slug": "qwen3-8-max",
+    "provider": "alibaba",
+    "name": "Qwen3.8-Max",
+    "family": "Qwen",
+    "version": "3.8",
+    "description": "Alibaba's largest and most capable Qwen model: 2.4T parameters (95B active), built for coding, cowork and long-horizon tasks. A text-only open-weight variant is published separately.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-08-03",
+    "contextWindow": 1000000,
+    "openWeights": true,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "open-weights", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://qwen.ai/blog?id=qwen3.8",
+    "apiAvailability": "QwenCloud and Alibaba Cloud Model Studio. Open weights as Qwen3.8-2.4T-A95B on Hugging Face under a custom licence.",
+    "purpose": "Qwen flagship for coding, work and research tasks.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://qwen.ai/blog?id=qwen3.8",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Mixture of experts with a 125B main model plus 51B N-gram embeddings, 6B active per token, with a 4B multi-token-prediction module.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": null,
+    "functionCalling": null,
+    "limitations": [],
+    "notableFeatures": [
+      "Native 262K context, extendable to 1M",
+      "Thinking and reasoning-effort controls"
+    ],
+    "useCases": ["Agentic coding", "Multimodal understanding", "High-volume workloads"],
+    "maxOutputTokens": null,
+    "slug": "qwen3-8-flash",
+    "provider": "alibaba",
+    "name": "Qwen3.8-Flash",
+    "family": "Qwen",
+    "version": "3.8",
+    "description": "Efficient multimodal mixture-of-experts Qwen model (125B parameters, 6B active) with a new architecture that is an early preview of Qwen4; open weights are published as Qwen3.8-Flash-Next.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-08-27",
+    "contextWindow": 262144,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://www.alibabacloud.com/blog/alibaba-releases-qwen3-8-flash-with-innovative-model-architecture-delivering-optimal-price-performance_603503",
+    "apiAvailability": "Alibaba Cloud Model Studio and QwenCloud; open weights on Hugging Face and ModelScope under the Qwen Community 1.0 licence.",
+    "purpose": "Price-efficient Qwen model for agentic and multimodal work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://www.alibabacloud.com/blog/alibaba-releases-qwen3-8-flash-with-innovative-model-architecture-delivering-optimal-price-performance_603503",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Sparse mixture of experts with 218B total parameters and 25B active.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [
+      "The API rate limit for production use of Command A+ is arranged through Cohere sales"
+    ],
+    "notableFeatures": [
+      "Apache 2.0 licence",
+      "Runs on two H100s or one Blackwell GPU with W4A4 weights",
+      "48 languages"
+    ],
+    "useCases": [
+      "Agentic workflows",
+      "RAG",
+      "Multilingual work in 48 languages",
+      "Multimodal document processing"
+    ],
+    "maxOutputTokens": 64000,
+    "slug": "command-a-plus",
+    "provider": "cohere",
+    "name": "Command A+",
+    "family": "Command A",
+    "version": "+",
+    "description": "Cohere's first mixture-of-experts model and the last of the Command A family: it unifies vision input, reasoning, translation and agentic tool use, and is released as open weights.",
+    "categories": ["llm", "reasoning", "multimodal"],
+    "releaseDate": "2026-05-20",
+    "contextWindow": 128000,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "custom",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.cohere.com/docs/command-a-plus",
+    "apiAvailability": "Cohere API (model ID command-a-plus-05-2026), Model Vault managed inference, and weights on Hugging Face under Apache 2.0 (BF16, FP8, W4A4).",
+    "purpose": "Cohere model for enterprise agents, RAG and multimodal document work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://cohere.com/blog/command-a-plus",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Dense model with 111B parameters.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": ["The published weights use a non-commercial licence (CC-BY-NC-4.0)"],
+    "notableFeatures": [],
+    "useCases": ["Agents", "RAG", "Multilingual enterprise use"],
+    "maxOutputTokens": 8000,
+    "slug": "command-a",
+    "provider": "cohere",
+    "name": "Command A",
+    "family": "Command A",
+    "version": null,
+    "description": "Cohere's dense 111B model for tool use, agents, retrieval-augmented generation and multilingual work in 23 languages.",
+    "categories": ["llm"],
+    "releaseDate": "2025-03-12",
+    "contextWindow": 256000,
+    "openWeights": true,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "custom",
+    "inputModalities": ["text"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.cohere.com/docs/command-a",
+    "apiAvailability": "Cohere API (model ID command-a-03-2025); research weights on Hugging Face under CC-BY-NC-4.0.",
+    "purpose": "Cohere model for tool use, agents and RAG.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://docs.cohere.com/docs/command-a",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": null,
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": null,
+    "functionCalling": null,
+    "limitations": [],
+    "notableFeatures": [
+      "Thinking effort low, medium or high",
+      "Built-in code interpreter and web grounding",
+      "Remote MCP tools"
+    ],
+    "useCases": [
+      "High-volume applications",
+      "Document and video analysis",
+      "Agents with built-in tools"
+    ],
+    "maxOutputTokens": 65536,
+    "slug": "amazon-nova-2-lite",
+    "provider": "amazon",
+    "name": "Amazon Nova 2 Lite",
+    "family": "Amazon Nova",
+    "version": "2",
+    "description": "Fast, cost-effective reasoning model for everyday, high-volume workloads, with a one-million-token context window and three thinking levels.",
+    "categories": ["llm", "reasoning", "multimodal"],
+    "releaseDate": "2025-12-02",
+    "contextWindow": 1000000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.aws.amazon.com/nova/latest/nova2-userguide/what-is-nova-2.html",
+    "apiAvailability": "Amazon Bedrock via global cross-Region inference; can be customised with fine-tuning on Bedrock and SageMaker AI.",
+    "purpose": "Amazon general model for fast, low-cost reasoning.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://aws.amazon.com/blogs/aws/introducing-amazon-nova-2-lite-a-fast-cost-effective-reasoning-model/",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T20:20:00Z",
+    "collectedAt": "2026-10-02T20:20:00Z",
+    "isDemo": false
   }
 ]
