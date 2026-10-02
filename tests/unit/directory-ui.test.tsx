@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FilterGroups } from '@/components/models/directory/filter-groups';
@@ -175,6 +175,46 @@ describe('SearchBox', () => {
     await userEvent.keyboard('{Enter}');
     expect(push).toHaveBeenCalledWith('/models/sample-model-2');
     expect(list).toBeDefined();
+  });
+
+  describe('opening a suggested model while the debounced ?q= update is still pending', () => {
+    // Regression: the pending `replace('/models?q=...')` used to fire after `push('/models/<slug>')`
+    // while the profile page was still loading, sending the user back to the directory. Fake timers
+    // make the "still pending" state exact instead of depending on machine speed. fireEvent (not
+    // userEvent) because RTL's async wrapper only advances jest fake timers and would hang here.
+    const openWithPendingDebounce = async (choose: () => void) => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        setup();
+        const box = screen.getByRole('combobox');
+        fireEvent.change(box, { target: { value: 'sample' } }); // schedules ?q= in 250ms
+        await act(() => vi.advanceTimersByTimeAsync(150)); // suggestions arrive after 120ms
+        expect(screen.getAllByRole('option')).toHaveLength(2);
+        expect(replace).not.toHaveBeenCalled(); // still pending
+
+        choose();
+        expect(push).toHaveBeenCalledWith('/models/sample-model-1');
+
+        await act(() => vi.advanceTimersByTimeAsync(1_000)); // the debounce window passes
+        expect(replace).not.toHaveBeenCalled();
+      } finally {
+        vi.useRealTimers();
+      }
+    };
+
+    it('Enter cancels it', async () => {
+      await openWithPendingDebounce(() => {
+        const box = screen.getByRole('combobox');
+        fireEvent.keyDown(box, { key: 'ArrowDown' });
+        fireEvent.keyDown(box, { key: 'Enter' });
+      });
+    });
+
+    it('clicking a suggestion cancels it', async () => {
+      await openWithPendingDebounce(() => {
+        fireEvent.click(screen.getAllByRole('option')[0]!);
+      });
+    });
   });
 
   it('Enter without a highlighted suggestion applies the search to the URL', async () => {

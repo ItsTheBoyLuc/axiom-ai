@@ -16,7 +16,7 @@ Living status of the build. `CLAUDE.md` holds the rules, `docs/PROMPT.md` the sp
 ## Phase 3a verification (2026-10-02)
 
 - Migrations apply to an empty database; `prisma migrate diff` reports no drift.
-- Unit 199, integration 206, Playwright 70: all pass. Typecheck, lint and production build are clean (the build needs no database).
+- Unit 201, integration 206, Playwright 70: all pass (CI e2e caught a search debounce race, fixed in the follow-up commit). Typecheck, lint and production build are clean (the build needs no database).
 - Demo seed (`npm run db:seed:demo`) is idempotent: 16 models, 7 providers, 26 prices, 21 benchmark results.
 - Full Docker stack: `migrate` exits 0, `web`, `worker`, `postgres`, `redis` healthy, web runs as a non-root user, `/api/v1/health` is ok.
 - Prisma overrides reviewed: still required (no fixed 7.x release). See `docs/DECISIONS.md`.

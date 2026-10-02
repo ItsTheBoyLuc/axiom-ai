@@ -88,6 +88,16 @@ export function SearchBox() {
     navigate({ q: value.trim() }, { replace: false });
   };
 
+  /**
+   * Opens a suggested model. The pending debounced `?q=` update must be cancelled first, or it
+   * can fire while the profile page is still loading and send the user back to the directory.
+   */
+  const openModel = (slug: string) => {
+    clearTimeout(urlTimer.current);
+    setOpen(false);
+    router.push(`/models/${slug}`);
+  };
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setTerm(v);
@@ -124,8 +134,7 @@ export function SearchBox() {
         e.preventDefault();
         const chosen = expanded ? items[active] : undefined;
         if (chosen) {
-          setOpen(false);
-          router.push(`/models/${chosen.slug}`);
+          openModel(chosen.slug);
         } else {
           setOpen(false);
           applySearch(e.currentTarget.value);
@@ -217,10 +226,7 @@ export function SearchBox() {
                 aria-selected={i === active}
                 onMouseDown={(e) => e.preventDefault()}
                 onMouseEnter={() => setActive(i)}
-                onClick={() => {
-                  setOpen(false);
-                  router.push(`/models/${s.slug}`);
-                }}
+                onClick={() => openModel(s.slug)}
                 className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm ${
                   i === active ? 'bg-card text-fg' : 'text-fg-2'
                 }`}
