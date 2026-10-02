@@ -93,6 +93,41 @@ export type ReleaseQuery = {
   pageSize: number;
 };
 
+/**
+ * Controlled vocabulary for Benchmark.category (kebab-case keys). The first eight are the rows of
+ * the profile capabilities matrix; a benchmark only evidences a row when its category is that key.
+ */
+export const BENCHMARK_CATEGORIES = [
+  'reasoning',
+  'coding',
+  'mathematics',
+  'multimodal',
+  'long-context',
+  'tool-use',
+  'instruction-following',
+  'creative-writing',
+  'computer-use',
+  'browsing',
+  'professional-work',
+  'science',
+] as const;
+export type BenchmarkCategoryKey = (typeof BENCHMARK_CATEGORIES)[number];
+
+export const benchmarkCategoryLabel: Record<BenchmarkCategoryKey, string> = {
+  reasoning: 'Reasoning',
+  coding: 'Coding',
+  mathematics: 'Mathematics',
+  multimodal: 'Multimodal',
+  'long-context': 'Long context',
+  'tool-use': 'Tool use',
+  'instruction-following': 'Instruction following',
+  'creative-writing': 'Creative writing',
+  'computer-use': 'Computer use',
+  browsing: 'Browsing',
+  'professional-work': 'Professional work',
+  science: 'Science',
+};
+
 export const NEWS_CATEGORIES = [
   'MODEL_RELEASES',
   'RESEARCH',

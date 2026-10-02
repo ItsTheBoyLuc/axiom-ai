@@ -19,7 +19,7 @@ async function main() {
 
   const db = createPrisma(url);
   try {
-    await runSeed(db, { demo: true });
+    await runSeed(db, { demo: true, realData: false });
   } finally {
     await db.$disconnect();
   }

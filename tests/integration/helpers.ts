@@ -12,7 +12,7 @@ export const resetDb = () => truncateAll(testUrl());
 /** Loads the fictional demo fixtures (the 16 Sample Models) into the test database. */
 export async function seedDemo(db: PrismaClient) {
   await resetDb();
-  return runSeed(db, { demo: true });
+  return runSeed(db, { demo: true, realData: false });
 }
 
 /** A client that records every SQL statement it runs, to assert query counts and columns. */

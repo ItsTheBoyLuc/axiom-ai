@@ -53,6 +53,11 @@ export function readSeedDir(dir: string): {
 
 export type SeedOptions = {
   dataDir?: string;
+  /**
+   * Load prisma/seed/data (default true). Test harnesses pass false so they run on the fictional
+   * fixtures only and never depend on the real catalogue.
+   */
+  realData?: boolean;
   /** Also load the fictional demo fixtures (SEED_DEMO=true). Off by default: real DBs stay demo-free. */
   demo?: boolean;
 };
@@ -64,7 +69,10 @@ export type SeedResult = { data: LoadReport; demo: LoadReport | null };
  * demo fixtures are validated separately and loaded after (they cannot overwrite real data).
  */
 export async function runSeed(db: PrismaClient, opts: SeedOptions = {}): Promise<SeedResult> {
-  const { raw, errors: readErrors } = readSeedDir(opts.dataDir ?? DEFAULT_DATA_DIR);
+  const { raw, errors: readErrors } =
+    opts.realData === false
+      ? { raw: {}, errors: [] as SeedError[] }
+      : readSeedDir(opts.dataDir ?? DEFAULT_DATA_DIR);
   const dataResult = readErrors.length
     ? ({ ok: false, errors: readErrors } as const)
     : validateBundle(raw, { allowDemo: false });

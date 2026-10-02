@@ -10,7 +10,7 @@ import {
   RELEASE_KINDS,
   type CapabilityAvailability,
 } from '../../src/types/model';
-import { NEWS_CATEGORIES } from '../../src/types/catalog';
+import { BENCHMARK_CATEGORIES, NEWS_CATEGORIES } from '../../src/types/catalog';
 
 /**
  * Seed data schemas (docs/PROMPT.md section 2). Data files in prisma/seed/data/*.json are
@@ -147,7 +147,7 @@ export const benchmarkSchema = z
   .object({
     slug,
     name: text(200),
-    category: text(100),
+    category: z.enum(BENCHMARK_CATEGORIES),
     description: text(),
     methodologyUrl: httpUrl.nullable().default(null),
     version: text(100).nullable().default(null),

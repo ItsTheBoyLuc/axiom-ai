@@ -1,1 +1,1114 @@
-[]
+[
+  {
+    "slug": "gpt-6-astra",
+    "provider": "openai",
+    "name": "GPT-6 Astra",
+    "family": "GPT-6",
+    "version": null,
+    "description": "OpenAI's most capable model, aimed at demanding reasoning, coding, computer use, research and document work.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-03",
+    "contextWindow": 1050000,
+    "maxOutputTokens": 128000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+    "knowledgeCutoff": "2026-04-30",
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "OpenAI API: Chat Completions, Responses and Batch endpoints. Also offered through Microsoft Azure and Amazon Bedrock.",
+    "structuredOutput": true,
+    "streaming": true,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Top-tier GPT-6 model for the hardest professional, coding and computer-use work.",
+    "useCases": [
+      "Complex reasoning and research",
+      "Agentic coding",
+      "Computer and browser use",
+      "Document, spreadsheet and presentation creation"
+    ],
+    "notableFeatures": [
+      "Hosted tools including web search, file search, code interpreter, computer use and MCP",
+      "Prompt caching",
+      "Fast mode at a higher price for lower latency"
+    ],
+    "limitations": [
+      "Declines more advanced cybersecurity tasks such as writing proof-of-concept exploits; wider access is planned through OpenAI Daybreak",
+      "Extra safety checks can stop a task in the API, including legitimate work"
+    ],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gpt-6-1-sol",
+    "provider": "openai",
+    "name": "GPT-6.1 Sol",
+    "family": "GPT-6",
+    "version": "6.1",
+    "description": "An upgrade to GPT-6 Sol that comes close to GPT-6 Astra on agentic coding, computer use and professional work at about a fifth of the price.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-29",
+    "contextWindow": 1050000,
+    "maxOutputTokens": 128000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "knowledgeCutoff": "2026-04-30",
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "OpenAI API: Chat Completions, Responses and Batch endpoints.",
+    "structuredOutput": true,
+    "streaming": true,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Cost-efficient near-Astra model for complex everyday work.",
+    "useCases": ["Agentic coding", "Computer use", "Professional document workflows"],
+    "notableFeatures": [
+      "Reasoning effort from low to max",
+      "Prompt caching with a low cached-input price"
+    ],
+    "limitations": ["Not available in ChatGPT Chat at launch; offered in ChatGPT Work and Codex"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gpt-6-sol",
+    "provider": "openai",
+    "name": "GPT-6 Sol",
+    "family": "GPT-6",
+    "version": null,
+    "description": "A GPT-6 model built for complex coding and agentic workflows at a lower price than GPT-5.6 Sol.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-22",
+    "contextWindow": 1050000,
+    "maxOutputTokens": 128000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+    "knowledgeCutoff": "2026-04-20",
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "OpenAI API: Chat Completions, Responses and Batch endpoints.",
+    "structuredOutput": true,
+    "streaming": true,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Mid-tier GPT-6 model for coding and agent workloads.",
+    "useCases": ["Complex coding", "Agentic workflows"],
+    "notableFeatures": ["Prompt caching", "Hosted tools"],
+    "limitations": ["Not available in ChatGPT Chat at launch; offered in ChatGPT Work and Codex"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gpt-6-luna",
+    "provider": "openai",
+    "name": "GPT-6 Luna",
+    "family": "GPT-6",
+    "version": null,
+    "description": "The most efficient GPT-6 model, meant for focused, high-volume tasks.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-22",
+    "contextWindow": 1050000,
+    "maxOutputTokens": 128000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+    "knowledgeCutoff": "2026-05-18",
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "OpenAI API: Chat Completions, Responses and Batch endpoints.",
+    "structuredOutput": true,
+    "streaming": true,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Lowest-cost GPT-6 model for high-volume work.",
+    "useCases": ["High-volume focused tasks", "Coding at low cost"],
+    "notableFeatures": ["Reasoning effort from none to max", "Prompt caching"],
+    "limitations": ["Not available in ChatGPT Chat at launch; offered in ChatGPT Work and Codex"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gpt-image-2-5-sunburst",
+    "provider": "openai",
+    "name": "GPT-Image-2.5 Sunburst",
+    "family": "GPT Image",
+    "version": "2.5",
+    "description": "OpenAI image model that generates and edits images from text and image inputs, with a focus on precise editing and adjustable quality levels.",
+    "categories": ["image-generation"],
+    "releaseDate": "2026-09-08",
+    "contextWindow": null,
+    "maxOutputTokens": null,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["image"],
+    "officialDocumentation": "https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst",
+    "knowledgeCutoff": null,
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "OpenAI API: image generation, image edit and Batch endpoints. Snapshot gpt-image-2.5-sunburst-2026-09-08.",
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": null,
+    "functionCalling": null,
+    "purpose": "Image generation and editing from text and image prompts.",
+    "useCases": ["Image generation", "Image editing"],
+    "notableFeatures": ["Quality settings from low to max"],
+    "limitations": [],
+    "capabilities": [
+      {
+        "name": "image-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "claude-fable-5-1",
+    "provider": "anthropic",
+    "name": "Claude Fable 5.1",
+    "family": "Claude Fable",
+    "version": "5.1",
+    "description": "Top Claude model for demanding reasoning and long-horizon agentic work. It extends Claude Fable 5 at the same token prices with cheaper cache reads.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-01",
+    "contextWindow": 1000000,
+    "maxOutputTokens": 128000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+    "knowledgeCutoff": "Jun 2026",
+    "architecture": null,
+    "trainingInfo": "Training data cutoff: Jun 2026.",
+    "apiAvailability": "Claude API, Amazon Bedrock, Google Cloud, Microsoft Foundry and Claude Platform on AWS.",
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": null,
+    "purpose": "Anthropic flagship for long-running agentic coding, research and document work.",
+    "useCases": [
+      "Long-horizon agentic work",
+      "Multistep research",
+      "Documents, spreadsheets and slides"
+    ],
+    "notableFeatures": [
+      "Adaptive thinking is always on",
+      "Cache reads cost a quarter of Fable 5",
+      "Per-message effort and progress updates (beta)"
+    ],
+    "limitations": [
+      "Forced tool use returns an error",
+      "Higher-risk cybersecurity and life-science requests are redirected to other Claude models by safeguards"
+    ],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "claude-opus-5-5",
+    "provider": "anthropic",
+    "name": "Claude Opus 5.5",
+    "family": "Claude Opus",
+    "version": "5.5",
+    "description": "First model of the Claude 5.5 family, built for long-running agentic coding and knowledge work at a lower price than Claude Opus 5.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-22",
+    "contextWindow": 1000000,
+    "maxOutputTokens": 128000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+    "knowledgeCutoff": "Jun 2026",
+    "architecture": null,
+    "trainingInfo": "Training data cutoff: Jun 2026.",
+    "apiAvailability": "Claude API, Amazon Bedrock, Google Cloud, Microsoft Foundry and Claude Platform on AWS.",
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": null,
+    "purpose": "Anthropic model for long-running agentic coding and knowledge work.",
+    "useCases": ["Agentic coding", "Knowledge work", "Large code migrations and audits"],
+    "notableFeatures": [
+      "Adaptive thinking is always on",
+      "Fast mode in research preview at higher prices",
+      "Message Batches API supports up to 300K output tokens with a beta header"
+    ],
+    "limitations": [
+      "Thinking cannot be turned off",
+      "Forced tool use returns an error",
+      "Cybersecurity safeguards redirect most security tasks to another model"
+    ],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "claude-sonnet-5-5",
+    "provider": "anthropic",
+    "name": "Claude Sonnet 5.5",
+    "family": "Claude Sonnet",
+    "version": "5.5",
+    "description": "Faster, lower-cost Claude 5.5 model for everyday tasks, bug fixing and polished documents, slides and spreadsheets.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-28",
+    "contextWindow": 1000000,
+    "maxOutputTokens": 128000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "knowledgeCutoff": "Jun 2026",
+    "architecture": null,
+    "trainingInfo": "Training data cutoff: Jun 2026.",
+    "apiAvailability": "Claude API, Amazon Bedrock, Google Cloud, Microsoft Foundry and Claude Platform on AWS.",
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": null,
+    "purpose": "Anthropic model balancing speed and intelligence.",
+    "useCases": ["Everyday coding tasks", "Bug fixing", "Documents, slides and spreadsheets"],
+    "notableFeatures": [
+      "Adaptive thinking with a between_tools setting that turns off up-front thinking",
+      "Message Batches API supports up to 300K output tokens with a beta header"
+    ],
+    "limitations": [
+      "Non-default temperature, top_p or top_k returns an error",
+      "Forced tool use returns an error"
+    ],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "claude-haiku-4-5",
+    "provider": "anthropic",
+    "name": "Claude Haiku 4.5",
+    "family": "Claude Haiku",
+    "version": "4.5",
+    "description": "The fastest Claude model with near-frontier intelligence, meant for high-volume and cost-sensitive work.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2025-10-15",
+    "contextWindow": 200000,
+    "maxOutputTokens": 64000,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
+    "knowledgeCutoff": "Feb 2025",
+    "architecture": null,
+    "trainingInfo": "Training data cutoff: Jul 2025.",
+    "apiAvailability": "Claude API, Amazon Bedrock, Google Cloud, Microsoft Foundry and Claude Platform on AWS.",
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": null,
+    "purpose": "Anthropic fastest model.",
+    "useCases": ["High-volume workloads", "Low-latency applications"],
+    "notableFeatures": ["Manual extended thinking with a token budget"],
+    "limitations": ["Retirement is not sooner than 2026-10-15"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gemini-3-8-flash",
+    "provider": "google-deepmind",
+    "name": "Gemini 3.8 Flash",
+    "family": "Gemini Flash",
+    "version": "3.8",
+    "description": "The most capable Flash model so far, built for long-horizon software engineering, autonomous agents and complex enterprise workflows.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-02",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 65536,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "free-tier",
+    "inputModalities": ["text", "image", "audio", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash",
+    "knowledgeCutoff": null,
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "Gemini API (Google AI Studio) and Google Cloud.",
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Google workhorse model for agentic and enterprise workloads.",
+    "useCases": ["Long-horizon software engineering", "Autonomous agents", "Enterprise workflows"],
+    "notableFeatures": [
+      "Thinking levels",
+      "Code execution, search grounding and URL context",
+      "Context caching and Batch API",
+      "Computer use tool (preview)"
+    ],
+    "limitations": ["No audio or image generation, no Live API"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "audio-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gemini-3-7-flash",
+    "provider": "google-deepmind",
+    "name": "Gemini 3.7 Flash",
+    "family": "Gemini Flash",
+    "version": "3.7",
+    "description": "Flash model for complex coding, agentic workflows and reliable multi-step execution.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-08-13",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 65536,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "free-tier",
+    "inputModalities": ["text", "image", "audio", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://ai.google.dev/gemini-api/docs/models/gemini-3.7-flash",
+    "knowledgeCutoff": null,
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "Gemini API (Google AI Studio) and Google Cloud.",
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Google Flash model for coding and agent workflows.",
+    "useCases": ["Complex coding", "Agentic workflows"],
+    "notableFeatures": [
+      "Thinking levels",
+      "Code execution, search grounding and URL context",
+      "Context caching and Batch API",
+      "Computer use tool (preview)"
+    ],
+    "limitations": ["No audio or image generation, no Live API"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "audio-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-3.7-flash",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gemini-3-6-flash",
+    "provider": "google-deepmind",
+    "name": "Gemini 3.6 Flash",
+    "family": "Gemini Flash",
+    "version": "3.6",
+    "description": "Flash model balancing speed and multimodal ability across general agentic tasks, with strength in code generation.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-07-21",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 65536,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "free-tier",
+    "inputModalities": ["text", "image", "audio", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://ai.google.dev/gemini-api/docs/models/gemini-3.6-flash",
+    "knowledgeCutoff": null,
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "Gemini API (Google AI Studio) and Google Cloud.",
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Google Flash model for general agentic tasks.",
+    "useCases": ["General agentic tasks", "Code generation"],
+    "notableFeatures": [
+      "Thinking levels",
+      "Code execution, search grounding and URL context",
+      "Context caching and Batch API",
+      "Computer use tool (preview)"
+    ],
+    "limitations": ["No audio or image generation, no Live API"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "audio-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-3.6-flash",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gemini-3-5-flash",
+    "provider": "google-deepmind",
+    "name": "Gemini 3.5 Flash",
+    "family": "Gemini Flash",
+    "version": "3.5",
+    "description": "Flash model with a baseline of speed and capability for routine, high-throughput workloads, strong in agentic workflows and coding iterations.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-05-19",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 65536,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "free-tier",
+    "inputModalities": ["text", "image", "audio", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash",
+    "knowledgeCutoff": null,
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "Gemini API (Google AI Studio) and Google Cloud.",
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Google Flash model for routine high-throughput work.",
+    "useCases": ["High-throughput workloads", "Coding iterations"],
+    "notableFeatures": [
+      "Thinking levels",
+      "Code execution, search grounding and URL context",
+      "Context caching and Batch API",
+      "Computer use tool (preview)"
+    ],
+    "limitations": ["No audio or image generation, no Live API"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "audio-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gemini-3-5-flash-lite",
+    "provider": "google-deepmind",
+    "name": "Gemini 3.5 Flash-Lite",
+    "family": "Gemini Flash-Lite",
+    "version": "3.5",
+    "description": "Low-latency, cost-effective multimodal model for subagent tasks and document parsing at high throughput.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-07-21",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 65536,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "free-tier",
+    "inputModalities": ["text", "image", "audio", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite",
+    "knowledgeCutoff": null,
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "Gemini API (Google AI Studio) and Google Cloud.",
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Cheapest Gemini 3.5 model for high-throughput execution.",
+    "useCases": ["Subagent tasks", "Document parsing"],
+    "notableFeatures": [
+      "Thinking levels",
+      "Code execution, search grounding and URL context",
+      "Context caching and Batch API",
+      "Computer use tool (preview)"
+    ],
+    "limitations": ["No audio or image generation, no Live API"],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "audio-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "gemini-3-1-pro",
+    "provider": "google-deepmind",
+    "name": "Gemini 3.1 Pro (preview)",
+    "family": "Gemini Pro",
+    "version": "3.1",
+    "description": "Preview Pro model refining the Gemini 3 Pro series with better thinking, token efficiency and factual consistency, tuned for software engineering and agents.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-02-19",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 65536,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image", "audio", "video"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview",
+    "knowledgeCutoff": null,
+    "architecture": null,
+    "trainingInfo": null,
+    "apiAvailability": "Gemini API (Google AI Studio) and Google Cloud.",
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "purpose": "Google Pro-tier preview model for complex problems and agent work.",
+    "useCases": ["Complex problem solving", "Software engineering", "Agentic workflows"],
+    "notableFeatures": [
+      "Thinking",
+      "Code execution, search grounding and URL context",
+      "Context caching and Batch API"
+    ],
+    "limitations": [
+      "Preview model: may change, with a minimum two-week deprecation notice",
+      "No audio or image generation, no Live API"
+    ],
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "audio-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  }
+]

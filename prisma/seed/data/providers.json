@@ -1,1 +1,41 @@
-[]
+[
+  {
+    "slug": "openai",
+    "name": "OpenAI",
+    "monogram": "O",
+    "description": "AI research and product company behind the GPT model family, ChatGPT and the OpenAI API.",
+    "officialWebsite": "https://openai.com",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://developers.openai.com/api/docs/models",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "anthropic",
+    "name": "Anthropic",
+    "monogram": "A",
+    "description": "AI safety and research company that builds the Claude model family, offered through the Claude apps, the Claude API and major cloud platforms.",
+    "officialWebsite": "https://www.anthropic.com",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "google-deepmind",
+    "name": "Google DeepMind",
+    "monogram": "G",
+    "description": "Google's AI research lab. It develops the Gemini model family, offered through the Gemini API, Google AI Studio and Google Cloud.",
+    "officialWebsite": "https://deepmind.google",
+    "orgType": "RESEARCH_LAB",
+    "sourceUrl": "https://ai.google.dev/gemini-api/docs/models",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:05:00Z",
+    "collectedAt": "2026-10-02T19:05:00Z",
+    "isDemo": false
+  }
+]
