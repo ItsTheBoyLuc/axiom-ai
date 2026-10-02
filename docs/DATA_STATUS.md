@@ -75,3 +75,62 @@ Eight records drawn at random (a random generator, stratified over four tables),
 8. Model category assignments (e.g. "coding", "reasoning"): derived from how providers describe the models; they are editorial, not a provider field.
 9. `capabilities` lists: derived from the supported-features lists on the model pages.
 10. Fable 5.1 CursorBench 3.2.0 at "max effort": the table and a partner quote agree on 73.4%, but the table does not state the effort.
+
+## Batch 2: Meta, xAI, DeepSeek, Mistral (2026-10-02)
+
+| Provider       | Models | Prices | Benchmark results | Releases |
+| -------------- | ------ | ------ | ----------------- | -------- |
+| Meta           | 3      | 9      | 7                 | 4        |
+| xAI (SpaceXAI) | 3      | 9      | 15                | 3        |
+| DeepSeek       | 2      | 12     | 12                | 5        |
+| Mistral AI     | 3      | 6      | 3                 | 3        |
+
+Plus 12 new benchmark variants and 4 provider records. Catalogue totals after batch 2: 7 providers, 26 models, 113 prices, 104 benchmark results, 46 benchmark variants, 36 releases.
+
+### Included models
+
+- **Meta:** Muse Spark 1.1, Muse Spark 1.2 (Meta Model API), Muse Glimmer 30B (open weights, Apache 2.0).
+- **xAI:** Grok 4.7, Grok 4.6, Grok 4.5. The company's own pages now brand it SpaceXAI; the record is "xAI (SpaceXAI)".
+- **DeepSeek:** DeepSeek-V4.1-Flash (`deepseek-flash`) and DeepSeek-V4-Pro (the 0813 build, `deepseek-v4-pro`), both MIT-licensed open weights.
+- **Mistral AI:** Mistral Medium 3.5, Mistral Small 4, Mistral Large 3 (all open weights).
+
+### Deliberately not included, and why
+
+- **Meta Muse Spark 1.3** (Meta's latest model, with benchmark numbers on its model page): **no official page states its release date**, and the schema requires one. Third-party sites say 2026-09-02; that is not an acceptable source, so the model is omitted rather than guessed. Add it once Meta dates it, or if a decision is taken to allow a null release date.
+- Meta **Muse Image**, **Muse Voice Transcribe**, **SAM 3.1**, **Muse Code**; xAI **Grok 4.3**, the **Grok 4.20** family, **Grok Build 0.1**, Imagine and Voice models; DeepSeek legacy and retired names; Mistral **Ministral 3** (3B, 8B, 14B), Codestral, OCR, Voxtral, embeddings, moderation and the hosted third-party GLM models. No in-session release date (or no release date at all) was collected for them.
+- Meta **Muse Spark** (April 2026, the original) has no API model record; it appears only as a release entry.
+
+### Not publicly disclosed or not found (stored as `null`)
+
+- Maximum output tokens for Meta, xAI and Mistral models (not shown on the pages read).
+- Knowledge cutoff for all models except Grok 4.7 (May 2026, from the xAI docs).
+- Benchmark scores for Muse Spark 1.1 and 1.2 (charts without readable numbers) and Mistral Large 3 (charts only).
+- `openWeights = false` for Muse Spark and Grok means "no weights are published on the pages read", not an explicit "closed" statement by the provider.
+- DeepSeek-V4-Pro (0813) scores other than the three in the API update notes. The Hugging Face card with many more scores was last modified on 2026-06-22 and describes the **original April V4-Pro**, so those scores were **not** attributed to the 0813 build.
+
+### Conventions specific to this batch
+
+- **xAI prices** are for prompts up to 200K tokens (the unit says so). The docs say higher rates apply above 200K, but the exact numbers were not verified from a page, so they are not stored.
+- **DeepSeek prices** have peak and off-peak variants and cache hit/miss rows, each with its own unit; the effective-from date is 2026-10-02 (first observed). Peak hours are 01:00-04:00 and 06:00-10:00 UTC on weekdays; off-peak is half of peak. The structure took effect on 2026-08-16.
+- **Meta prices** are the Standard tier ($1.25 in / $4.25 out / $0.15 cached). Muse Spark 1.2 also has a Contributor tier ($0.10 / $0.20 / $0.002), which permits Meta to train on prompts and completions; it is a separate unit.
+- **Card price summary.** A card shows a price only when exactly one unit carries both an input and an output price (`headlineTokenPrice`). Models with several variants show "See profile for units", so variants are never collapsed into one number.
+- **Benchmark evaluation dates.** For Meta Glimmer (the card says "August 2026") and Mistral Medium 3.5 and Small 4 (model cards undated) the evaluation date is the model's release date, the earliest the numbers could have been published.
+- **Variants kept apart:** Glimmer's `terminal-bench-2-1` is with the Terminus 2 harness; Grok 4.5's `deepswe-1-1` (53%) used the mini-swe-agent harness by Datacurve; Glimmer's GPQA Diamond is the "(AA)" variant. Each is described in `methodologyNotes`.
+- **Search-tool summaries are not a source.** Two search summaries stated wrong release dates for Grok 4.5 and 4.6 (the announcement pages say 2026-07-16 and 2026-08-12). Every date in this batch was read from the provider's own page.
+
+### Verification (batch 2)
+
+Rather than a random sample, every fact that came through the summarising fetcher alone was re-read in the browser from its source page: the Meta and Mistral pricing tables (verbatim match), the three Mistral release dates, the four Meta announcement dates, the DeepSeek update-note dates and pricing table, the Muse Glimmer scores, and all xAI benchmark tables and docs pages (read directly). **Mismatches in stored values: 0.** Two wrong dates from search summaries were rejected before storing.
+
+### Records Claude is least sure about (batch 2)
+
+1. Muse Spark 1.1 and 1.2 `openWeights = false` (absence of published weights, not an explicit statement).
+2. Grok 4.5 and 4.6 cached-input `effectiveFrom` (2026-10-02, first observed).
+3. DeepSeek-V4-Pro `openWeights = true`: the weights on Hugging Face are the earlier release, not the 0813 build the API serves (noted in the model's limitations).
+4. DeepSeek-V4-Pro 0813 `hle-with-tools` 60.0%: from the API update note, which does not say which tools or effort.
+5. Muse Glimmer `gpqa-diamond` 83.5%: the card labels the row "(AA)", possibly Artificial Analysis settings.
+6. Mistral Small 4 `aa-lcr` 0.72: a 0-1 score with reasoning enabled, stored as unit `score`.
+7. Mistral Medium 3.5 `tau3-telecom` and SWE-Bench Verified: read from the Hugging Face card (undated); evaluation date set to the release date.
+8. Grok 4.7 DeepSWE v1.1 71.0%: high effort, while the rest of that table is xhigh.
+9. Model category assignments for these models (editorial, from how providers describe them).
+10. Mistral context windows ("256k") stored as 256,000 tokens, not 262,144.

@@ -47,7 +47,7 @@ describe('real seed data', () => {
   it('keeps percentage scores within 0-100 and uses known units', () => {
     if (!bundle) return;
     for (const r of bundle['benchmark-results']) {
-      expect(['%', 'Elo', 'score']).toContain(r.scoreUnit);
+      expect(['%', 'Elo', 'score', 'Rating']).toContain(r.scoreUnit);
       if (r.scoreUnit === '%') {
         expect(r.score, `${r.model}/${r.benchmark}`).toBeGreaterThanOrEqual(0);
         expect(r.score, `${r.model}/${r.benchmark}`).toBeLessThanOrEqual(100);

@@ -4,20 +4,21 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 
 ## Phases
 
-| Phase | Scope                                                         | Status                                                                  |
-| ----- | ------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| 0     | Foundation (Next.js, worker, Compose, CI)                     | Done                                                                    |
-| 1     | Brand, design system, homepage                                | Done                                                                    |
-| 2     | Model directory and profiles (demo data)                      | Done                                                                    |
-| 3a    | Prisma schema, migrations, REST API, seed pipeline            | Done (2026-10-02, CI green)                                             |
-| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`               | Batch 1 done (OpenAI, Anthropic, Google DeepMind). Batches 2 and 3 next |
-| 4-10  | Compare, Benchmarks, Providers, News, Admin, Auth, Production | Not started                                                             |
+| Phase | Scope                                                         | Status                                                                                                |
+| ----- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 0     | Foundation (Next.js, worker, Compose, CI)                     | Done                                                                                                  |
+| 1     | Brand, design system, homepage                                | Done                                                                                                  |
+| 2     | Model directory and profiles (demo data)                      | Done                                                                                                  |
+| 3a    | Prisma schema, migrations, REST API, seed pipeline            | Done (2026-10-02, CI green)                                                                           |
+| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`               | Batches 1 and 2 done (OpenAI, Anthropic, Google DeepMind; Meta, xAI, DeepSeek, Mistral). Batch 3 next |
+| 4-10  | Compare, Benchmarks, Providers, News, Admin, Auth, Production | Not started                                                                                           |
 
 ## Phase 3b status
 
 - **Batch 1 (2026-10-02):** 3 providers, 15 models, 77 prices, 67 benchmark results (34 benchmark variants), 21 releases. Self-audit of 8 random records: 0 mismatches (see `docs/DATA_STATUS.md`). Real data loaded into the dev database; screenshots of `/models` and profiles at 1440 and 390 reviewed.
 - **Fixed on the way:** reduced-motion hydration error (regression test added), capabilities matrix empty on real data (controlled benchmark categories), hero "DEMO DATA" over real data, long names truncating, monogram "O" looking like a zero, `.dockerignore` and CI gaps from 3a.
-- **Next:** batch 2 = Meta, xAI, DeepSeek, Mistral (provider, models, pricing, releases, benchmark results together; read every source in-session; validate with `npx vitest run tests/unit/real-seed-data.test.ts`; reseed with `npm run db:seed`; check `/models`, a profile and `/api/v1/stats` with Playwright; update `DATA_STATUS.md`; commit and push). Then batch 3 = Microsoft, NVIDIA, Alibaba, Cohere, Amazon plus news and publications, then remove demo data from the homepage, directory and profiles (demo rows stay only as `SEED_DEMO=true` test fixtures).
+- **Batch 2 (2026-10-02):** 4 providers, 11 models, 36 prices, 37 benchmark results, 12 new benchmark variants, 15 releases; every source verified directly (see `docs/DATA_STATUS.md`). Also fixed: card price summary for tiered pricing, and two CI-only e2e flakes (streaming staging element; axe scanning a moving sheet). CI is green on `c86acb7`.
+- **Next:** batch 3 = Microsoft, NVIDIA, Alibaba, Cohere, Amazon plus news and publications (provider, models, pricing, releases, benchmark results together; read every source in-session; validate with `npx vitest run tests/unit/real-seed-data.test.ts`; reseed with `npm run db:seed`; check `/models`, a profile and `/api/v1/stats`; update `DATA_STATUS.md`; commit and push). Then remove demo data from the homepage, directory and profiles (demo rows stay only as `SEED_DEMO=true` fixtures), then Phase 4.
 
 ## Verification log
 

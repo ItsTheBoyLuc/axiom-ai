@@ -37,5 +37,57 @@
     "verifiedAt": "2026-10-02T19:05:00Z",
     "collectedAt": "2026-10-02T19:05:00Z",
     "isDemo": false
+  },
+  {
+    "slug": "meta",
+    "name": "Meta",
+    "monogram": "M",
+    "description": "Meta Superintelligence Labs builds the Muse model family: Muse Spark is served through the Meta AI app and the Meta Model API, and Muse Glimmer is released as open weights.",
+    "officialWebsite": "https://ai.meta.com",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://dev.meta.ai/docs/models",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "xai",
+    "name": "xAI (SpaceXAI)",
+    "monogram": "X",
+    "description": "Creator of the Grok models, available through the Grok apps, Grok Build and the xAI API. Its own pages now brand the company SpaceXAI.",
+    "officialWebsite": "https://x.ai",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://docs.x.ai/developers/models",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "deepseek",
+    "name": "DeepSeek",
+    "monogram": "D",
+    "description": "AI lab that publishes the DeepSeek model family as open weights under the MIT licence and serves it through the DeepSeek API.",
+    "officialWebsite": "https://www.deepseek.com",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "slug": "mistral",
+    "name": "Mistral AI",
+    "monogram": "M",
+    "description": "AI company that releases the Mistral model family, many of them as open weights, and serves them through the Mistral API.",
+    "officialWebsite": "https://mistral.ai",
+    "orgType": "COMPANY",
+    "sourceUrl": "https://docs.mistral.ai/models/overview",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
   }
 ]

@@ -1110,5 +1110,782 @@
     "verifiedAt": "2026-10-02T19:05:00Z",
     "collectedAt": "2026-10-02T19:05:00Z",
     "isDemo": false
+  },
+  {
+    "architecture": null,
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": [
+      "Search grounding",
+      "Structured output",
+      "Contributor tier at a much lower price"
+    ],
+    "useCases": ["Agentic workflows", "Coding agents"],
+    "slug": "muse-spark-1-1",
+    "provider": "meta",
+    "name": "Muse Spark 1.1",
+    "family": "Muse Spark",
+    "version": "1.1",
+    "description": "Multimodal reasoning model built for agentic tasks, with large gains in tool and computer use, coding and multimodal understanding. First Muse Spark release on the Meta Model API.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-07-09",
+    "contextWindow": 1048576,
+    "maxOutputTokens": null,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image", "video", "audio"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://dev.meta.ai/docs/models",
+    "apiAvailability": "Meta Model API (model ID muse-spark-1.1); the Standard tier and a cheaper Contributor tier that lets Meta train on prompts and completions.",
+    "purpose": "Meta model for agentic workflows and coding.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://dev.meta.ai/docs/models",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": null,
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": [
+      "Search grounding",
+      "Structured output",
+      "Contributor tier at a much lower price"
+    ],
+    "useCases": ["Agentic workflows", "Coding agents"],
+    "slug": "muse-spark-1-2",
+    "provider": "meta",
+    "name": "Muse Spark 1.2",
+    "family": "Muse Spark",
+    "version": "1.2",
+    "description": "Coding-optimised Muse Spark release that arrived with Muse Code, Meta's coding agent; a moderate improvement over Muse Spark 1.1.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-08-05",
+    "contextWindow": 1048576,
+    "maxOutputTokens": null,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image", "video", "audio"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://dev.meta.ai/docs/models",
+    "apiAvailability": "Meta Model API (model ID muse-spark-1.2); the Standard tier and a cheaper Contributor tier that lets Meta train on prompts and completions.",
+    "purpose": "Meta model for agentic workflows and coding.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "video-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://dev.meta.ai/docs/models",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Causal language model of about 29.6B parameters, including a perception encoder of about 1.8B.",
+    "trainingInfo": "Distilled from Muse Spark.",
+    "knowledgeCutoff": null,
+    "structuredOutput": null,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [
+      "Full-precision weights need far more than a consumer GPU; use quantised weights for local runs"
+    ],
+    "notableFeatures": ["Apache 2.0 licence", "4-bit weights fit under 20 GB"],
+    "useCases": ["Local agents", "Tool orchestration", "Agentic coding"],
+    "slug": "muse-glimmer-30b",
+    "provider": "meta",
+    "name": "Muse Glimmer 30B",
+    "family": "Muse Glimmer",
+    "version": null,
+    "description": "Open-weight 30-billion-parameter multimodal model distilled from Muse Spark, built to run always-on agents locally on a Mac or a single consumer GPU.",
+    "categories": ["llm", "multimodal", "coding"],
+    "releaseDate": "2026-08-12",
+    "contextWindow": 131072,
+    "maxOutputTokens": null,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["local", "open-weights"],
+    "pricingKind": "free",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://dev.meta.ai/resources/blog/build-with-muse-glimmer",
+    "apiAvailability": "Weights on Hugging Face (Apache 2.0), runnable through Ollama, LM Studio, llama.cpp, ExecuTorch, vLLM and SGLang.",
+    "purpose": "Local, always-on agents with tool use and image understanding.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://huggingface.co/meta-models/Muse-Glimmer-30B",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": null,
+    "trainingInfo": null,
+    "knowledgeCutoff": "May 2026",
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": [
+      "Reasoning effort low, medium, high or xhigh (default high)",
+      "Prompts over 200K tokens are billed at higher rates"
+    ],
+    "useCases": ["Coding", "Agentic tasks", "Knowledge work"],
+    "slug": "grok-4-7",
+    "provider": "xai",
+    "name": "Grok 4.7",
+    "family": "Grok",
+    "version": "4.7",
+    "description": "Flagship Grok model for coding, agentic tasks and knowledge work. Uses a new, larger base model than Grok 4.6 and checks its own work more carefully.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-21",
+    "contextWindow": 500000,
+    "maxOutputTokens": null,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.x.ai/developers/models/grok-4.7",
+    "apiAvailability": "xAI API (model ID grok-4.7), Grok Build and Cursor; Batch API not supported.",
+    "purpose": "xAI model for coding, agentic work and knowledge work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://docs.x.ai/developers/models/grok-4.7",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": null,
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": [
+      "Reasoning effort low, medium, high or xhigh (default high)",
+      "Prompts over 200K tokens are billed at higher rates"
+    ],
+    "useCases": ["Coding", "Agentic tasks", "Knowledge work"],
+    "slug": "grok-4-6",
+    "provider": "xai",
+    "name": "Grok 4.6",
+    "family": "Grok",
+    "version": "4.6",
+    "description": "Grok model that builds on Grok 4.5 with a focus on long-running agents and more ambitious interactive and visual work.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-08-12",
+    "contextWindow": 500000,
+    "maxOutputTokens": null,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.x.ai/developers/models/grok-4.6",
+    "apiAvailability": "xAI API (model ID grok-4.6), Grok Build and Cursor; Batch API not supported.",
+    "purpose": "xAI model for coding, agentic work and knowledge work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://docs.x.ai/developers/models/grok-4.6",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": null,
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": [
+      "Reasoning effort low, medium, high or xhigh (default high)",
+      "Prompts over 200K tokens are billed at higher rates"
+    ],
+    "useCases": ["Coding", "Agentic tasks", "Knowledge work"],
+    "slug": "grok-4-5",
+    "provider": "xai",
+    "name": "Grok 4.5",
+    "family": "Grok",
+    "version": "4.5",
+    "description": "Coding-focused Grok model for agentic software and workflow tasks, trained alongside Cursor and served at fast-model speeds.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-07-16",
+    "contextWindow": 500000,
+    "maxOutputTokens": null,
+    "openWeights": false,
+    "availability": "CLOUD_API",
+    "deployment": ["cloud-api", "proprietary"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.x.ai/developers/models/grok-4.5",
+    "apiAvailability": "xAI API (model ID grok-4.5), Grok Build and Cursor; Batch API not supported.",
+    "purpose": "xAI model for coding, agentic work and knowledge work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://docs.x.ai/developers/models/grok-4.5",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Mixture of experts with 552B total parameters; 8B active for prefill and 16B for decode.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": ["FIM completion works in non-thinking mode only"],
+    "notableFeatures": [
+      "MIT licence",
+      "Reasoning effort adjustable from 1 to 100",
+      "Off-peak prices at half the peak rate"
+    ],
+    "useCases": ["Agentic tasks", "Coding", "Vision understanding"],
+    "slug": "deepseek-v4-1-flash",
+    "provider": "deepseek",
+    "name": "DeepSeek-V4.1-Flash",
+    "family": "DeepSeek V4",
+    "version": null,
+    "description": "Open-weight mixture-of-experts model with native multimodal understanding, a continuously adjustable reasoning effort and a 1M-token context.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-09-10",
+    "contextWindow": 1000000,
+    "maxOutputTokens": 384000,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://api-docs.deepseek.com/quick_start/pricing",
+    "apiAvailability": "DeepSeek API as deepseek-flash (OpenAI and Anthropic formats, Responses API); weights on Hugging Face under the MIT licence.",
+    "purpose": "Fast, low-cost open model for agentic and coding work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Mixture of experts with 1.6T total parameters and 49B active (original V4-Pro release).",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [
+      "Vision input is not supported",
+      "The weights on Hugging Face are the original V4-Pro release; the API now serves the 0813 build"
+    ],
+    "notableFeatures": [
+      "MIT licence",
+      "Thinking effort low, high or max",
+      "Off-peak prices at half the peak rate"
+    ],
+    "useCases": ["Agent workloads", "Reasoning", "Coding"],
+    "slug": "deepseek-v4-pro",
+    "provider": "deepseek",
+    "name": "DeepSeek-V4-Pro",
+    "family": "DeepSeek V4",
+    "version": "0813",
+    "description": "Large open-weight mixture-of-experts model for agent work; the API serves the 0813 build with stronger production-agent performance.",
+    "categories": ["llm", "reasoning", "coding"],
+    "releaseDate": "2026-08-13",
+    "contextWindow": 1000000,
+    "maxOutputTokens": 384000,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "paid",
+    "inputModalities": ["text"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://api-docs.deepseek.com/quick_start/pricing",
+    "apiAvailability": "DeepSeek API as deepseek-v4-pro (OpenAI and Anthropic formats, Responses API); weights on Hugging Face under the MIT licence.",
+    "purpose": "Open model for demanding agent and reasoning workloads.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://api-docs.deepseek.com/quick_start/pricing",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Dense model with 128B parameters.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": [
+      "Configurable reasoning effort per request (none or high)",
+      "Open weights",
+      "Self-hosting possible on four GPUs"
+    ],
+    "useCases": ["Agentic workflows", "Coding", "Document question answering"],
+    "slug": "mistral-medium-3-5",
+    "provider": "mistral",
+    "name": "Mistral Medium 3.5",
+    "family": "Mistral Medium",
+    "version": "3.5",
+    "description": "Frontier-class multimodal model tuned for agentic and coding use, released with open weights under a modified MIT licence.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-04-28",
+    "contextWindow": 256000,
+    "maxOutputTokens": null,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.mistral.ai/models/mistral-medium-3-5-26-04",
+    "apiAvailability": "Mistral API; open weights under the Modified MIT licence.",
+    "purpose": "Mistral flagship for agentic and coding work.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://docs.mistral.ai/models/mistral-medium-3-5-26-04",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Mixture of experts with 119B total parameters and 6.5B active; 128 experts, 4 active per token.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": ["Reasoning mode on request", "Apache 2.0 licence"],
+    "useCases": ["General assistants", "Reasoning", "Coding"],
+    "slug": "mistral-small-4",
+    "provider": "mistral",
+    "name": "Mistral Small 4",
+    "family": "Mistral Small",
+    "version": "4",
+    "description": "Hybrid model that unifies instruct, reasoning and coding in one efficient mixture-of-experts model, with a toggle between instant replies and reasoning mode.",
+    "categories": ["llm", "reasoning", "multimodal", "coding"],
+    "releaseDate": "2026-03-16",
+    "contextWindow": 256000,
+    "maxOutputTokens": null,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.mistral.ai/models/mistral-small-4-0-26-03",
+    "apiAvailability": "Mistral API; open weights under the Apache 2.0 licence.",
+    "purpose": "Efficient Mistral model combining chat, reasoning and coding.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "code-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "reasoning",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://docs.mistral.ai/models/mistral-small-4-0-26-03",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
+  },
+  {
+    "architecture": "Granular mixture of experts with 675B total parameters and 41B active.",
+    "trainingInfo": null,
+    "knowledgeCutoff": null,
+    "structuredOutput": true,
+    "streaming": null,
+    "toolCalling": true,
+    "functionCalling": true,
+    "limitations": [],
+    "notableFeatures": ["Apache 2.0 licence", "Function calling and structured outputs"],
+    "useCases": ["General-purpose assistants", "Multimodal understanding"],
+    "slug": "mistral-large-3",
+    "provider": "mistral",
+    "name": "Mistral Large 3",
+    "family": "Mistral Large",
+    "version": "3",
+    "description": "Open-weight general-purpose multimodal model with a granular mixture-of-experts architecture.",
+    "categories": ["llm", "multimodal"],
+    "releaseDate": "2025-12-02",
+    "contextWindow": 256000,
+    "maxOutputTokens": null,
+    "openWeights": true,
+    "availability": "OPEN_WEIGHTS",
+    "deployment": ["cloud-api", "open-weights"],
+    "pricingKind": "paid",
+    "inputModalities": ["text", "image"],
+    "outputModalities": ["text"],
+    "officialDocumentation": "https://docs.mistral.ai/models/mistral-large-3-25-12",
+    "apiAvailability": "Mistral API; open weights under the Apache 2.0 licence.",
+    "purpose": "Mistral large open-weight multimodal model.",
+    "capabilities": [
+      {
+        "name": "text-generation",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "image-understanding",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "tool-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      },
+      {
+        "name": "function-calling",
+        "availability": "AVAILABLE",
+        "documentationUrl": null
+      }
+    ],
+    "sourceUrl": "https://docs.mistral.ai/models/mistral-large-3-25-12",
+    "verificationStatus": "OFFICIALLY_VERIFIED",
+    "verifiedAt": "2026-10-02T19:45:00Z",
+    "collectedAt": "2026-10-02T19:45:00Z",
+    "isDemo": false
   }
 ]
