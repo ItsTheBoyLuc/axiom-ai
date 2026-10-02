@@ -1,16 +1,7 @@
 import { formatDate } from '@/lib/format';
 import { RevealGroup, RevealItem } from '@/components/ui/reveal';
-import type { ModelDetail, ReleaseKind } from '@/types/model';
+import { releaseKindLabel as kindLabel, type ModelDetail } from '@/types/model';
 import { ProfileSection } from './profile-section';
-
-const kindLabel: Record<ReleaseKind, string> = {
-  INITIAL: 'Initial release',
-  VERSION: 'New version',
-  CAPABILITY: 'Capability change',
-  DEPRECATION: 'Deprecation',
-  PRICING: 'Pricing change',
-  DOCS: 'Documentation update',
-};
 
 /** Vertical timeline of release events, newest first. */
 export function ReleaseHistory({ model }: { model: ModelDetail }) {

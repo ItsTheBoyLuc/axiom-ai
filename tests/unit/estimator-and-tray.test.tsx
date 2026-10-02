@@ -5,7 +5,7 @@ import { CompareToggle } from '@/components/comparison/compare-toggle';
 import { ComparisonTray } from '@/components/comparison/comparison-tray';
 import { useComparison } from '@/components/comparison/comparison-store';
 import { CostEstimator } from '@/components/models/profile/cost-estimator';
-import { demoModelDetails } from '../../server/repositories/demo/models';
+import { demoModelDetails } from '../../prisma/seed/demo/models';
 
 const pricing = (slug: string) => demoModelDetails.find((m) => m.slug === slug)!.pricing;
 

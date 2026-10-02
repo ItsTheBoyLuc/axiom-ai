@@ -9,7 +9,7 @@ import {
   type ModelRef,
 } from '@/lib/comparison';
 import { MATRIX_ROWS, buildCapabilityMatrix } from '@/lib/models/capability-matrix';
-import { demoModelDetails } from '../../server/repositories/demo/models';
+import { demoModelDetails } from '../../prisma/seed/demo/models';
 
 const ref = (n: number): ModelRef => ({ slug: `m-${n}`, name: `Model ${n}`, providerName: 'P' });
 

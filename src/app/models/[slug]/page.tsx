@@ -21,8 +21,12 @@ export const revalidate = 3600;
 
 type Props = { params: Promise<{ slug: string }> };
 
-export async function generateStaticParams() {
-  return (await getModelRepository().slugs()).map((slug) => ({ slug }));
+/**
+ * No pages are prerendered at build time (the database is not available then). Each profile is
+ * rendered on first request and cached for `revalidate` seconds (incremental static regeneration).
+ */
+export function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

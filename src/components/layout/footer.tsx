@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/ui/logo';
 import { Container } from '@/components/ui/section';
 import { footerColumns } from '@/lib/routes';
-import { getStats } from '../../../server/services/stats';
+import { getLastDataUpdate } from '../../../server/services/site';
 
 /** Social links come from env and are hidden when unset. */
 const socials = [
@@ -11,7 +11,7 @@ const socials = [
 ].filter((s): s is { label: string; href: string } => Boolean(s.href));
 
 export async function Footer() {
-  const { lastDataUpdate } = await getStats();
+  const lastDataUpdate = await getLastDataUpdate();
   const updated = lastDataUpdate
     ? new Date(lastDataUpdate).toLocaleString('en-GB', {
         dateStyle: 'medium',

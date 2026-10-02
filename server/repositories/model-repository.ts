@@ -6,7 +6,8 @@ import type {
   ModelQuery,
   ModelSuggestion,
 } from '../../src/types/model';
-import { demoModelRepository } from './demo/demo-model-repository';
+import { getPrisma } from '../db/client';
+import { createPrismaModelRepository } from './prisma/model-repository';
 
 export type ModelStats = {
   total: number;
@@ -19,12 +20,15 @@ export type ModelStats = {
 };
 
 /**
- * Data access contract for models. UI code and route handlers depend only on this.
- * Phase 3 adds a Prisma implementation and switches getModelRepository(); nothing else changes.
+ * Data access contract for models. UI code and route handlers depend only on this; the
+ * PostgreSQL implementation lives in ./prisma/, and tests use an in-memory reference
+ * implementation (tests/support) to prove both behave the same.
  */
 export interface ModelRepository {
   list(query: ModelQuery): Promise<ModelListResult>;
   getBySlug(slug: string): Promise<ModelDetail | null>;
+  /** Details for several models in one round trip, in the requested order (unknown slugs are skipped). */
+  getManyBySlugs(slugs: string[]): Promise<ModelDetail[]>;
   suggest(q: string, limit?: number): Promise<ModelSuggestion[]>;
   related(slug: string, limit?: number): Promise<ModelListItem[]>;
   benchmarks(): Promise<BenchmarkOption[]>;
@@ -34,6 +38,9 @@ export interface ModelRepository {
   stats(now?: Date): Promise<ModelStats>;
 }
 
+let instance: ModelRepository | undefined;
+
 export function getModelRepository(): ModelRepository {
-  return demoModelRepository;
+  instance ??= createPrismaModelRepository(getPrisma());
+  return instance;
 }

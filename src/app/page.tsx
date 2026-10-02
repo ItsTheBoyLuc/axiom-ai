@@ -8,14 +8,20 @@ import {
   ProvidersOverview,
   StatsSection,
 } from '@/components/home/sections';
-import { demoProviders } from '@/lib/demo-data';
-import { getModelRepository } from '../../server/repositories/model-repository';
+import { getRepositories } from '../../server/repositories';
+
+// Rendered per request: the content comes from PostgreSQL, which is not available at build time.
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  // The hero network is seeded through the repository layer (demo data until Phase 3).
-  const models = await getModelRepository().featured(8);
+  // The hero network is seeded through the repository layer.
+  const repos = getRepositories();
+  const [models, providers] = await Promise.all([
+    repos.models.featured(8),
+    repos.providers.listAll(),
+  ]);
   const seed = {
-    providers: demoProviders
+    providers: providers
       .filter((p) => models.some((m) => m.providerSlug === p.slug))
       .map((p) => ({ slug: p.slug, name: p.name })),
     models: models.map((m) => ({ slug: m.slug, name: m.name, providerSlug: m.providerSlug })),

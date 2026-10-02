@@ -1,24 +1,9 @@
-import { demoProviders, type DemoProvider } from '../../src/lib/demo-data';
-import { getModelRepository } from './model-repository';
+import type { ProviderSummary } from '../../src/types/catalog';
+import { getRepositories } from './index';
 
-export type ProviderSummary = DemoProvider & { modelCount: number };
+export type { ProviderSummary };
 
-/** Providers with their model counts. Phase 3 swaps the source for Prisma. */
-export async function listProviders(): Promise<ProviderSummary[]> {
-  const { items } = await getModelRepository().list({
-    q: '',
-    provider: [],
-    category: [],
-    capability: [],
-    deployment: [],
-    pricing: [],
-    sort: 'alpha',
-    benchmark: null,
-    page: 1,
-    pageSize: 1000,
-  });
-  return demoProviders.map((p) => ({
-    ...p,
-    modelCount: items.filter((m) => m.providerSlug === p.slug).length,
-  }));
+/** Providers with their model counts (thin wrapper kept for the homepage components). */
+export function listProviders(): Promise<ProviderSummary[]> {
+  return getRepositories().providers.listAll();
 }

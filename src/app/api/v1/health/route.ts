@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { checkHealth } from '../../../../../server/health';
+import { checkHealth } from '@server/health';
 
 export const dynamic = 'force-dynamic';
 
-/** GET /api/v1/health - 200 when Postgres and Redis respond, 503 otherwise. */
+/** GET /api/v1/health - 200 when Postgres and Redis respond, 503 otherwise. Never cached. */
 export async function GET() {
   try {
     const report = await checkHealth();

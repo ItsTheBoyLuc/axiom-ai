@@ -1,4 +1,16 @@
-// Full data model (docs section 9) lands in Phase 3. Step 0 only wires the toolchain.
+// AXIOM AI data model (docs/PROMPT.md section 9).
+//
+// Conventions
+//  - Every FACTUAL table carries the "sourced-record mixin" (sourceUrl, verificationStatus,
+//    verifiedAt, collectedAt, dataType, isDemo). Migration 2 adds CHECK constraints so the
+//    rules of section 2 hold in the database itself, not only in application code.
+//  - `sortName` (Provider, Model) is a lowercase, accent-stripped copy of the name stored with
+//    COLLATE "C" so alphabetical order is identical in SQL and in the in-memory logic.
+//  - `searchDocument` is a denormalised, normalised text blob (name, family, provider,
+//    capabilities, categories, description) used for substring search (pg_trgm GIN index);
+//    `searchTsv` is generated from it for full-text search. Built by server/search/document.ts.
+//  - Prices/scores that are not publicly disclosed are NULL (never 0).
+
 generator client {
   provider = "prisma-client"
   output   = "./generated"
@@ -6,4 +18,586 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ---------------------------------------------------------------- enums
+
+enum VerificationStatus {
+  OFFICIALLY_VERIFIED
+  INDEPENDENTLY_EVALUATED
+  PROVIDER_REPORTED
+  COMMUNITY_REPORTED
+  UNVERIFIED
+  NOT_PUBLICLY_DISCLOSED
+}
+
+enum OrgType {
+  COMPANY
+  NONPROFIT
+  ACADEMIC
+  RESEARCH_LAB
+  OPEN_SOURCE
+  GOVERNMENT
+  OTHER
+}
+
+/// Primary way to get the model (shown as "Availability").
+enum ModelAvailability {
+  CLOUD_API
+  HOSTED_SERVICE
+  LOCAL_DEPLOYMENT
+  OPEN_WEIGHTS
+  RESEARCH_PREVIEW
+  UNAVAILABLE
+}
+
+enum Category {
+  LLM
+  REASONING
+  MULTIMODAL
+  CODING
+  IMAGE_GENERATION
+  VIDEO_GENERATION
+  AUDIO
+  EMBEDDING
+}
+
+enum Deployment {
+  CLOUD_API
+  HOSTED_SERVICE
+  LOCAL
+  OPEN_WEIGHTS
+  PROPRIETARY
+}
+
+enum Modality {
+  TEXT
+  IMAGE
+  AUDIO
+  VIDEO
+  EMBEDDINGS
+}
+
+enum PricingKind {
+  FREE
+  PAID
+  FREE_TIER
+  CUSTOM
+  UNKNOWN
+}
+
+enum CapabilityAvailability {
+  AVAILABLE
+  LIMITED
+  PREVIEW
+  NOT_AVAILABLE
+}
+
+enum PricingType {
+  INPUT
+  OUTPUT
+  CACHED_INPUT
+  BATCH_INPUT
+  BATCH_OUTPUT
+  IMAGE
+  AUDIO
+  OTHER
+}
+
+enum EvaluationType {
+  INDEPENDENT
+  PROVIDER_REPORTED
+  COMMUNITY
+}
+
+/// Superset of the spec's MAJOR|MINOR|DEPRECATION|CAPABILITY|API_CHANGE so a model's history
+/// can also show pricing changes and documentation updates (docs/PROMPT.md 7.3.6).
+enum ReleaseKind {
+  MAJOR
+  MINOR
+  DEPRECATION
+  CAPABILITY
+  API_CHANGE
+  PRICING_CHANGE
+  DOCS_UPDATE
+}
+
+enum NewsCategory {
+  MODEL_RELEASES
+  RESEARCH
+  COMPANIES
+  INFRASTRUCTURE
+  HARDWARE
+  SAFETY
+  REGULATION
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SyncRunStatus {
+  RUNNING
+  SUCCEEDED
+  PARTIAL
+  FAILED
+}
+
+enum ImportStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ---------------------------------------------------------------- catalogue
+
+model Provider {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  sortName        String
+  /// Single letter shown on the neutral logo tile (never a redrawn company logo).
+  monogram        String?
+  description     String
+  officialWebsite String?
+  logoUrl         String?
+  headquarters    String?
+  orgType         OrgType  @default(COMPANY)
+  /// Listed providers get their own filter entry; the rest are grouped under "Other".
+  isListed        Boolean  @default(true)
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  models       Model[]
+  releases     Release[]
+  publications Publication[]
+  news         NewsArticle[]
+
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([isListed])
+}
+
+model Model {
+  id         String   @id @default(cuid())
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  name       String
+  slug       String   @unique
+  sortName   String
+  family     String
+  version    String?
+  description String
+  categories Category[]
+
+  releaseDate     DateTime @db.Date
+  contextWindow   Int?
+  maxOutputTokens Int?
+  openWeights     Boolean
+  availability    ModelAvailability
+  deployment      Deployment[]
+  pricingKind     PricingKind       @default(UNKNOWN)
+  inputModalities  Modality[]
+  outputModalities Modality[]
+
+  officialDocumentation String?
+  knowledgeCutoff       String?
+  architecture          String?
+  trainingInfo          String?
+  apiAvailability       String?
+  structuredOutput      Boolean?
+  streaming             Boolean?
+  toolCalling           Boolean?
+  functionCalling       Boolean?
+
+  // Overview section (neutral, factual text)
+  purpose         String?
+  useCases        String[]
+  notableFeatures String[]
+  limitations     String[]
+
+  searchDocument String                     @default("")
+  /// GENERATED ALWAYS column (see migration 1). The dbgenerated default only mirrors it so
+  /// `migrate diff` reports no drift. Never written by the application.
+  searchTsv      Unsupported("tsvector")?                @default(dbgenerated("to_tsvector('simple'::regconfig, \"searchDocument\")"))
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  capabilities     ModelCapability[]
+  pricing          Pricing[]
+  benchmarkResults BenchmarkResult[]
+  releases         Release[]
+  news             NewsArticle[]
+  savedBy          SavedModel[]
+  viewedBy         RecentlyViewed[]
+
+  @@index([providerId, releaseDate])
+  @@index([releaseDate])
+  @@index([updatedAt])
+  @@index([categories], type: Gin)
+  @@index([deployment], type: Gin)
+  @@index([searchDocument(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([searchTsv], type: Gin)
+}
+
+model Capability {
+  id       String @id @default(cuid())
+  /// Stable kebab-case key, e.g. "tool-calling".
+  name     String @unique
+  category String
+
+  models ModelCapability[]
+}
+
+model ModelCapability {
+  modelId          String
+  capabilityId     String
+  model            Model                  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  capability       Capability             @relation(fields: [capabilityId], references: [id], onDelete: Restrict)
+  availability     CapabilityAvailability @default(AVAILABLE)
+  documentationUrl String?
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  @@id([modelId, capabilityId])
+  @@index([capabilityId])
+}
+
+model Pricing {
+  id          String      @id @default(cuid())
+  modelId     String
+  model       Model       @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  pricingType PricingType
+  /// NULL = not publicly disclosed.
+  price       Decimal?    @db.Decimal(18, 8)
+  currency    String      @db.VarChar(3)
+  /// e.g. "per 1M tokens", "per image"
+  unit        String
+  effectiveFrom DateTime  @db.Date
+  effectiveTo   DateTime? @db.Date
+  isCurrent   Boolean     @default(true)
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  @@unique([modelId, pricingType, unit, effectiveFrom])
+  @@index([modelId, isCurrent])
+}
+
+model Benchmark {
+  id             String  @id @default(cuid())
+  slug           String  @unique
+  name           String
+  category       String
+  description    String
+  methodologyUrl String?
+  version        String?
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  results BenchmarkResult[]
+
+  @@index([category])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model BenchmarkResult {
+  id               String         @id @default(cuid())
+  modelId          String
+  benchmarkId      String
+  model            Model          @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  benchmark        Benchmark      @relation(fields: [benchmarkId], references: [id], onDelete: Cascade)
+  score            Decimal        @db.Decimal(12, 4)
+  scoreUnit        String
+  evaluationDate   DateTime       @db.Date
+  modelVersion     String
+  benchmarkVersion String?
+  methodologyNotes String?
+  evaluationType   EvaluationType
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  @@unique([modelId, benchmarkId, evaluationDate, evaluationType, modelVersion])
+  @@index([benchmarkId, modelId, evaluationDate])
+  @@index([modelId])
+}
+
+model Release {
+  id              String      @id @default(cuid())
+  modelId         String?
+  providerId      String
+  model           Model?      @relation(fields: [modelId], references: [id], onDelete: SetNull)
+  provider        Provider    @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  kind            ReleaseKind
+  releaseDate     DateTime    @db.Date
+  title           String
+  description     String
+  announcementUrl String?
+  docsUrl         String?
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  @@unique([providerId, releaseDate, title])
+  @@index([releaseDate])
+  @@index([providerId, releaseDate])
+  @@index([modelId])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model NewsArticle {
+  id              String       @id @default(cuid())
+  title           String
+  summary         String
+  publisher       String
+  articleUrl      String       @unique
+  publicationDate DateTime
+  category        NewsCategory
+  isOfficial      Boolean      @default(false)
+  isAiSummary     Boolean      @default(false)
+  providerId      String?
+  provider        Provider?    @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  models          Model[]
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  @@index([publicationDate])
+  @@index([providerId, publicationDate])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model Publication {
+  id          String   @id @default(cuid())
+  providerId  String
+  provider    Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  title       String
+  url         String
+  publishedAt DateTime @db.Date
+  venue       String?
+
+  sourceUrl          String?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  collectedAt        DateTime           @default(now())
+  dataType           String?
+  isDemo             Boolean            @default(false)
+
+  @@unique([providerId, url])
+  @@index([providerId, publishedAt])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+// ---------------------------------------------------------------- users (Auth.js v5 shapes)
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  accounts         Account[]
+  sessions         Session[]
+  savedComparisons SavedComparison[]
+  savedModels      SavedModel[]
+  recentlyViewed   RecentlyViewed[]
+  preference       UserPreference?
+  auditLogs        AuditLog[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model SavedComparison {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  configuration Json
+  createdAt     DateTime @default(now()) @map("created_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model SavedModel {
+  userId    String
+  modelId   String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model     Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@id([userId, modelId])
+}
+
+model RecentlyViewed {
+  userId   String
+  modelId  String
+  viewedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model    Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@id([userId, modelId])
+  @@index([userId, viewedAt])
+}
+
+model UserPreference {
+  userId             String   @id
+  theme              String?
+  preferredProviders String[]
+  settings           Json?
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------- operations
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  before     Json?
+  after      Json?
+  ip         String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@index([actorId])
+}
+
+model SyncSource {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  kind     String
+  config   Json
+  schedule String
+  enabled  Boolean   @default(true)
+  runs     SyncRun[]
+}
+
+model SyncRun {
+  id             String        @id @default(cuid())
+  sourceId       String
+  source         SyncSource    @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  startedAt      DateTime      @default(now())
+  finishedAt     DateTime?
+  status         SyncRunStatus @default(RUNNING)
+  recordsSeen    Int           @default(0)
+  recordsChanged Int           @default(0)
+  error          String?
+  issues         SyncIssue[]
+  imports        ImportedRecord[]
+
+  @@index([sourceId, startedAt])
+}
+
+model SyncIssue {
+  id         String  @id @default(cuid())
+  runId      String
+  run        SyncRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  entityType String
+  message    String
+  payload    Json
+
+  @@index([runId])
+}
+
+/// Staging area: imports land here as PENDING and need admin approval (docs/PROMPT.md 9).
+model ImportedRecord {
+  id         String       @id @default(cuid())
+  runId      String
+  run        SyncRun      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  entityType String
+  payload    Json
+  diff       Json
+  status     ImportStatus @default(PENDING)
+  reviewedBy String?
+  reviewedAt DateTime?
+
+  @@index([runId])
+  @@index([status])
 }

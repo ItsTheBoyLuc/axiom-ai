@@ -53,6 +53,7 @@ export async function StatsSection() {
 
 export async function FeaturedModels() {
   const models = await getModelRepository().featured(6);
+  if (models.length === 0) return null; // nothing to show yet: render no empty section
   return (
     <Section
       id="featured"
@@ -79,6 +80,7 @@ export async function FeaturedModels() {
 
 export async function ProvidersOverview() {
   const providers = await listProviders();
+  if (providers.length === 0) return null;
   return (
     <Section
       id="providers"
@@ -122,6 +124,7 @@ export async function ProvidersOverview() {
 
 export async function ComparisonSection() {
   const models = await getModelRepository().featured(6);
+  if (models.length === 0) return null;
   return (
     <Section
       id="compare"

@@ -9,6 +9,9 @@ import { SmoothScroll } from '@/components/layout/smooth-scroll';
 import { ThemeProvider, themeInitScript } from '@/components/layout/theme-provider';
 import '../styles/globals.css';
 
+/** Static pages re-check the database (footer timestamp) at most every 5 minutes. */
+export const revalidate = 300;
+
 const siteUrl = process.env.APP_URL ?? 'http://localhost:3000';
 
 export const metadata: Metadata = {

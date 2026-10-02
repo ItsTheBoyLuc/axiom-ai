@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  demoModelRepository,
-  toListItem,
-} from '../../server/repositories/demo/demo-model-repository';
-import { demoModelDetails } from '../../server/repositories/demo/models';
+import { createInMemoryModelRepository, toListItem } from '../support/in-memory-model-repository';
+import { demoModelDetails } from '../../prisma/seed/demo/models';
 import {
   buildFacets,
   filterModels,
@@ -18,6 +15,7 @@ import { defaultQuery } from '@/lib/models/query';
 import type { ModelQuery } from '@/types/model';
 
 const all = demoModelDetails.map(toListItem);
+const memoryRepo = createInMemoryModelRepository();
 const q = (over: Partial<ModelQuery> = {}): ModelQuery => ({ ...defaultQuery, ...over });
 const slugs = (items: { slug: string }[]) => items.map((m) => m.slug);
 
@@ -219,9 +217,9 @@ describe('suggestions and related', () => {
   });
 
   it('repository facade agrees with the pure functions', async () => {
-    const r = await demoModelRepository.list(q({ category: ['embedding'] }));
+    const r = await memoryRepo.list(q({ category: ['embedding'] }));
     expect(slugs(r.items)).toEqual(['sample-model-10']);
-    expect((await demoModelRepository.getBySlug('sample-model-1'))?.name).toBe('Sample Model 1');
-    expect(await demoModelRepository.getBySlug('nope')).toBeNull();
+    expect((await memoryRepo.getBySlug('sample-model-1'))?.name).toBe('Sample Model 1');
+    expect(await memoryRepo.getBySlug('nope')).toBeNull();
   });
 });

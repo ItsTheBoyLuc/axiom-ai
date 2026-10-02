@@ -20,7 +20,17 @@ RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --ignore-scripts
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+# --ignore-scripts skipped the postinstall hook, so generate the Prisma client explicitly.
+# (prisma/generated is dockerignored: a stale host copy must never leak into the image.)
+RUN npx prisma generate && npm run build
+
+# ---- migrate: one-shot job that applies pending migrations (`prisma migrate deploy`).
+# Also the place to run the seed: `docker compose run --rm migrate npm run db:seed`.
+FROM builder AS migrate
+ENV NODE_ENV=production
+RUN chown -R node:node /app/prisma
+USER node
+CMD ["npx", "prisma", "migrate", "deploy"]
 
 # ---- web runtime (non-root)
 FROM base AS web

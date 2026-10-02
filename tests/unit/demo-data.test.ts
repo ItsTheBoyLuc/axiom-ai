@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { demoNews, demoProviders, demoReleases } from '@/lib/demo-data';
 import { formatTokens } from '@/lib/format';
 import { buildGraph } from '@/components/hero/graph';
-import { demoBenchmarks, demoModelDetails } from '../../server/repositories/demo/models';
-import { getStats } from '../../server/services/stats';
+import { demoBenchmarks, demoModelDetails } from '../../prisma/seed/demo/models';
 import { trustRank } from '@/lib/verification';
 
 describe('demo data safety (docs/PROMPT.md section 2)', () => {
@@ -59,14 +58,6 @@ describe('demo data safety (docs/PROMPT.md section 2)', () => {
     for (const m of withHistory) {
       for (const p of m.pricing.filter((x) => !x.isCurrent)) expect(p.effectiveTo).not.toBeNull();
     }
-  });
-
-  it('stats are flagged as demo while data is placeholder', async () => {
-    const s = await getStats(new Date('2026-09-29T12:00:00Z'));
-    expect(s.isDemo).toBe(true);
-    expect(s.totalModels).toBe(demoModelDetails.length);
-    expect(s.providers).toBe(demoProviders.length);
-    expect(s.lastDataUpdate).toBeNull();
   });
 });
 

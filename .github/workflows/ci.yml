@@ -27,6 +27,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - run: npm run test:integration
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
       - run: npm audit --audit-level=high
-      # Integration, Playwright and Docker build jobs are added in later phases.
+      # A Docker image build job is added in the hardening phase.

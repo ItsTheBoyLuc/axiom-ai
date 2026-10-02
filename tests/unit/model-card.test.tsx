@@ -2,8 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { ModelCard } from '@/components/models/model-card';
 import { pricingSummary } from '@/lib/models/display';
-import { toListItem } from '../../server/repositories/demo/demo-model-repository';
-import { demoModelDetails } from '../../server/repositories/demo/models';
+import { toListItem } from '../support/in-memory-model-repository';
+import { demoModelDetails } from '../../prisma/seed/demo/models';
 
 const item = (slug: string) => toListItem(demoModelDetails.find((m) => m.slug === slug)!);
 

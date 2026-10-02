@@ -1,4 +1,5 @@
 import { latestBenchmarkResult } from '../../src/lib/models/benchmarks';
+import { compareKeys, normalizeText, searchTokens, sortKey } from '../../src/lib/text';
 import {
   CAPABILITIES,
   CATEGORIES,
@@ -8,6 +9,8 @@ import {
   categoryLabel,
   deploymentLabel,
   pricingKindLabel,
+  type Capability,
+  type Category,
   type FacetOption,
   type ModelFacets,
   type ModelListItem,
@@ -17,31 +20,56 @@ import {
 } from '../../src/types/model';
 
 /**
- * Pure directory logic (search, filter, sort, paginate, facets). The demo repository runs it
- * in memory; the Prisma repository (Phase 3) implements the same contract in SQL.
+ * Pure directory logic (search, filter, sort, paginate, facets). The in-memory reference
+ * implementation (used by tests) runs it directly; the Prisma repository reimplements the same
+ * contract in SQL and is checked against this one by parity tests.
  * Semantics: OR within a filter group, AND across groups.
  */
 
-type Dimension = 'provider' | 'category' | 'capability' | 'deployment' | 'pricing';
+export type Dimension = 'provider' | 'category' | 'capability' | 'deployment' | 'pricing';
 
-const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/\p{M}/gu, '');
+/** The fields search looks at. ModelListItem satisfies this, so does a slim DB row. */
+export type SearchFields = {
+  name: string;
+  family: string;
+  providerName: string;
+  description: string;
+  capabilities: Capability[];
+  categories: Category[];
+};
 
-const tokens = (q: string) => norm(q).split(/\s+/).filter(Boolean);
+/**
+ * The normalised text blob used for substring search: one line per field, so a token (which
+ * never contains whitespace) can only match inside a single field. The database stores exactly
+ * this string in Model.searchDocument.
+ */
+export function buildSearchDocumentText(m: SearchFields): string {
+  return [
+    m.name,
+    m.family,
+    m.providerName,
+    m.capabilities.map((c) => capabilityLabel[c]).join(' '),
+    m.categories.map((c) => categoryLabel[c]).join(' '),
+    m.description,
+  ]
+    .map(normalizeText)
+    .join('\n');
+}
 
 /**
  * Relevance of a model to a search string. Every token must match somewhere (name, family,
  * provider, description, capabilities, categories); 0 means no match.
  */
-export function searchScore(m: ModelListItem, q: string): number {
-  const toks = tokens(q);
+export function searchScore(m: SearchFields, q: string): number {
+  const toks = searchTokens(q);
   if (toks.length === 0) return 1;
   const fields: [string, number][] = [
-    [norm(m.name), 4],
-    [norm(m.family), 3],
-    [norm(m.providerName), 3],
-    [norm(m.capabilities.map((c) => capabilityLabel[c]).join(' ')), 2],
-    [norm(m.categories.map((c) => categoryLabel[c]).join(' ')), 2],
-    [norm(m.description), 1],
+    [normalizeText(m.name), 4],
+    [normalizeText(m.family), 3],
+    [normalizeText(m.providerName), 3],
+    [normalizeText(m.capabilities.map((c) => capabilityLabel[c]).join(' ')), 2],
+    [normalizeText(m.categories.map((c) => categoryLabel[c]).join(' ')), 2],
+    [normalizeText(m.description), 1],
   ];
   let score = 0;
   for (const t of toks) {
@@ -77,7 +105,13 @@ function matchesDimension(m: ModelListItem, query: ModelQuery, dim: Dimension): 
   }
 }
 
-const DIMENSIONS: Dimension[] = ['provider', 'category', 'capability', 'deployment', 'pricing'];
+export const DIMENSIONS: Dimension[] = [
+  'provider',
+  'category',
+  'capability',
+  'deployment',
+  'pricing',
+];
 
 /** Applies search + all filter groups, optionally skipping one group (used for facet counts). */
 export function filterModels(
@@ -92,7 +126,9 @@ export function filterModels(
   );
 }
 
-const byName = (a: ModelListItem, b: ModelListItem) => a.name.localeCompare(b.name);
+/** Name order used everywhere: normalised name by code point, then slug (fully deterministic). */
+export const byName = (a: { name: string; slug: string }, b: { name: string; slug: string }) =>
+  compareKeys(sortKey(a.name), sortKey(b.name)) || compareKeys(a.slug, b.slug);
 
 /** Sorts a copy. There is deliberately no "overall" / relevance-blended ranking. */
 export function sortModels(items: ModelListItem[], query: ModelQuery): ModelListItem[] {
@@ -107,25 +143,28 @@ export function sortModels(items: ModelListItem[], query: ModelQuery): ModelList
       if (y === null) return -1;
       return y - x || byName(a, b);
     };
+  const newestFirst = (a: ModelListItem, b: ModelListItem) =>
+    compareKeys(b.releaseDate, a.releaseDate) || byName(a, b);
 
   switch (query.sort) {
     case 'alpha':
       return out.sort(byName);
     case 'provider':
-      return out.sort((a, b) => a.providerName.localeCompare(b.providerName) || byName(a, b));
+      return out.sort(
+        (a, b) => compareKeys(sortKey(a.providerName), sortKey(b.providerName)) || byName(a, b),
+      );
     case 'updated':
-      return out.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || byName(a, b));
+      return out.sort((a, b) => compareKeys(b.updatedAt, a.updatedAt) || byName(a, b));
     case 'context':
       return out.sort(numericDesc((m) => m.contextWindow));
     case 'benchmark': {
       const slug = query.benchmark;
-      if (!slug)
-        return out.sort((a, b) => b.releaseDate.localeCompare(a.releaseDate) || byName(a, b));
+      if (!slug) return out.sort(newestFirst);
       return out.sort(numericDesc((m) => latestBenchmarkResult(m.benchmarks, slug)?.score ?? null));
     }
     case 'recent':
     default:
-      return out.sort((a, b) => b.releaseDate.localeCompare(a.releaseDate) || byName(a, b));
+      return out.sort(newestFirst);
   }
 }
 
@@ -141,7 +180,7 @@ export function buildFacets(all: ModelListItem[], query: ModelQuery): ModelFacet
     else hasOther = true;
   }
   const provider: FacetOption[] = [...listedProviders.entries()]
-    .sort((a, b) => a[1].localeCompare(b[1]))
+    .sort((a, b) => compareKeys(sortKey(a[1]), sortKey(b[1])))
     .map(([value, label]) => ({
       value,
       label,
@@ -180,13 +219,18 @@ export function buildFacets(all: ModelListItem[], query: ModelQuery): ModelFacet
   };
 }
 
+/** Clamps a page number into range and returns the slice bounds. */
+export function paginate(total: number, page: number, pageSize: number) {
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const clamped = Math.min(Math.max(1, page), pageCount);
+  return { pageCount, page: clamped, start: (clamped - 1) * pageSize };
+}
+
 /** Full directory result: filter, sort, paginate (page is clamped into range) and facets. */
 export function listModels(all: ModelListItem[], query: ModelQuery): ModelListResult {
   const filtered = sortModels(filterModels(all, query), query);
   const total = filtered.length;
-  const pageCount = Math.max(1, Math.ceil(total / query.pageSize));
-  const page = Math.min(Math.max(1, query.page), pageCount);
-  const start = (page - 1) * query.pageSize;
+  const { pageCount, page, start } = paginate(total, query.page, query.pageSize);
   const items = filtered.slice(start, start + query.pageSize);
   return {
     items,
@@ -199,36 +243,67 @@ export function listModels(all: ModelListItem[], query: ModelQuery): ModelListRe
   };
 }
 
-/** Top suggestions for the search box, best match first. */
-export function suggestModels(all: ModelListItem[], q: string, limit = 6): ModelSuggestion[] {
-  if (tokens(q).length === 0) return [];
-  return all
+/** Orders search hits: best match first, then name. Shared by every suggest implementation. */
+export function rankSuggestions<T extends SearchFields & { slug: string }>(
+  rows: T[],
+  q: string,
+  limit: number,
+): T[] {
+  return rows
     .map((m) => ({ m, score: searchScore(m, q) }))
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score || byName(a.m, b.m))
     .slice(0, limit)
-    .map(({ m }) => ({
-      slug: m.slug,
-      name: m.name,
-      providerName: m.providerName,
-      family: m.family,
-      isDemo: m.isDemo,
-    }));
+    .map((x) => x.m);
+}
+
+/** Top suggestions for the search box, best match first. */
+export function suggestModels(all: ModelListItem[], q: string, limit = 6): ModelSuggestion[] {
+  if (searchTokens(q).length === 0) return [];
+  return rankSuggestions(all, q, limit).map((m) => ({
+    slug: m.slug,
+    name: m.name,
+    providerName: m.providerName,
+    family: m.family,
+    isDemo: m.isDemo,
+  }));
+}
+
+export type RelatedFields = {
+  slug: string;
+  name: string;
+  providerSlug: string;
+  categories: Category[];
+  capabilities: Capability[];
+};
+
+/** Related-model score: same provider, plus overlapping categories and capabilities. */
+export function relatedScore(self: RelatedFields, m: RelatedFields): number {
+  return (
+    (m.providerSlug === self.providerSlug ? 3 : 0) +
+    m.categories.filter((c) => self.categories.includes(c)).length * 2 +
+    m.capabilities.filter((c) => self.capabilities.includes(c)).length
+  );
+}
+
+/** Ranks candidates by related score (ties by name) and returns the top `limit`. */
+export function rankRelated<T extends RelatedFields>(
+  self: RelatedFields,
+  all: T[],
+  limit: number,
+): T[] {
+  return all
+    .filter((m) => m.slug !== self.slug)
+    .map((m) => ({ m, s: relatedScore(self, m) }))
+    .filter((x) => x.s > 0)
+    .sort((a, b) => b.s - a.s || byName(a.m, b.m))
+    .slice(0, limit)
+    .map((x) => x.m);
 }
 
 /** Related models: same provider and/or overlapping categories and capabilities. */
 export function relatedModels(all: ModelListItem[], slug: string, limit = 3): ModelListItem[] {
   const self = all.find((m) => m.slug === slug);
   if (!self) return [];
-  const score = (m: ModelListItem) =>
-    (m.providerSlug === self.providerSlug ? 3 : 0) +
-    m.categories.filter((c) => self.categories.includes(c)).length * 2 +
-    m.capabilities.filter((c) => self.capabilities.includes(c)).length;
-  return all
-    .filter((m) => m.slug !== slug)
-    .map((m) => ({ m, s: score(m) }))
-    .filter((x) => x.s > 0)
-    .sort((a, b) => b.s - a.s || byName(a.m, b.m))
-    .slice(0, limit)
-    .map((x) => x.m);
+  return rankRelated(self, all, limit);
 }

@@ -10,6 +10,14 @@ x-app-env: &app-env
   WORKER_HEALTH_PORT: ${WORKER_HEALTH_PORT:-3001}
 
 services:
+  # One-shot: applies pending Prisma migrations, then exits. web and worker wait for it.
+  migrate:
+    build: { context: ., dockerfile: docker/Dockerfile, target: migrate }
+    environment: *app-env
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: 'no'
+
   web:
     build: { context: ., dockerfile: docker/Dockerfile, target: web }
     ports: ['${WEB_PORT:-3000}:3000']
@@ -17,6 +25,7 @@ services:
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
     restart: unless-stopped
 
   worker:
@@ -25,6 +34,7 @@ services:
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
     restart: unless-stopped
 
   postgres:

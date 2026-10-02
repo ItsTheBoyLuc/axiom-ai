@@ -1,5 +1,4 @@
-import { getModelRepository } from '../repositories/model-repository';
-import { listProviders } from '../repositories/provider-repository';
+import { getRepositories, type Repositories } from '../repositories';
 
 export type PlatformStats = {
   totalModels: number;
@@ -7,14 +6,17 @@ export type PlatformStats = {
   releasedThisMonth: number;
   benchmarks: number;
   recentlyUpdated: number;
-  /** True while values come from placeholder data; the UI must show a DEMO DATA badge. */
+  /** True while the database holds placeholder rows; the UI must show a DEMO DATA badge. */
   isDemo: boolean;
   lastDataUpdate: string | null;
 };
 
-/** Platform statistics, derived through the repository layer (demo data until Phase 3). */
-export async function getStats(now = new Date()): Promise<PlatformStats> {
-  const [s, providers] = await Promise.all([getModelRepository().stats(now), listProviders()]);
+/** Platform statistics from the database, via the repository layer. */
+export async function getStats(
+  repos: Pick<Repositories, 'models' | 'providers'> = getRepositories(),
+  now = new Date(),
+): Promise<PlatformStats> {
+  const [s, providers] = await Promise.all([repos.models.stats(now), repos.providers.listAll()]);
   return {
     totalModels: s.total,
     providers: providers.length,

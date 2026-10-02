@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-dropdown-menu": "^2.1.24",
@@ -60,13 +61,18 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "worker": "tsx worker/index.ts",
+    "worker": "tsx --env-file-if-exists=.env worker/index.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "prepare": "husky || echo skip",
     "test:e2e": "playwright test",
-    "icons": "node scripts/generate-icons.mjs"
+    "icons": "node scripts/generate-icons.mjs",
+    "postinstall": "prisma generate",
+    "db:seed": "tsx --env-file-if-exists=.env prisma/seed/run.ts",
+    "db:seed:demo": "cross-env SEED_DEMO=true tsx --env-file-if-exists=.env prisma/seed/run.ts",
+    "db:status": "prisma migrate status",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [

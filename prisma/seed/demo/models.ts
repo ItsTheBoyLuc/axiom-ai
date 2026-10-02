@@ -1,5 +1,11 @@
 import { demoProviders } from '../../../src/lib/demo-data';
 import {
+  sortCapabilities,
+  sortHistory,
+  sortPricing,
+  sortResults,
+} from '../../../src/lib/models/ordering';
+import {
   categoryLabel,
   type BenchmarkOption,
   type BenchmarkResult,
@@ -525,6 +531,14 @@ function buildResults(spec: Spec): BenchmarkResult[] {
   });
 }
 
+/** Current prices start at release, or the day after the previous price ended. */
+function currentFrom(spec: Spec): string {
+  if (!spec.pastPrice) return spec.release;
+  const next = new Date(`${spec.pastPrice.to}T00:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  return next.toISOString().slice(0, 10);
+}
+
 function buildPricing(spec: Spec): PricingEntry[] {
   const unit = 'per 1M tokens';
   const base = { currency: 'USD', unit, sourceUrl: null, verifiedAt: null, isDemo: true } as const;
@@ -535,7 +549,7 @@ function buildPricing(spec: Spec): PricingEntry[] {
       ...base,
       type,
       price,
-      effectiveFrom: spec.release,
+      effectiveFrom: currentFrom(spec),
       effectiveTo: null,
       isCurrent: true,
     });
@@ -553,7 +567,7 @@ function buildPricing(spec: Spec): PricingEntry[] {
       unit: spec.otherPrice.unit,
       type: spec.otherPrice.type,
       price: spec.otherPrice.price,
-      effectiveFrom: spec.release,
+      effectiveFrom: currentFrom(spec),
       effectiveTo: null,
       isCurrent: true,
     });
@@ -585,7 +599,7 @@ function buildHistory(spec: Spec, name: string): ReleaseHistoryEntry[] {
   const entries: ReleaseHistoryEntry[] = [
     {
       date: spec.release,
-      kind: 'INITIAL',
+      kind: 'MAJOR',
       title: `${name} released`,
       description: 'Placeholder initial release entry. Invented for layout testing.',
       sourceUrl: null,
@@ -595,7 +609,7 @@ function buildHistory(spec: Spec, name: string): ReleaseHistoryEntry[] {
   if (spec.pastPrice) {
     entries.push({
       date: '2026-07-01',
-      kind: 'PRICING',
+      kind: 'PRICING_CHANGE',
       title: 'Placeholder pricing change',
       description: 'Invented entry for layout testing.',
       sourceUrl: null,
@@ -607,8 +621,10 @@ function buildHistory(spec: Spec, name: string): ReleaseHistoryEntry[] {
 function build(spec: Spec): ModelDetail {
   const provider = demoProviders.find((p) => p.monogram === spec.provider)!;
   const name = `Sample Model ${spec.n}`;
-  const results = buildResults(spec);
-  const pricing = buildPricing(spec);
+  // Canonical ordering (see src/lib/models/ordering.ts) so fixtures and database rows agree.
+  const results = sortResults(buildResults(spec));
+  const pricing = sortPricing(buildPricing(spec));
+  const caps = sortCapabilities(spec.caps);
   const modalities = [...new Set([...spec.input, ...spec.output])];
   const catText = spec.cats.map((c) => categoryLabel[c].toLowerCase()).join(', ');
   const tokenCurrent = pricing.filter((p) => p.isCurrent && p.unit === 'per 1M tokens');
@@ -626,7 +642,7 @@ function build(spec: Spec): ModelDetail {
     providerMonogram: provider.monogram,
     providerTier: provider.tier,
     releaseDate: spec.release,
-    updatedAt: spec.updated,
+    updatedAt: `${spec.updated}T00:00:00.000Z`,
     contextWindow: spec.ctx,
     modalities,
     availability: spec.availability,
@@ -642,7 +658,7 @@ function build(spec: Spec): ModelDetail {
         }
       : null,
     categories: spec.cats,
-    capabilities: spec.caps,
+    capabilities: caps,
     benchmarks: results,
     verificationStatus: 'UNVERIFIED',
     isDemo: true,
@@ -659,7 +675,7 @@ function build(spec: Spec): ModelDetail {
       ],
       limitations: ['Placeholder limitation. Demo data has no verified limitations.'],
     },
-    capabilityAvailability: spec.caps.map((capability, i) => ({
+    capabilityAvailability: caps.map((capability, i) => ({
       capability,
       availability: (i === spec.caps.length - 1 && spec.caps.length > 3
         ? 'PREVIEW'
@@ -684,7 +700,7 @@ function build(spec: Spec): ModelDetail {
       apiAvailability: spec.deploy.includes('cloud-api') ? 'Available' : null,
     },
     pricing,
-    releaseHistory: buildHistory(spec, name),
+    releaseHistory: sortHistory(buildHistory(spec, name)),
     documentationUrl: null,
   };
 }

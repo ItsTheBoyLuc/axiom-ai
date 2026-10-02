@@ -119,7 +119,52 @@ export type PricingType =
   | 'IMAGE'
   | 'AUDIO'
   | 'OTHER';
-export type ReleaseKind = 'INITIAL' | 'VERSION' | 'CAPABILITY' | 'DEPRECATION' | 'PRICING' | 'DOCS';
+/** Mirrors the Prisma ReleaseKind enum (a superset of the spec's kinds, see schema.prisma). */
+export const RELEASE_KINDS = [
+  'MAJOR',
+  'MINOR',
+  'CAPABILITY',
+  'DEPRECATION',
+  'API_CHANGE',
+  'PRICING_CHANGE',
+  'DOCS_UPDATE',
+] as const;
+export type ReleaseKind = (typeof RELEASE_KINDS)[number];
+
+export const releaseKindLabel: Record<ReleaseKind, string> = {
+  MAJOR: 'Major release',
+  MINOR: 'Minor update',
+  CAPABILITY: 'Capability change',
+  DEPRECATION: 'Deprecation',
+  API_CHANGE: 'API change',
+  PRICING_CHANGE: 'Pricing change',
+  DOCS_UPDATE: 'Documentation update',
+};
+
+/** Primary access channel (Prisma ModelAvailability), shown as "Availability". */
+export const AVAILABILITIES = [
+  'CLOUD_API',
+  'HOSTED_SERVICE',
+  'LOCAL_DEPLOYMENT',
+  'OPEN_WEIGHTS',
+  'RESEARCH_PREVIEW',
+  'UNAVAILABLE',
+] as const;
+export type AvailabilityKey = (typeof AVAILABILITIES)[number];
+
+export const availabilityLabel: Record<AvailabilityKey, string> = {
+  CLOUD_API: 'Cloud API',
+  HOSTED_SERVICE: 'Hosted service',
+  LOCAL_DEPLOYMENT: 'Local deployment',
+  OPEN_WEIGHTS: 'Open weights',
+  RESEARCH_PREVIEW: 'Research preview',
+  UNAVAILABLE: 'Not available',
+};
+
+/** Label -> key, for mapping display strings (e.g. fixtures) back to the enum. */
+export const availabilityKeyByLabel = Object.fromEntries(
+  Object.entries(availabilityLabel).map(([k, v]) => [v, k as AvailabilityKey]),
+) as Record<string, AvailabilityKey>;
 
 /** Fields every factual record carries (docs/PROMPT.md section 2). */
 export type Sourced = {
