@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
-import { gotoReady, revealAll, setTheme } from './helpers';
+import { animationsSettled, gotoReady, revealAll, setTheme } from './helpers';
 
 const SHOTS = 'test-results/screenshots';
 mkdirSync(SHOTS, { recursive: true });
@@ -542,6 +542,7 @@ test.describe('accessibility (axe, WCAG 2.2 AA)', () => {
     await gotoReady(page, '/models');
     await page.getByRole('button', { name: /^Filters/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
+    await animationsSettled(page); // the sheet is still sliding in when it first counts as visible
     const a = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();

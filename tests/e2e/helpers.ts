@@ -36,3 +36,49 @@ export async function gotoReady(page: Page, url: string) {
   await page.waitForFunction(() => document.querySelector('[id^="S:"]') === null);
   return res;
 }
+
+/**
+ * Waits until the page has stopped moving: no finite WAAPI animation is running AND the computed
+ * transform and opacity of every element stay unchanged for several consecutive frames (Motion's
+ * springs are JS-driven, so `getAnimations()` alone cannot see them). Axe samples the background
+ * under each text node by on-screen position, so scanning while a sheet, menu or fade is still
+ * moving can pick the wrong background and report a flaky color-contrast violation (seen in CI on
+ * the mobile filter sheet, which is still sliding in when it first counts as visible). Infinite
+ * animations (skeleton shimmer, ambient loops) are ignored.
+ */
+export async function animationsSettled(page: Page, timeoutMs = 5_000) {
+  await page.evaluate(async (limit) => {
+    const finite = () =>
+      document
+        .getAnimations()
+        .every(
+          (a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity,
+        );
+    const signature = () => {
+      const parts: string[] = [];
+      let i = 0;
+      for (const el of document.querySelectorAll('body *')) {
+        i++;
+        const cs = getComputedStyle(el);
+        if (
+          cs.opacity !== '1' ||
+          (cs.transform !== 'none' && !cs.transform.startsWith('matrix(1, 0, 0, 1, 0, 0)'))
+        )
+          parts.push(`${i}:${cs.transform}|${cs.opacity}`);
+      }
+      return parts.join(';');
+    };
+    const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+    const start = performance.now();
+    let last = '';
+    let stable = 0;
+    while (performance.now() - start < limit) {
+      await frame();
+      const sig = signature();
+      stable = finite() && sig === last ? stable + 1 : 0;
+      last = sig;
+      if (stable >= 6) return;
+    }
+    throw new Error('page did not settle: animations or transforms kept changing');
+  }, timeoutMs);
+}
