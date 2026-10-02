@@ -15,6 +15,8 @@ export type Graph = { nodes: GraphNode[]; edges: GraphEdge[] };
 export type GraphSeed = {
   providers: { slug: string; name: string }[];
   models: { slug: string; name: string; providerSlug: string }[];
+  /** True when the labels come from demo fixtures; the UI then says so. */
+  isDemo?: boolean;
 };
 
 /** Small seeded PRNG (mulberry32) so server, static fallback and canvas agree on the layout. */

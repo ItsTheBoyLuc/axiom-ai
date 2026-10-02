@@ -1,19 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
 import { ButtonLink } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/badges';
 import { LogoMark } from '@/components/ui/logo';
-import { fadeUp, reducedFade, stagger } from '@/lib/motion';
+import { fadeUp, stagger } from '@/lib/motion';
 import type { GraphSeed } from './graph';
 import { HeroScroll } from './hero-scroll';
 import { HeroVisual } from './hero-visual';
 import { StaticNetwork } from './static-network';
 
 export function Hero({ seed }: { seed: GraphSeed }) {
-  const reduce = useReducedMotion();
-  const item = reduce ? reducedFade : fadeUp;
+  // Reduced motion is applied by MotionProvider (fade only); never branch on it while rendering.
+  const item = fadeUp;
 
   return (
     <HeroScroll>
@@ -66,19 +66,21 @@ export function Hero({ seed }: { seed: GraphSeed }) {
               Compare Models
             </ButtonLink>
           </motion.div>
-          <motion.div variants={item} className="mt-8">
-            <DemoBadge />
-            <span className="sr-only">
-              {' '}
-              The network in the background shows placeholder providers and models.
-            </span>
-          </motion.div>
+          {seed.isDemo && (
+            <motion.div variants={item} className="mt-8">
+              <DemoBadge />
+              <span className="sr-only">
+                {' '}
+                The network in the background shows placeholder providers and models.
+              </span>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Keyboard / screen-reader alternative to the canvas: the same links as a real list,
             visible when focused. */}
         <nav
-          aria-label="Providers and models (demo)"
+          aria-label={seed.isDemo ? 'Providers and models (demo)' : 'Providers and models'}
           className="sr-only-focusable border-line-strong bg-elevated absolute bottom-4 left-4 z-20 max-h-[40vh] max-w-[calc(100%-2rem)] overflow-auto rounded-xl border p-4 text-sm shadow-[var(--shadow-pop)]"
         >
           <ul className="flex flex-wrap gap-x-4 gap-y-1">

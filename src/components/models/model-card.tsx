@@ -14,7 +14,7 @@ export function Monogram({ letter, size = 40 }: { letter: string; size?: number 
   return (
     <span
       aria-hidden
-      className="border-line-strong bg-elevated text-fg-2 inline-flex shrink-0 items-center justify-center rounded-xl border font-mono font-medium"
+      className="border-line-strong bg-elevated text-fg-2 inline-flex shrink-0 items-center justify-center rounded-xl border font-sans font-semibold"
       style={{ width: size, height: size, fontSize: size * 0.4 }}
     >
       {letter}
@@ -49,12 +49,12 @@ export function ModelCard({
       <div className="flex items-start gap-3">
         <Monogram letter={model.providerMonogram} />
         <div className="min-w-0 flex-1">
-          <h3 className="t-h3 truncate">
+          <h3 className="t-h3 [overflow-wrap:anywhere]">
             <Link href={`/models/${model.slug}`} className="hover:underline">
               {model.name}
             </Link>
           </h3>
-          <p className="text-fg-2 truncate text-sm">
+          <p className="text-fg-2 line-clamp-2 text-sm">
             {model.providerName} &middot; {model.family}
             {model.version ? ` v${model.version}` : ''}
           </p>

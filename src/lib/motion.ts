@@ -60,12 +60,6 @@ export const stagger: Variants = {
   show: { transition: { staggerChildren: staggerDelay, delayChildren: 0.05 } },
 };
 
-/** Reduced-motion counterparts: opacity only, very short. */
-export const reducedFade: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: duration.fast } },
-};
-
 /** Viewport options for scroll-triggered reveals (once, slightly before entering). */
 export const viewportOnce = { once: true, margin: '0px 0px -80px 0px' } as const;
 

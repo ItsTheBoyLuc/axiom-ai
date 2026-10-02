@@ -25,6 +25,7 @@ export default async function Home() {
       .filter((p) => models.some((m) => m.providerSlug === p.slug))
       .map((p) => ({ slug: p.slug, name: p.name })),
     models: models.map((m) => ({ slug: m.slug, name: m.name, providerSlug: m.providerSlug })),
+    isDemo: models.some((m) => m.isDemo),
   };
 
   return (

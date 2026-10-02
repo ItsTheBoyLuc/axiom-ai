@@ -1,9 +1,9 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
-import { fadeUp, reducedFade, stagger, viewportOnce } from '@/lib/motion';
+import { motion } from 'motion/react';
+import { fadeUp, stagger, viewportOnce } from '@/lib/motion';
 
-/** Scroll-triggered reveal (once). Reduced motion: opacity fade only. */
+/** Scroll-triggered reveal (once). Reduced motion (fade only) is applied by MotionProvider. */
 export function Reveal({
   children,
   className,
@@ -13,11 +13,10 @@ export function Reveal({
   className?: string;
   as?: 'div' | 'section' | 'ul' | 'ol';
 }) {
-  const reduce = useReducedMotion();
   const M = motion[as];
   return (
     <M
-      variants={reduce ? reducedFade : fadeUp}
+      variants={fadeUp}
       initial="hidden"
       whileInView="show"
       viewport={viewportOnce}
@@ -61,10 +60,9 @@ export function RevealItem({
   className?: string;
   as?: 'div' | 'li';
 }) {
-  const reduce = useReducedMotion();
   const M = motion[as];
   return (
-    <M variants={reduce ? reducedFade : fadeUp} className={className}>
+    <M variants={fadeUp} className={className}>
       {children}
     </M>
   );

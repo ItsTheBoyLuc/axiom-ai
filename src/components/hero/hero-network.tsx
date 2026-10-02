@@ -246,9 +246,11 @@ export default function HeroNetwork({ seed }: { seed: GraphSeed }) {
           style={{ left: tip.x, top: tip.y }}
         >
           <span className="text-fg font-medium">{tip.node.label}</span>
-          <span className="text-warn ml-2 font-mono text-[10px] tracking-wider uppercase">
-            demo
-          </span>
+          {seed.isDemo && (
+            <span className="text-warn ml-2 font-mono text-[10px] tracking-wider uppercase">
+              demo
+            </span>
+          )}
           <span className="text-muted block capitalize">
             {tip.node.kind} &middot; click to open
           </span>
