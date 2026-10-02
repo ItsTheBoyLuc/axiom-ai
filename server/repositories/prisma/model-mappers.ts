@@ -35,6 +35,63 @@ import {
 
 export const TOKEN_UNIT = 'per 1M tokens';
 
+type TokenPriceRow = {
+  pricingType: string;
+  price: { toNumber(): number } | null;
+  currency: string;
+  unit: string;
+  isCurrent: boolean;
+};
+
+/**
+ * The single "headline" per-token price shown on cards, or null when there is none to show.
+ * Units start with `per 1M tokens` and may carry a qualifier (a prompt-length tier, peak or
+ * off-peak hours, a data-sharing tier). A headline exists only when exactly ONE unit carries both
+ * an input and an output price; with several (tiers, peak/off-peak) the profile shows them all
+ * and the card defers to it, so variants are never silently collapsed into one number.
+ */
+export function headlineTokenPrice(rows: TokenPriceRow[]): {
+  input: number | null;
+  output: number | null;
+  currency: string;
+  unit: string;
+} | null {
+  const current = rows.filter(
+    (p) =>
+      p.isCurrent &&
+      p.unit.startsWith(TOKEN_UNIT) &&
+      (p.pricingType === 'INPUT' || p.pricingType === 'OUTPUT'),
+  );
+  const paired = [...new Set(current.map((p) => p.unit))].filter(
+    (u) =>
+      current.some((p) => p.unit === u && p.pricingType === 'INPUT') &&
+      current.some((p) => p.unit === u && p.pricingType === 'OUTPUT'),
+  );
+  if (paired.length !== 1) {
+    // No unambiguous pair. Keep the long-standing behaviour for a lone plain-unit price (e.g.
+    // an input price with no published output price).
+    const plain = current.filter((p) => p.unit === TOKEN_UNIT);
+    if (paired.length === 0 && plain.length > 0) return pick(plain, TOKEN_UNIT);
+    return null;
+  }
+  return pick(
+    current.filter((p) => p.unit === paired[0]),
+    paired[0]!,
+  );
+}
+
+function pick(rows: TokenPriceRow[], unit: string) {
+  const input = rows.find((p) => p.pricingType === 'INPUT');
+  const output = rows.find((p) => p.pricingType === 'OUTPUT');
+  const first = input ?? output!;
+  return {
+    input: input?.price?.toNumber() ?? null,
+    output: output?.price?.toNumber() ?? null,
+    currency: first.currency,
+    unit,
+  };
+}
+
 /**
  * Column sets ("select-only-needed-columns"). Never `include: true`: the search blob and
  * tsvector, audit fields and unused relations must not travel on every request.
@@ -76,7 +133,11 @@ export const listSelect = {
     select: { availability: true, capability: { select: { name: true } } },
   },
   pricing: {
-    where: { isCurrent: true, unit: TOKEN_UNIT, pricingType: { in: ['INPUT', 'OUTPUT'] } },
+    where: {
+      isCurrent: true,
+      unit: { startsWith: TOKEN_UNIT },
+      pricingType: { in: ['INPUT', 'OUTPUT'] },
+    },
     select: { pricingType: true, price: true, currency: true, unit: true, isCurrent: true },
   },
   benchmarkResults: { select: resultSelect },
@@ -183,15 +244,7 @@ export function toListItem(
     }[];
   },
 ): ModelListItem {
-  const tokenPrices = row.pricing.filter(
-    (p) =>
-      p.isCurrent &&
-      p.unit === TOKEN_UNIT &&
-      (p.pricingType === 'INPUT' || p.pricingType === 'OUTPUT'),
-  );
-  const input = tokenPrices.find((p) => p.pricingType === 'INPUT');
-  const output = tokenPrices.find((p) => p.pricingType === 'OUTPUT');
-  const first = input ?? output;
+  const headline = headlineTokenPrice(row.pricing);
 
   return {
     slug: row.slug,
@@ -214,14 +267,7 @@ export function toListItem(
     openWeights: row.openWeights,
     deployment: fromDbEnums<Deployment>(row.deployment),
     pricingKind: fromDbEnum<PricingKind>(row.pricingKind),
-    currentPricing: first
-      ? {
-          input: input?.price?.toNumber() ?? null,
-          output: output?.price?.toNumber() ?? null,
-          currency: first.currency,
-          unit: TOKEN_UNIT,
-        }
-      : null,
+    currentPricing: headline,
     categories: fromDbEnums<Category>(row.categories),
     capabilities: sortCapabilities(
       row.capabilities
