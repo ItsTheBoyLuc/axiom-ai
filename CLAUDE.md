@@ -64,4 +64,41 @@ docker compose down -v           # stop and wipe volumes
 
 ## Status
 
-Step 0, Phase 1 and Phase 2 (model directory + profiles on demo data through the repository layer) complete. Next: Phase 3 (Prisma schema, migrations, REST API + OpenAPI, Redis cache, sourced seed data) after user go-ahead. Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
+Step 0, Phases 1, 2 and 3a (Prisma schema, migrations, REST API + OpenAPI, Redis cache, seed pipeline) complete. In progress: Phase 3b (real sourced data, see Autopilot mode and docs/PROGRESS.md). Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
+
+## Autopilot mode
+
+Saved verbatim from the user's instructions (2026-10-02). These override the "stop and report after each phase" rule in section 1.
+
+### Autopilot rules
+
+Run all remaining phases autonomously and in order (3b, 4, 5, 6, 7, 8, 9, 10) without waiting for my approval between phases; I review only the final result.
+Loop per phase: brief plan -> build as specified in docs/PROMPT.md §14 -> run ALL gates -> fix -> commit (Conventional Commits) -> push -> CI green (fix if red) -> update docs/PROGRESS.md and DECISIONS.md -> next phase.
+Gates: prettier, typecheck, lint, unit + integration tests, Playwright (incl. axe, both themes), production build, npm audit, BOM check, and screenshots at 390/768/1440 of the touched routes (actually view them and fix what you see).
+Stop ONLY if: (a) a gate still fails after a real fix attempt, (b) a decision needs me (credentials, legal, cost, breaking change), or (c) a usage limit. Before stopping, update PROGRESS.md with exactly where you are and the next step, and commit.
+Never: disable or weaken tests/CI/audit, add retries to hide flakes, force-push, fabricate data, commit secrets, or change major versions of Next, React, Prisma (^7) or Tailwind without noting it in DECISIONS.md. Never ask me for passwords or tokens in chat.
+Commit and push after every batch and every phase so a usage limit never leaves uncommitted work.
+Keep a running list of motion values in docs/MOTION.md instead of reporting them per phase.
+
+### Phase 3b: real sourced data, 3 batches by provider
+
+Batch 1: OpenAI, Anthropic, Google DeepMind. Batch 2: Meta, xAI, DeepSeek, Mistral. Batch 3: Microsoft, NVIDIA, Alibaba, Cohere, Amazon, plus news and publications.
+Per batch, for each provider: provider record, models, pricing, releases and benchmark results together, so each batch is complete and checkable.
+Rules (docs/PROMPT.md §2 and §18 apply in full):
+
+- Determine each provider's CURRENT lineup by fetching official model/pricing/docs pages in this session. Do NOT use memory for model names, versions, dates, prices, specs or scores; your training data is out of date.
+- Every record has sourceUrl, verificationStatus, verifiedAt (today), collectedAt. Unverifiable -> null / NOT_PUBLICLY_DISCLOSED. Descriptions in your own words; no long copied text.
+- Pricing: currency, unit, effectiveFrom, isCurrent. Benchmarks: only scores readable in an official model card/announcement or an independent leaderboard, with evaluationType, benchmark + model version, date, URL. No invented or converted scores.
+- News: only real articles you fetched, with publisher, date and URL. Mark AI-written summaries as such.
+- Run the seed validation, load into Postgres, update docs/DATA_STATUS.md (verified, missing, why).
+- After each batch: check /models, a profile and /api/v1/stats in the browser via Playwright, and fix UI issues that real data exposes (long names, missing fields, empty sections).
+- After batch 1: self-audit. Pick 8 random records across tables, re-fetch their sourceUrl, and confirm the stored values match. Write the result in DATA_STATUS.md and fix any mismatch.
+- After batch 3: remove demo data from the Phase 1-2 pages (homepage, directory, profiles). Demo rows remain only as test fixtures with SEED_DEMO=true. The DEMO DATA badge must still work for fixtures.
+
+### Later phases (details in docs/PROMPT.md §14)
+
+4 Compare, 5 Benchmarks, 6 Providers + releases (incl. GSAP scroll effects), 7 News + global search (palette wired to real search), 8 Admin (RBAC, CRUD, audit logs, sync worker with official APIs/feeds only, respecting robots.txt and rate limits, network mocked in tests; staging + approval flow that can never downgrade verified data; sync dashboard), 9 Auth + personalization (Auth.js; first admin via `npm run admin:create`, which generates a random password and writes it to a git-ignored local file, never printed in chat, logs or commits; saving comparisons gets enabled here), 10 Production readiness (full tests, security checklist incl. CSP, a11y pass, Lighthouse/Core Web Vitals numbers, SEO, production Docker/compose, README, API.md, DEPLOYMENT.md with Compose on a Linux VM, Cloudflare Tunnel and Postgres backup/restore, final DATA_STATUS.md).
+
+### Final report (when all phases are done)
+
+What is built, how to run it (exact PowerShell commands), what is verified vs. missing in the data, the 10 records you are least sure about, known issues, decisions that need my review, and the docs/MOTION.md values.
