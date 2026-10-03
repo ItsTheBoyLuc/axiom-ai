@@ -16,8 +16,8 @@ export default defineConfig({
   // The admin write specs create and delete real records, so they run only after every other
   // spec has finished (they never overlap with the count-based public-page specs).
   projects: [
-    { name: 'main', testIgnore: /admin-write.spec.ts/ },
-    { name: 'admin-write', testMatch: /admin-write.spec.ts/, dependencies: ['main'] },
+    { name: 'main', testIgnore: /admin-write.*.spec.ts/ },
+    { name: 'admin-write', testMatch: /admin-write.*.spec.ts/, dependencies: ['main'] },
   ],
   use: { baseURL: `http://localhost:${PORT}`, browserName: 'chromium' },
   // Serves the production build. ENABLE_DESIGN_PAGE exposes /design for the scans.

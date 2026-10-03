@@ -5,6 +5,18 @@ import { listAudit } from './audit-log';
 import { isAdminEntity, type AdminEntity } from './definitions';
 import type { AdminCtx, AdminResult } from './handler';
 import { deleteRecord, getRecord, listRecords, saveRecord } from './records';
+import { approveImport, getImport, listImports, rejectImport, type ImportStatus } from './imports';
+import {
+  createSource,
+  deleteSource,
+  getRun,
+  getSource,
+  listRuns,
+  listSources,
+  setSourceEnabled,
+  updateSource,
+} from './sync-sources';
+import { ADAPTERS } from '../adapters';
 import { deleteUser, listUsers, revokeUserSessions, setUserRole } from './users';
 
 /**
@@ -112,5 +124,114 @@ export async function revokeSessionsRoute(ctx: AdminCtx): Promise<AdminResult> {
 
 export async function deleteUserRoute(ctx: AdminCtx): Promise<AdminResult> {
   await deleteUser(ctx.deps.db, { id: ctx.user.id, ip: ctx.ip }, idOf(ctx));
+  return { data: { ok: true } };
+}
+
+// ------------------------------------------------------------------ sync
+
+const actorOf = (ctx: AdminCtx) => ({ id: ctx.user.id, ip: ctx.ip });
+const sourceId = (ctx: AdminCtx) => idOf(ctx);
+
+export async function listSourcesRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const [sources, worker] = await Promise.all([
+    listSources(ctx.deps.db, ctx.deps.now?.()),
+    ctx.deps.workerStatus(),
+  ]);
+  const adapters = Object.values(ADAPTERS).map((a) => ({
+    kind: a.kind,
+    label: a.label,
+    help: a.help,
+    exampleConfig: a.exampleConfig,
+  }));
+  return { data: { sources, worker, adapters } };
+}
+
+export async function createSourceRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const body = await readJson(ctx.request, recordBody);
+  const row = await createSource(ctx.deps.db, actorOf(ctx), body);
+  return { status: 201, data: { id: row.id } };
+}
+
+export async function getSourceRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const row = await getSource(ctx.deps.db, sourceId(ctx));
+  if (!row) throw new ApiError(404, 'NOT_FOUND', 'source not found');
+  return { data: row };
+}
+
+export async function updateSourceRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const body = await readJson(ctx.request, recordBody);
+  const row = await updateSource(ctx.deps.db, actorOf(ctx), sourceId(ctx), body);
+  return { data: { id: row.id } };
+}
+
+export async function deleteSourceRoute(ctx: AdminCtx): Promise<AdminResult> {
+  await deleteSource(ctx.deps.db, actorOf(ctx), sourceId(ctx));
+  return { data: { ok: true } };
+}
+
+const enabledBody = z.strictObject({ enabled: z.boolean() });
+export async function setSourceEnabledRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const { enabled } = await readJson(ctx.request, enabledBody);
+  await setSourceEnabled(ctx.deps.db, actorOf(ctx), sourceId(ctx), enabled);
+  return { data: { enabled } };
+}
+
+/** "Run now": queues a run for the worker (202). Disabled sources are not run. */
+export async function runSourceRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const id = sourceId(ctx);
+  const row = await getSource(ctx.deps.db, id);
+  if (!row) throw new ApiError(404, 'NOT_FOUND', 'source not found');
+  if (!row.enabled) {
+    throw new ApiError(409, 'CONFLICT', 'This source is disabled. Enable it before running it.');
+  }
+  await ctx.deps.enqueueSync({ sourceId: id, trigger: 'manual', actorId: ctx.user.id, ip: ctx.ip });
+  return { status: 202, data: { queued: true } };
+}
+
+export async function listRunsRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const sp = query(ctx);
+  const source = sp.get('source') ?? undefined;
+  return {
+    data: await listRuns(ctx.deps.db, {
+      sourceId: source && /^[A-Za-z0-9_-]{1,64}$/.test(source) ? source : undefined,
+      page: page.parse(sp.get('page') ?? undefined),
+    }),
+  };
+}
+
+export async function getRunRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const run = await getRun(ctx.deps.db, idOf(ctx));
+  if (!run) throw new ApiError(404, 'NOT_FOUND', 'run not found');
+  return { data: run };
+}
+
+const IMPORT_STATUSES = new Set(['PENDING', 'APPROVED', 'REJECTED']);
+export async function listImportsRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const sp = query(ctx);
+  const status = sp.get('status') ?? undefined;
+  const run = sp.get('run') ?? undefined;
+  return {
+    data: await listImports(ctx.deps.db, {
+      status: status && IMPORT_STATUSES.has(status) ? (status as ImportStatus) : undefined,
+      runId: run && /^[A-Za-z0-9_-]{1,64}$/.test(run) ? run : undefined,
+      page: page.parse(sp.get('page') ?? undefined),
+    }),
+  };
+}
+
+export async function getImportRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const row = await getImport(ctx.deps.db, idOf(ctx));
+  if (!row) throw new ApiError(404, 'NOT_FOUND', 'import not found');
+  return { data: row };
+}
+
+const approveBody = z.strictObject({ override: z.boolean().default(false) });
+export async function approveImportRoute(ctx: AdminCtx): Promise<AdminResult> {
+  const { override } = await readJson(ctx.request, approveBody);
+  return { data: await approveImport(ctx.deps.db, idOf(ctx), { override }, saveCtx(ctx)) };
+}
+
+export async function rejectImportRoute(ctx: AdminCtx): Promise<AdminResult> {
+  await rejectImport(ctx.deps.db, idOf(ctx), saveCtx(ctx));
   return { data: { ok: true } };
 }

@@ -35,6 +35,9 @@ test.describe('anonymous visitors', () => {
       '/api/v1/admin/users',
       '/api/v1/admin/records/providers',
       '/api/v1/admin/audit',
+      '/api/v1/admin/sync/sources',
+      '/api/v1/admin/sync/runs',
+      '/api/v1/admin/sync/imports',
     ]) {
       const res = await request.get(url);
       expect(res.status(), url).toBe(401);
@@ -136,7 +139,12 @@ test.describe('signed in without the admin role', () => {
     const res = await page.goto('/admin');
     expect(res?.status()).toBe(404);
     await expect(page.getByRole('heading', { name: /not found|404/i }).first()).toBeVisible();
-    for (const url of ['/api/v1/admin/users', '/api/v1/admin/records/models']) {
+    for (const url of [
+      '/api/v1/admin/users',
+      '/api/v1/admin/records/models',
+      '/api/v1/admin/sync/sources',
+      '/api/v1/admin/sync/imports',
+    ]) {
       const r = await request.get(url);
       expect(r.status(), url).toBe(403);
     }

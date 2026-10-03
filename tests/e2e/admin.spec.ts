@@ -221,6 +221,9 @@ test.describe('visual and accessibility quality', () => {
     ['audit', '/admin/audit'],
     ['new-provider', '/admin/providers/new'],
     ['new-model', '/admin/models/new'],
+    ['sync', '/admin/sync'],
+    ['sync-new-source', '/admin/sync/sources/new'],
+    ['imports', '/admin/sync/imports'],
   ];
 
   for (const theme of ['dark', 'light'] as const) {

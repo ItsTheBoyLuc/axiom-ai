@@ -82,3 +82,7 @@ Tests check that the effects run (the line's transform changes with scroll, entr
 
 - Command palette (`layout/command-palette.tsx`): unchanged dialog motion from Phase 1 (overlay 200 ms `out`; content spring `soft`, scale 0.97 and y -8 px in, 0.98 and -4 px out). Selection and chip changes are colour transitions only (100 ms and 150 ms). Results appear without animation so typing never feels laggy.
 - News and search pages: no motion beyond the page template; filters change the URL.
+
+## Phase 8 (Admin)
+
+No new motion. Admin pages use the existing button press (`whileTap` scale 0.97, `spring.snappy`) and CSS colour transitions only; there are no scroll or entrance effects in the admin area.

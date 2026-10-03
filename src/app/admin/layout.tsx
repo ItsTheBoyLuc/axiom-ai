@@ -24,6 +24,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     {
       title: 'System',
       items: [
+        { href: '/admin/sync', label: 'Data sync' },
+        { href: '/admin/sync/imports', label: 'Imports' },
         { href: '/admin/users', label: 'Users' },
         { href: '/admin/audit', label: 'Audit log' },
       ],

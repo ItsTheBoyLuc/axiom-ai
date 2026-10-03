@@ -8,10 +8,14 @@ export type NavItem = { href: string; label: string };
 /** Admin section navigation. A horizontal scroll strip on phones, a vertical list from lg. */
 export function AdminNav({ groups }: { groups: { title: string; items: NavItem[] }[] }) {
   const pathname = usePathname();
-  const current = (href: string) =>
+  // The most specific link wins: /admin/sync/imports must not also light up /admin/sync.
+  const all = groups.flatMap((g) => g.items.map((i) => i.href));
+  const matches = (href: string) =>
     href === '/admin'
       ? pathname === '/admin'
       : pathname === href || pathname.startsWith(`${href}/`);
+  const best = all.filter(matches).sort((a, b) => b.length - a.length)[0];
+  const current = (href: string) => href === best;
 
   return (
     <nav aria-label="Admin">

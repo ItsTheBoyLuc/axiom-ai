@@ -54,6 +54,10 @@ COPY --chown=app:app package.json tsconfig.json ./
 COPY --chown=app:app worker ./worker
 COPY --chown=app:app server ./server
 COPY --chown=app:app src/lib ./src/lib
+COPY --chown=app:app src/types ./src/types
+# The sync jobs validate with the seed schemas and write through the Prisma client, which the
+# builder generated (prisma/generated is dockerignored, so it only exists in the builder stage).
+COPY --from=builder --chown=app:app /app/prisma ./prisma
 USER app
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=5 \
   CMD wget -qO- http://127.0.0.1:${WORKER_HEALTH_PORT:-3001}/health >/dev/null || exit 1

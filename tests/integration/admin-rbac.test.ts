@@ -3,7 +3,20 @@ import path from 'node:path';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { adminRoute, type AdminDeps } from '../../server/admin/handler';
 import {
+  approveImportRoute,
   createRecordRoute,
+  createSourceRoute,
+  deleteSourceRoute,
+  getImportRoute,
+  getRunRoute,
+  getSourceRoute,
+  listImportsRoute,
+  listRunsRoute,
+  listSourcesRoute,
+  rejectImportRoute,
+  runSourceRoute,
+  setSourceEnabledRoute,
+  updateSourceRoute,
   deleteRecordRoute,
   deleteUserRoute,
   getRecordRoute,
@@ -29,17 +42,21 @@ const db = newDb();
 const cookie = cookieConfig('http://localhost:3000');
 const ORIGIN = 'http://localhost:3000';
 const invalidate = vi.fn(async (_tags: string[]) => {});
+const enqueueSync = vi.fn(async (_job: unknown) => {});
 
 let deps: AdminDeps;
 beforeEach(async () => {
   await resetDb();
   invalidate.mockClear();
+  enqueueSync.mockClear();
   deps = {
     db,
     limiter: createMemoryLimiter(),
     cookie,
     allowedOrigins: [ORIGIN],
     invalidate,
+    enqueueSync,
+    workerStatus: async () => ({ online: true, lastSeen: '2026-10-03T12:00:00.000Z' }),
   };
 });
 afterAll(() => db.$disconnect());
@@ -55,6 +72,19 @@ const routes = () => ({
   'PUT user role': adminRoute(setUserRoleRoute, () => deps),
   'DELETE user sessions': adminRoute(revokeSessionsRoute, () => deps),
   'DELETE user': adminRoute(deleteUserRoute, () => deps),
+  'GET sources': adminRoute(listSourcesRoute, () => deps),
+  'POST sources': adminRoute(createSourceRoute, () => deps),
+  'GET source': adminRoute(getSourceRoute, () => deps),
+  'PUT source': adminRoute(updateSourceRoute, () => deps),
+  'DELETE source': adminRoute(deleteSourceRoute, () => deps),
+  'PUT source enabled': adminRoute(setSourceEnabledRoute, () => deps),
+  'POST source run': adminRoute(runSourceRoute, () => deps),
+  'GET runs': adminRoute(listRunsRoute, () => deps),
+  'GET run': adminRoute(getRunRoute, () => deps),
+  'GET imports': adminRoute(listImportsRoute, () => deps),
+  'GET import': adminRoute(getImportRoute, () => deps),
+  'POST import approve': adminRoute(approveImportRoute, () => deps),
+  'POST import reject': adminRoute(rejectImportRoute, () => deps),
 });
 
 type Case = { name: keyof ReturnType<typeof routes>; method: string; url: string; body?: unknown };
@@ -74,6 +104,34 @@ const CASES: Case[] = [
   },
   { name: 'DELETE user sessions', method: 'DELETE', url: '/api/v1/admin/users/x1/sessions' },
   { name: 'DELETE user', method: 'DELETE', url: '/api/v1/admin/users/x1' },
+  { name: 'GET sources', method: 'GET', url: '/api/v1/admin/sync/sources' },
+  { name: 'POST sources', method: 'POST', url: '/api/v1/admin/sync/sources', body: {} },
+  { name: 'GET source', method: 'GET', url: '/api/v1/admin/sync/sources/x1' },
+  { name: 'PUT source', method: 'PUT', url: '/api/v1/admin/sync/sources/x1', body: {} },
+  { name: 'DELETE source', method: 'DELETE', url: '/api/v1/admin/sync/sources/x1' },
+  {
+    name: 'PUT source enabled',
+    method: 'PUT',
+    url: '/api/v1/admin/sync/sources/x1/enabled',
+    body: { enabled: false },
+  },
+  { name: 'POST source run', method: 'POST', url: '/api/v1/admin/sync/sources/x1/run', body: {} },
+  { name: 'GET runs', method: 'GET', url: '/api/v1/admin/sync/runs' },
+  { name: 'GET run', method: 'GET', url: '/api/v1/admin/sync/runs/x1' },
+  { name: 'GET imports', method: 'GET', url: '/api/v1/admin/sync/imports' },
+  { name: 'GET import', method: 'GET', url: '/api/v1/admin/sync/imports/x1' },
+  {
+    name: 'POST import approve',
+    method: 'POST',
+    url: '/api/v1/admin/sync/imports/x1/approve',
+    body: {},
+  },
+  {
+    name: 'POST import reject',
+    method: 'POST',
+    url: '/api/v1/admin/sync/imports/x1/reject',
+    body: {},
+  },
 ];
 const PARAMS: Record<string, Record<string, string>> = {
   'GET records': { entity: 'providers' },
@@ -84,6 +142,15 @@ const PARAMS: Record<string, Record<string, string>> = {
   'PUT user role': { id: 'x1' },
   'DELETE user sessions': { id: 'x1' },
   'DELETE user': { id: 'x1' },
+  'GET source': { id: 'x1' },
+  'PUT source': { id: 'x1' },
+  'DELETE source': { id: 'x1' },
+  'PUT source enabled': { id: 'x1' },
+  'POST source run': { id: 'x1' },
+  'GET run': { id: 'x1' },
+  'GET import': { id: 'x1' },
+  'POST import approve': { id: 'x1' },
+  'POST import reject': { id: 'x1' },
 };
 
 function call(c: Case, headers: Record<string, string> = {}, extra: Record<string, string> = {}) {
@@ -329,5 +396,118 @@ describe('route files', () => {
       }
       expect(src, f).toContain("export const dynamic = 'force-dynamic'");
     }
+  });
+});
+
+describe('sync administration through the handlers', () => {
+  const source = {
+    name: 'Example blog',
+    kind: 'rss',
+    schedule: 'every 6h',
+    config: { feedUrl: 'https://blog.example.com/feed.xml', publisher: 'Example Lab' },
+  };
+  const c = (name: Case['name'], over: Partial<Case> = {}): Case => ({
+    name,
+    method: name.split(' ')[0]!,
+    url: '/x',
+    ...over,
+  });
+
+  it('creates a source, lists it with the worker status and adapter help, and queues a manual run', async () => {
+    const admin = await sessionFor('ADMIN');
+    const created = await call(c('POST sources', { body: source }), admin.headers);
+    expect(created.status).toBe(201);
+    const { id } = (await created.json()).data;
+
+    const list = await (await call(c('GET sources'), admin.headers)).json();
+    expect(list.data.sources[0]).toMatchObject({
+      name: 'Example blog',
+      schedule: 'every 6h',
+      enabled: true,
+    });
+    expect(list.data.worker).toEqual({ online: true, lastSeen: '2026-10-03T12:00:00.000Z' });
+    expect(list.data.adapters.map((a: { kind: string }) => a.kind).sort()).toEqual([
+      'github-releases',
+      'huggingface',
+      'rss',
+    ]);
+
+    const run = await call(c('POST source run', { body: {} }), admin.headers, { id });
+    expect(run.status).toBe(202);
+    expect(enqueueSync).toHaveBeenCalledWith({
+      sourceId: id,
+      trigger: 'manual',
+      actorId: admin.user.id,
+      ip: 'unknown',
+    });
+  });
+
+  it('will not run a disabled source, and reports a down queue as 503', async () => {
+    const admin = await sessionFor('ADMIN');
+    const { id } = (await (await call(c('POST sources', { body: source }), admin.headers)).json())
+      .data;
+
+    const off = await call(c('PUT source enabled', { body: { enabled: false } }), admin.headers, {
+      id,
+    });
+    expect(off.status).toBe(200);
+    const blocked = await call(c('POST source run', { body: {} }), admin.headers, { id });
+    expect(blocked.status).toBe(409);
+    expect(enqueueSync).not.toHaveBeenCalled();
+
+    await call(c('PUT source enabled', { body: { enabled: true } }), admin.headers, { id });
+    enqueueSync.mockRejectedValueOnce(
+      Object.assign(new Error('x'), { name: 'ApiError', status: 503 }),
+    );
+    // A generic failure of the queue must never be a 200.
+    const down = await call(c('POST source run', { body: {} }), admin.headers, { id });
+    expect(down.status).toBeGreaterThanOrEqual(500);
+  });
+
+  it('strict bodies: unknown keys and wrong types are 400', async () => {
+    const admin = await sessionFor('ADMIN');
+    const { id } = (await (await call(c('POST sources', { body: source }), admin.headers)).json())
+      .data;
+    const extra = await call(
+      c('PUT source enabled', { body: { enabled: true, x: 1 } }),
+      admin.headers,
+      { id },
+    );
+    expect(extra.status).toBe(400);
+    const wrong = await call(c('PUT source enabled', { body: { enabled: 'yes' } }), admin.headers, {
+      id,
+    });
+    expect(wrong.status).toBe(400);
+    const approve = await call(
+      c('POST import approve', { body: { override: true, sneaky: 1 } }),
+      admin.headers,
+      { id: 'x1' },
+    );
+    expect(approve.status).toBe(400);
+  });
+
+  it('unknown ids are 404 and malformed ids never reach the database', async () => {
+    const admin = await sessionFor('ADMIN');
+    for (const name of ['GET source', 'GET run', 'GET import'] as const) {
+      expect((await call(c(name), admin.headers, { id: 'ghost' })).status, name).toBe(404);
+      expect((await call(c(name), admin.headers, { id: "x'; DROP TABLE" })).status, name).toBe(404);
+    }
+    expect(
+      (await call(c('POST import approve', { body: {} }), admin.headers, { id: 'ghost' })).status,
+    ).toBe(404);
+    expect(
+      (await call(c('POST import reject', { body: {} }), admin.headers, { id: 'ghost' })).status,
+    ).toBe(404);
+  });
+
+  it('listing endpoints ignore malformed filters instead of failing', async () => {
+    const admin = await sessionFor('ADMIN');
+    expect(
+      (await call(c('GET imports', { url: '/x?status=NOPE&run=%27%3B--&page=abc' }), admin.headers))
+        .status,
+    ).toBe(200);
+    expect(
+      (await call(c('GET runs', { url: '/x?source=%27%3B--&page=-5' }), admin.headers)).status,
+    ).toBe(200);
   });
 });

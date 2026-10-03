@@ -66,3 +66,13 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - Review the Prisma `overrides` at the start of Phase 10 (hard limit 2026-12-31).
 - Image-model profiles show "Not publicly disclosed" for inapplicable fields (context window, tool calling).
 - Phase 10 at the latest: restore the strict all-dependency `npm audit` gate if a patched `braces` or fixed `eslint-config-next` exists (CI currently blocks on `--omit=dev` only).
+
+## Phase 8 status
+
+- **Built (2026-10-03):**
+  - Auth core: Argon2id, hashed DB sessions, sign-in/out/me API, `/sign-in`, `proxy.ts` guard, `npm run admin:create` (see DECISIONS: custom sessions instead of Auth.js).
+  - Admin (`/admin`): dashboard with counts and recent changes; schema-driven create/edit/delete for providers, models, benchmarks, benchmark results, pricing, releases, news and publications; users; audit log; data sync (sources, runs with validation issues, imports review, approve/reject with trust-guard override).
+  - Sync system: RSS/Atom, GitHub releases and Hugging Face adapters behind a polite, SSRF-guarded HTTP client; validation, diff and staging pipeline; BullMQ worker with scheduler and heartbeat.
+- **Not done on purpose:** no sync sources are pre-configured (feed URLs would have to come from memory); add real ones from `/admin/sync`. The worker has not fetched anything real yet: all network behaviour is covered with scripted responses.
+- **Gates:** see the commits (prettier, typecheck, lint, unit, integration, Playwright with axe in both themes on every admin page, production build, production audit, BOM, worker image build).
+- **Next:** Phase 9 (sign-up, saved comparisons and models, preferences, recently viewed, account menu, optional GitHub sign-in) on top of the auth core.

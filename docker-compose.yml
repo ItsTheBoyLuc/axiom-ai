@@ -8,6 +8,7 @@ x-app-env: &app-env
   REDIS_URL: redis://redis:6379
   AUTH_SECRET: ${AUTH_SECRET:-}
   WORKER_HEALTH_PORT: ${WORKER_HEALTH_PORT:-3001}
+  GITHUB_TOKEN: ${GITHUB_TOKEN:-}
 
 services:
   # One-shot: applies pending Prisma migrations, then exits. web and worker wait for it.

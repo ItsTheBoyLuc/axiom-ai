@@ -3,6 +3,7 @@ import { ApiError, errorResponse, toErrorResponse } from '../api/http';
 import type { PrismaClient } from '../../prisma/generated/client';
 import { authorize } from '../auth/authorize';
 import type { CookieConfig } from '../auth/cookie';
+import type { SyncJob, WorkerStatus } from '../jobs/queue';
 import { clientIp, type RateLimiter, type RateRule } from '../auth/rate-limit';
 import type { SessionUser } from '../auth/sessions';
 
@@ -20,6 +21,10 @@ export type AdminDeps = {
   allowedOrigins: string[];
   /** Makes cached reads stale after a write (cache tags, see server/admin/definitions.ts). */
   invalidate: (tags: string[]) => Promise<void>;
+  /** Queues a sync run for the worker ("Run now"). Throws ApiError 503 when the queue is down. */
+  enqueueSync: (job: SyncJob) => Promise<void>;
+  /** Whether a worker has reported in recently (dashboard). */
+  workerStatus: () => Promise<WorkerStatus>;
   now?: () => Date;
 };
 
