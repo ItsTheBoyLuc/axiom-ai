@@ -64,3 +64,16 @@ Running list of every motion value in the product, kept current so it can be tun
 
 - Score-over-time, distribution and provider dot charts (`components/charts`): Recharts draw-in, 700 ms (`animationDuration`), `ease-out`, the same value as the Phase 4 charts; the table view is the static alternative. Series differ by colour, dash and marker shape, so nothing depends on motion or colour.
 - The explorer index and filters have no motion of their own beyond the page template and the card hover border colour (150 ms colour transition, no transform). Filter changes are URL replacements with `aria-busy`, not animations.
+
+## Phase 6 (Providers and releases): GSAP scroll effects on `/releases`
+
+`src/components/releases/timeline-scroll.tsx`; GSAP and ScrollTrigger are imported dynamically (only this route's chunk); everything is skipped under `prefers-reduced-motion`, and without JavaScript the timeline is simply visible.
+
+| Effect                    | Values                                                                                              |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| Entry rise (each release) | `opacity 0 -> 1`, `y 28 px -> 0`, 0.6 s, `power2.out`; trigger `top 90%`, once                      |
+| Timeline line draw        | accent line `scaleY 0 -> 1`, `transformOrigin: top`, scrubbed 0.4 s; from `top 70%` to `bottom 70%` |
+| Provider timeline chart   | static server-rendered SVG; no motion                                                               |
+| Provider card hover       | border colour only (150 ms), no transform                                                           |
+
+Tests check that the effects run (the line's transform changes with scroll, entries reach opacity 1) and that under reduced motion nothing is hidden or transformed.

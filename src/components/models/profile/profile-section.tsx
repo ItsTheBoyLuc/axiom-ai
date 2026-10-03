@@ -19,7 +19,7 @@ export function ProfileSection({
   lead,
   children,
 }: {
-  id: (typeof PROFILE_SECTIONS)[number]['id'];
+  id: string;
   title: string;
   demo?: boolean;
   lead?: string;

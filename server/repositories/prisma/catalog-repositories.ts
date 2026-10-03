@@ -55,6 +55,7 @@ const pageOf = <T>(
 // ------------------------------------------------------------------ providers
 
 const providerSelect = {
+  id: true,
   slug: true,
   name: true,
   monogram: true,
@@ -70,7 +71,31 @@ const providerSelect = {
 
 type ProviderRow = Prisma.ProviderGetPayload<{ select: typeof providerSelect }>;
 
-function mapProvider(r: ProviderRow): ProviderSummary {
+type LatestRelease = NonNullable<ProviderSummary['latestRelease']>;
+
+/**
+ * The newest release of every provider in ONE statement (DISTINCT ON), keyed by provider id, so
+ * listing providers costs the same number of queries however many there are.
+ */
+async function latestReleases(db: Db): Promise<Map<string, LatestRelease>> {
+  const rows = await db.$queryRaw<
+    { providerId: string; title: string; releaseDate: Date; announcementUrl: string | null }[]
+  >`
+    SELECT DISTINCT ON (r."providerId")
+           r."providerId" AS "providerId", r.title, r."releaseDate" AS "releaseDate",
+           r."announcementUrl" AS "announcementUrl"
+    FROM "Release" r
+    ORDER BY r."providerId", r."releaseDate" DESC, r.id ASC
+  `;
+  return new Map(
+    rows.map((x) => [
+      x.providerId,
+      { title: x.title, date: isoDate(x.releaseDate), announcementUrl: x.announcementUrl },
+    ]),
+  );
+}
+
+function mapProvider(r: ProviderRow, latest: LatestRelease | null): ProviderSummary {
   return {
     slug: r.slug,
     name: r.name,
@@ -81,6 +106,7 @@ function mapProvider(r: ProviderRow): ProviderSummary {
     headquarters: r.headquarters,
     orgType: r.orgType,
     modelCount: r._count.models,
+    latestRelease: latest,
     verificationStatus: r.verificationStatus as VerificationStatus,
     isDemo: r.isDemo,
   };
@@ -124,22 +150,34 @@ function mapRelease(r: ReleaseRow): ReleaseItem {
 export function createPrismaProviderRepository(db: Db): ProviderRepository {
   return {
     async listAll() {
-      const rows = await db.provider.findMany({ orderBy: [...TIE], select: providerSelect });
-      return rows.map(mapProvider);
+      const [rows, latest] = await Promise.all([
+        db.provider.findMany({ orderBy: [...TIE], select: providerSelect }),
+        latestReleases(db),
+      ]);
+      return rows.map((r) => mapProvider(r, latest.get(r.id) ?? null));
     },
 
     async list({ q, page, pageSize }) {
       const where = { AND: tokenFilter(q, ['name', 'description']) } as Prisma.ProviderWhereInput;
       const total = await db.provider.count({ where });
       const p = paginate(total, page, pageSize);
-      const rows = await db.provider.findMany({
-        where,
-        orderBy: [...TIE],
-        skip: p.start,
-        take: pageSize,
-        select: providerSelect,
-      });
-      return pageOf(rows.map(mapProvider), total, p.page, pageSize, p.pageCount);
+      const [rows, latest] = await Promise.all([
+        db.provider.findMany({
+          where,
+          orderBy: [...TIE],
+          skip: p.start,
+          take: pageSize,
+          select: providerSelect,
+        }),
+        latestReleases(db),
+      ]);
+      return pageOf(
+        rows.map((r) => mapProvider(r, latest.get(r.id) ?? null)),
+        total,
+        p.page,
+        pageSize,
+        p.pageCount,
+      );
     },
 
     async getBySlug(slug): Promise<ProviderDetail | null> {
@@ -165,8 +203,18 @@ export function createPrismaProviderRepository(db: Db): ProviderRepository {
         },
       });
       if (!r) return null;
+      const newest = r.releases[0];
       return {
-        ...mapProvider(r),
+        ...mapProvider(
+          r,
+          newest
+            ? {
+                title: newest.title,
+                date: isoDate(newest.releaseDate),
+                announcementUrl: newest.announcementUrl,
+              }
+            : null,
+        ),
         logoUrl: r.logoUrl,
         sourceUrl: r.sourceUrl,
         verifiedAt: isoDateTimeOrNull(r.verifiedAt),

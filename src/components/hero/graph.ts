@@ -46,7 +46,7 @@ export function buildGraph(seed: GraphSeed): Graph {
       id: p.slug,
       label: p.name,
       kind: 'provider',
-      href: '/providers',
+      href: `/providers/${p.slug}`,
       x: 0.5 + Math.cos(ang) * 0.34,
       y: 0.5 + Math.sin(ang) * 0.32,
       radius: 6,

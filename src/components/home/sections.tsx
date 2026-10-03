@@ -12,6 +12,7 @@ import { getRepositories } from '../../../server/repositories';
 import { getModelRepository } from '../../../server/repositories/model-repository';
 import { listProviders } from '../../../server/repositories/provider-repository';
 import { getStats } from '../../../server/services/stats';
+import { NewsCard } from '@/components/news/news-card';
 import { ComparisonPreview } from './comparison-preview';
 
 export async function StatsSection() {
@@ -106,7 +107,7 @@ export async function ProvidersOverview() {
                     {p.modelCount} {p.modelCount === 1 ? 'model' : 'models'}
                   </span>
                   <Link
-                    href="/providers"
+                    href={`/providers/${p.slug}`}
                     aria-label={`View ${p.name}`}
                     className="text-accent inline-flex items-center gap-1 font-medium hover:underline"
                   >
@@ -216,22 +217,7 @@ export async function LatestNews() {
         {items.map((n, i) => (
           // First story is featured: spans both columns at md so the 2-col grid (sm and up) has no orphan.
           <RevealItem key={n.id} className={i === 0 ? 'sm:col-span-2 lg:col-span-1' : undefined}>
-            <Card as="article" className="flex h-full flex-col p-5">
-              <div className="mb-4 flex flex-wrap gap-2">
-                {n.isOfficial ? <OfficialBadge /> : <IndependentBadge />}
-                {n.isAiSummary && <AiSummaryBadge />}
-              </div>
-              <h3 className="t-h3">{n.title}</h3>
-              <p className="text-fg-2 mt-2 flex-1 text-sm">{n.summary}</p>
-              <p className="text-muted mt-4 text-xs">
-                {n.publisher} &middot;{' '}
-                <time dateTime={n.publishedAt}>{formatDate(n.publishedAt)}</time>
-                {n.provider && n.provider.name !== n.publisher && <> &middot; {n.provider.name}</>}
-              </p>
-              <p className="mt-1">
-                <SourceLink href={n.url}>Read at {n.publisher}</SourceLink>
-              </p>
-            </Card>
+            <NewsCard item={n} />
           </RevealItem>
         ))}
       </RevealGroup>

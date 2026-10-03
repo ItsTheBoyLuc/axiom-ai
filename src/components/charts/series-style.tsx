@@ -25,18 +25,34 @@ export function seriesStyle(i: number): { stroke: string; dash: string | undefin
   };
 }
 
-/** A marker centred on (0, 0); wrap in a translated <g>. */
-export function Marker({ shape, color, size = 5 }: { shape: Shape; color: string; size?: number }) {
+/**
+ * A marker centred on (0, 0); wrap in a translated <g>. `hollow` draws an outline instead of a
+ * fill (used for "unconfirmed" on the release timeline, so the state never depends on colour).
+ */
+export function Marker({
+  shape,
+  color,
+  size = 5,
+  hollow = false,
+}: {
+  shape: Shape;
+  color: string;
+  size?: number;
+  hollow?: boolean;
+}) {
   const s = size;
+  const paint = hollow
+    ? { fill: 'var(--bg-card)', stroke: color, strokeWidth: 2 }
+    : { fill: color };
   switch (shape) {
     case 'square':
-      return <rect x={-s} y={-s} width={s * 2} height={s * 2} fill={color} />;
+      return <rect x={-s} y={-s} width={s * 2} height={s * 2} {...paint} />;
     case 'triangle':
-      return <polygon points={`0,${-s - 1} ${s + 1},${s} ${-s - 1},${s}`} fill={color} />;
+      return <polygon points={`0,${-s - 1} ${s + 1},${s} ${-s - 1},${s}`} {...paint} />;
     case 'diamond':
-      return <polygon points={`0,${-s - 1} ${s + 1},0 0,${s + 1} ${-s - 1},0`} fill={color} />;
+      return <polygon points={`0,${-s - 1} ${s + 1},0 0,${s + 1} ${-s - 1},0`} {...paint} />;
     default:
-      return <circle r={s} fill={color} />;
+      return <circle r={s} {...paint} />;
   }
 }
 

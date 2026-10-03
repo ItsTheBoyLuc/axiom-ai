@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
-import { animationsSettled, gotoReady, revealAll, setTheme } from './helpers';
+import { animationsSettled, gotoReady, revealAll, setTheme, reloadReady } from './helpers';
 
 const SHOTS = 'test-results/screenshots';
 const INDEX = '/benchmarks';
@@ -48,7 +48,7 @@ test.describe('benchmark index', () => {
     await expect(page.getByRole('link', { name: /Sample Benchmark 2/ })).toBeVisible();
     await expect(page.getByRole('link', { name: /Sample Benchmark 1/ })).toHaveCount(0);
     // The category survives reload.
-    await page.reload();
+    await reloadReady(page);
     await expect(page.getByRole('link', { name: /Coding/ }).first()).toHaveAttribute(
       'aria-current',
       'true',
@@ -163,7 +163,7 @@ test.describe('benchmark filters', () => {
     await page.getByLabel('Provider', { exact: true }).selectOption('demo-provider-b');
     await expect(page).toHaveURL(/provider=demo-provider-b/);
     await expect(dataRows(page)).toHaveCount(3);
-    await page.reload();
+    await reloadReady(page);
     await expect(page.getByLabel('Provider', { exact: true })).toHaveValue('demo-provider-b');
     await expect(dataRows(page)).toHaveCount(3);
   });

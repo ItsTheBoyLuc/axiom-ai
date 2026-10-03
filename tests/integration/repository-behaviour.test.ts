@@ -75,6 +75,8 @@ describe('no N+1: query count does not grow with the amount of data returned', (
     const many = await sqlOf(() => repos.providers.list({ page: 1, pageSize: 50 }));
     expect(few.length).toBe(many.length);
     expect((await sqlOf(() => repos.benchmarks.list())).length).toBeLessThanOrEqual(3);
+    // Every provider's latest release comes from one statement, not one per provider.
+    expect((await sqlOf(() => repos.providers.listAll())).length).toBeLessThanOrEqual(3);
   });
 });
 

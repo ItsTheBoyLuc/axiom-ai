@@ -27,13 +27,24 @@ export async function revealAll(page: Page) {
  * holds two copies of the content (one hidden), and strict locators such as getByLabel (which
  * ignore visibility) match both. This was seen as a CI-only failure of the "Sort by" test.
  */
-export async function gotoReady(page: Page, url: string) {
-  const res = await page.goto(url);
+async function waitForHydrationAndStreaming(page: Page) {
   await page.waitForFunction(() => {
     const el = document.querySelector('button[aria-label="Change theme"]');
     return !!el && Object.keys(el).some((k) => k.startsWith('__reactProps$'));
   });
   await page.waitForFunction(() => document.querySelector('[id^="S:"]') === null);
+}
+
+export async function gotoReady(page: Page, url: string) {
+  const res = await page.goto(url);
+  await waitForHydrationAndStreaming(page);
+  return res;
+}
+
+/** page.reload() + the same waits as gotoReady (a bare reload can still show the streaming duplicate). */
+export async function reloadReady(page: Page) {
+  const res = await page.reload();
+  await waitForHydrationAndStreaming(page);
   return res;
 }
 

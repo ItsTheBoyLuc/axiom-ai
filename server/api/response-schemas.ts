@@ -184,6 +184,9 @@ export const providerSummarySchema = z.object({
   headquarters: nullableString,
   orgType: z.string(),
   modelCount: z.number().int(),
+  latestRelease: z
+    .object({ title: z.string(), date: z.string(), announcementUrl: nullableString })
+    .nullable(),
   verificationStatus: status,
   isDemo: z.boolean(),
 }) satisfies z.ZodType<ProviderSummary>;

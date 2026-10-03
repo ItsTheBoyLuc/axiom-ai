@@ -77,6 +77,32 @@ describe('providers', () => {
   });
 });
 
+describe('provider latest announcement', () => {
+  it('latestRelease is the newest release of each provider, in the summary list, page list and detail', async () => {
+    const all = await repos.providers.listAll();
+    let withRelease = 0;
+    for (const p of all) {
+      const { items } = await repos.releases.list({ provider: p.slug, page: 1, pageSize: 1 });
+      const newest = items[0];
+      if (!newest) {
+        expect(p.latestRelease, p.slug).toBeNull();
+        continue;
+      }
+      withRelease++;
+      expect(p.latestRelease, p.slug).toEqual({
+        title: newest.title,
+        date: newest.date,
+        announcementUrl: newest.announcementUrl,
+      });
+      const detail = await repos.providers.getBySlug(p.slug);
+      expect(detail?.latestRelease, p.slug).toEqual(p.latestRelease);
+    }
+    expect(withRelease).toBeGreaterThan(0);
+    const paged = await repos.providers.list({ page: 1, pageSize: 50 });
+    expect(paged.items.map((x) => x.latestRelease)).toEqual(all.map((x) => x.latestRelease));
+  });
+});
+
 describe('benchmarks', () => {
   it('lists benchmarks with result counts', async () => {
     const list = await repos.benchmarks.list();

@@ -28,6 +28,8 @@ export type ProviderSummary = {
   headquarters: string | null;
   orgType: string;
   modelCount: number;
+  /** The provider's newest release entry (the latest announcement), null when it has none. */
+  latestRelease: { title: string; date: string; announcementUrl: string | null } | null;
   verificationStatus: VerificationStatus;
   isDemo: boolean;
 };

@@ -13,8 +13,12 @@ const OFFSET_PX = 160;
  * the sticky navs (deterministic, unlike overlap-based observers, so clicking a link always
  * highlights that link). Scrolling to the very bottom activates the final section.
  */
-export function SectionNav() {
-  const [active, setActive] = useState<string>(PROFILE_SECTIONS[0].id);
+export function SectionNav({
+  sections = PROFILE_SECTIONS,
+}: {
+  sections?: readonly { id: string; label: string }[];
+}) {
+  const [active, setActive] = useState<string>(sections[0]!.id);
 
   useEffect(() => {
     let frame = 0;
@@ -22,12 +26,12 @@ export function SectionNav() {
       frame = 0;
       const atBottom =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
-      let current: string = PROFILE_SECTIONS[0].id;
-      for (const s of PROFILE_SECTIONS) {
+      let current: string = sections[0]!.id;
+      for (const s of sections) {
         const el = document.getElementById(s.id);
         if (el && el.getBoundingClientRect().top <= OFFSET_PX) current = s.id;
       }
-      if (atBottom) current = PROFILE_SECTIONS[PROFILE_SECTIONS.length - 1]!.id;
+      if (atBottom) current = sections[sections.length - 1]!.id;
       setActive(current);
     };
     const schedule = () => {
@@ -41,7 +45,7 @@ export function SectionNav() {
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
     };
-  }, []);
+  }, [sections]);
 
   return (
     <nav
@@ -49,7 +53,7 @@ export function SectionNav() {
       className="border-line bg-bg/85 sticky top-16 z-30 -mx-4 border-b px-4 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
     >
       <ul className="flex gap-1 overflow-x-auto py-2">
-        {PROFILE_SECTIONS.map((s) => {
+        {sections.map((s) => {
           const on = s.id === active;
           return (
             <li key={s.id} className="shrink-0">

@@ -67,6 +67,30 @@ export function IndependentBadge() {
   );
 }
 
+/**
+ * Release confirmation (docs/PROMPT.md 7.7): only officially verified or independently evaluated
+ * releases read as confirmed; every other status is shown as "Unconfirmed" (with the underlying
+ * status as a tooltip), never silently presented as fact.
+ */
+export function ConfirmationBadge({
+  confirmed,
+  status,
+}: {
+  confirmed: boolean;
+  status: VerificationStatus;
+}) {
+  if (confirmed) return <VerificationBadge status={status} />;
+  return (
+    <span
+      className={`${base} border-warn/40 bg-warn/10 text-warn`}
+      title={`Status: ${verificationLabel[status]}`}
+    >
+      <CircleHelp size={13} aria-hidden />
+      Unconfirmed
+    </span>
+  );
+}
+
 export function AiSummaryBadge() {
   return (
     <span className={`${base} border-accent-3/40 bg-accent-3/10 text-accent-3`}>

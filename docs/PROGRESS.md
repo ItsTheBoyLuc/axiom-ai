@@ -4,16 +4,17 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 
 ## Phases
 
-| Phase | Scope                                                 | Status                                                                                      |
-| ----- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| 0     | Foundation (Next.js, worker, Compose, CI)             | Done                                                                                        |
-| 1     | Brand, design system, homepage                        | Done                                                                                        |
-| 2     | Model directory and profiles (demo data)              | Done                                                                                        |
-| 3a    | Prisma schema, migrations, REST API, seed pipeline    | Done (2026-10-02, CI green)                                                                 |
-| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`       | Done 2026-10-03 (all 3 batches loaded, checked, audited, demo removed from pages, CI green) |
-| 4     | Compare (`/compare`, charts, share URL, CSV, history) | Done 2026-10-03 (see below)                                                                 |
-| 5     | Benchmarks (`/benchmarks` explorer, charts, filters)  | Done 2026-10-03 (see below)                                                                 |
-| 6-10  | Providers, News, Admin, Auth, Production              | Not started                                                                                 |
+| Phase | Scope                                                           | Status                                                                                      |
+| ----- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 0     | Foundation (Next.js, worker, Compose, CI)                       | Done                                                                                        |
+| 1     | Brand, design system, homepage                                  | Done                                                                                        |
+| 2     | Model directory and profiles (demo data)                        | Done                                                                                        |
+| 3a    | Prisma schema, migrations, REST API, seed pipeline              | Done (2026-10-02, CI green)                                                                 |
+| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`                 | Done 2026-10-03 (all 3 batches loaded, checked, audited, demo removed from pages, CI green) |
+| 4     | Compare (`/compare`, charts, share URL, CSV, history)           | Done 2026-10-03 (see below)                                                                 |
+| 5     | Benchmarks (`/benchmarks` explorer, charts, filters)            | Done 2026-10-03 (see below)                                                                 |
+| 6     | Providers and releases (directory, profiles, `/releases`, GSAP) | Done 2026-10-03 (see below)                                                                 |
+| 7-10  | News and search, Admin, Auth, Production                        | Not started                                                                                 |
 
 ## Phase 3b status
 
@@ -40,6 +41,12 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - **Honest about sparse, provider-reported data:** all 150 results are provider reported and the median benchmark has 2 results, so the overview always prints the independent count (0) with a note, and charts that would be meaningless (distribution under 5 models, provider comparison under 2 providers, history on one date) are replaced by a note saying why. No aggregate, ranking or "best" is computed.
 - **Gates:** prettier, typecheck, lint, 313 unit, 207 integration (incl. an N+1 guard that caught my first 4-query aggregate and an aggregate-vs-results invariant), 139 Playwright (axe in both themes on index, detail and filtered detail; mobile no-overflow; reduced motion; hydration), build, production audit, BOM: green. Screenshots reviewed at 390, 768 and 1440 with real and fixture data.
 
+## Phase 6 status
+
+- **Built (2026-10-03):** `/providers` (search, type chips, cards with latest announcement), `/providers/[slug]` (overview, filterable portfolio, release timeline chart + entries, APIs and modalities, research, news), `/releases` (timeline with GSAP scroll effects and list views; search, provider, kind and date filters; pager). `ProviderSummary.latestRelease` added (one `DISTINCT ON` statement).
+- **Real data:** 12 providers (none has a verified headquarters, so none is shown), 48 releases (all confirmed), 6 publications, 18 news items. Reviewed with real data at 390 and 1440 (directory, OpenAI and Google DeepMind profiles, timeline and list), and fixture data at 390, 768 and 1440.
+- **Gates:** prettier, typecheck, lint, 360+ unit, 208 integration, Playwright (axe in both themes on directory, profile, timeline, list and empty states; GSAP effect and reduced-motion checks; mobile no-overflow; hydration), build, production audit, BOM: green.
+
 ## Verification log
 
 - Phase 3a (2026-10-02): migrations from empty, 206 integration tests, 70 Playwright tests, production build without a database, full Docker stack healthy and non-root, Prisma overrides reviewed (still required).
@@ -52,4 +59,5 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - Review the Prisma `overrides` at the start of Phase 10 (hard limit 2026-12-31).
 - Image-model profiles show "Not publicly disclosed" for inapplicable fields (context window, tool calling).
 - Phase 7: label the DataCamp news item's date as "updated", not "published".
+- Phase 7: `/news` should reuse `NewsCard` and the `Pager`.
 - Phase 10 at the latest: restore the strict all-dependency `npm audit` gate if a patched `braces` or fixed `eslint-config-next` exists (CI currently blocks on `--omit=dev` only).
