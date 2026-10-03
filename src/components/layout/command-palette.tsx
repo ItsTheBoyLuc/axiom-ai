@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { AnimatePresence, motion } from 'motion/react';
 import { PaletteBody } from '@/components/search/palette-body';
@@ -21,7 +21,16 @@ export function usePalette(): PaletteCtx {
  * benchmarks, releases, news and research through the real API.
  */
 export function PaletteProvider({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
+  // `session` changes on every open, so a palette reopened while the previous one is still
+  // animating out starts fresh (empty field, focused) instead of reviving the old content.
+  const [state, setState] = useState({ open: false, session: 0 });
+  const { open, session } = state;
+  const setOpen = useCallback((next: boolean | ((o: boolean) => boolean)) => {
+    setState((s) => {
+      const o = typeof next === 'function' ? next(s.open) : next;
+      return o === s.open ? s : { open: o, session: o ? s.session + 1 : s.session };
+    });
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -32,9 +41,9 @@ export function PaletteProvider({ children }: { children: React.ReactNode }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [setOpen]);
 
-  const value = useMemo(() => ({ open, setOpen }), [open]);
+  const value = useMemo(() => ({ open, setOpen }), [open, setOpen]);
 
   return (
     <Ctx.Provider value={value}>
@@ -42,7 +51,7 @@ export function PaletteProvider({ children }: { children: React.ReactNode }) {
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <AnimatePresence>
           {open && (
-            <Dialog.Portal forceMount>
+            <Dialog.Portal forceMount key={session}>
               <Dialog.Overlay asChild>
                 <motion.div
                   className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm"

@@ -9,6 +9,8 @@ const box = (page: Page) => page.getByRole('combobox', { name: 'Search' });
 
 /** Opens the palette with the keyboard shortcut and waits for the field to take focus. */
 async function openPalette(page: Page) {
+  // A previous palette may still be animating out: wait until it is gone before reopening.
+  await expect(dialog(page)).toHaveCount(0);
   await page.keyboard.press('Control+K');
   await expect(dialog(page)).toBeVisible();
   await expect(box(page)).toBeFocused();
