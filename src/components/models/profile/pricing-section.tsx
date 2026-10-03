@@ -1,7 +1,7 @@
 import { CheckCircle2, History } from 'lucide-react';
 import { formatDate } from '@/lib/format';
 import { money } from '@/lib/models/display';
-import { TOKEN_UNIT } from '@/lib/pricing';
+import { TOKEN_UNIT, estimatorUnit } from '@/lib/pricing';
 import { NOT_DISCLOSED } from '@/lib/verification';
 import {
   pricingKindLabel,
@@ -85,7 +85,10 @@ export function PricingSection({ model }: { model: ModelDetail }) {
     .filter((p) => !p.isCurrent)
     .sort((a, b) => b.effectiveFrom.localeCompare(a.effectiveFrom));
   const rows = [...current, ...historical];
-  const hasTokenPricing = current.some((p) => p.unit === TOKEN_UNIT && p.price !== null);
+  const unit = estimatorUnit(current);
+  const hasTokenPricing = current.some((p) => p.unit === unit && p.price !== null);
+  // Token prices exist, but several variants (tiers) mean no single flat price applies.
+  const hasTokenVariants = !hasTokenPricing && current.some((p) => p.unit.startsWith(TOKEN_UNIT));
   const th = 'px-4 py-3 text-left text-xs font-medium tracking-wide text-muted uppercase';
 
   return (
@@ -145,7 +148,9 @@ export function PricingSection({ model }: { model: ModelDetail }) {
           <CostEstimator entries={model.pricing} modelName={model.name} />
         ) : (
           <p className="text-muted text-sm">
-            The cost estimator is unavailable: no per-token prices are published for this model.
+            {hasTokenVariants
+              ? 'The cost estimator is unavailable: this model lists several price variants (for example tiers), so no single flat price applies. See the table above.'
+              : 'The cost estimator is unavailable: no per-token prices are published for this model.'}
           </p>
         )}
       </div>

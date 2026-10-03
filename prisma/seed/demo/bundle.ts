@@ -1,4 +1,4 @@
-import { demoNews, demoProviders } from '../../../src/lib/demo-data';
+import { demoNews, demoProviders } from './fixtures';
 import { availabilityKeyByLabel } from '../../../src/types/model';
 import type { SeedFile } from '../schemas';
 import { demoBenchmarks, demoModelDetails } from './models';

@@ -1,9 +1,9 @@
 /**
- * PLACEHOLDER DATA for layout only (docs/PROMPT.md section 2).
+ * TEST FIXTURES ONLY (docs/PROMPT.md section 2). Loaded only with SEED_DEMO=true (the e2e and
+ * integration databases); the real catalogue never contains these rows.
  * Names are deliberately fictional and every value is invented; nothing here describes a
  * real provider, model, price, benchmark or article. Every record has isDemo = true and the
- * UI renders a DEMO DATA badge next to it. Replaced by sourced data in Phase 3.
- * (Demo MODELS live in server/repositories/demo/models.ts behind the repository layer.)
+ * UI renders a DEMO DATA badge next to it.
  */
 
 export type DemoProvider = {

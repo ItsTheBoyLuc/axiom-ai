@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { demoNews, demoProviders, demoReleases } from '@/lib/demo-data';
+import { demoNews, demoProviders, demoReleases } from '../../prisma/seed/demo/fixtures';
 import { formatTokens } from '@/lib/format';
 import { buildGraph } from '@/components/hero/graph';
 import { demoBenchmarks, demoModelDetails } from '../../prisma/seed/demo/models';

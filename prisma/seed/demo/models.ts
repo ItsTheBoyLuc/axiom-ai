@@ -1,4 +1,4 @@
-import { demoProviders } from '../../../src/lib/demo-data';
+import { demoProviders } from './fixtures';
 import {
   sortCapabilities,
   sortHistory,

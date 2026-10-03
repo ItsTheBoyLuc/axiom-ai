@@ -135,9 +135,9 @@ Rather than a random sample, every fact that came through the summarising fetche
 9. Model category assignments for these models (editorial, from how providers describe them).
 10. Mistral context windows ("256k") stored as 256,000 tokens, not 262,144.
 
-## Batch 3: Microsoft, NVIDIA, Alibaba, Cohere, Amazon, news, publications (IN PROGRESS, stopped 2026-10-02)
+## Batch 3: Microsoft, NVIDIA, Alibaba, Cohere, Amazon, news, publications (2026-10-02 and 2026-10-03)
 
-**Status: data files written and schema-validated (`tests/unit/real-seed-data.test.ts` passes). NOT yet loaded into the dev database, NOT yet checked in the browser (`/models`, a profile, `/api/v1/stats`), source verification NOT complete, demo data NOT yet removed from the pages.** Work was stopped on request before those steps.
+**Status: loaded into the dev database, checked in the browser at 390, 768 and 1440, source re-check and self-audit done (below).** News and publications are loaded as collected on 2026-10-02; no further news research was done (Phase 7 re-checks the sources).
 
 | Provider       | Models | Prices | Benchmark results | Releases |
 | -------------- | ------ | ------ | ----------------- | -------- |
@@ -145,29 +145,54 @@ Rather than a random sample, every fact that came through the summarising fetche
 | NVIDIA         | 2      | 0      | 20                | 3        |
 | Alibaba (Qwen) | 2      | 4      | 18                | 4        |
 | Cohere         | 2      | 0      | 6                 | 2        |
-| Amazon         | 1      | 0      | 0                 | 1        |
+| Amazon         | 1      | 2      | 0                 | 1        |
 
-Plus 13 new benchmark variants, 5 provider records, 18 news items (15 official, 3 independent) and 6 publications. Catalogue totals if loaded: 12 providers, 34 models, 120 prices, 150 benchmark results, 59 benchmark variants, 48 releases, 18 news items, 6 publications.
+Plus 13 new benchmark variants, 5 provider records, 18 news items (15 official, 3 independent) and 6 publications. Catalogue totals as loaded: 12 providers, 34 models, 122 prices, 150 benchmark results, 59 benchmark variants, 48 releases, 18 news items, 6 publications.
 
 ### Included models
 
 Microsoft MAI-Thinking-1 (public preview 2026-08-12); NVIDIA Nemotron 3 Ultra (2026-06-04) and Nemotron 3.5 Lightning (2026-08-11); Alibaba Qwen3.8-Max (2026-08-03) and Qwen3.8-Flash (2026-08-27); Cohere Command A+ (2026-05-20) and Command A (2025-03-12); Amazon Nova 2 Lite (GA 2025-12-02).
 
-### Verified directly (browser, page text) so far
+### Verified directly (rendered page text, Playwright)
 
-NVIDIA Ultra and Lightning scores and release dates (model cards); Qwen3.8-Max and Qwen3.8-Flash scores (model cards), Model Studio international prices (qwen3.8-max $2 / $6, qwen3.8-flash $0.15 / $0.47, up to 1M tokens); MAI-Thinking-1 date, AIME scores and Foundry prices ($2 / $0.20 cached / $8, global); Command A+ specs and scores (launch post); Command A blog date; DeepSeek V4 technical document date (April 27, 2026; read visually); Muse Glimmer / Muse Spark dates (batch 2).
+NVIDIA Ultra and Lightning scores and release dates (model cards); Qwen3.8-Max and Qwen3.8-Flash scores (model cards) and Model Studio international prices (qwen3.8-max $2 / $6, qwen3.8-flash $0.15 / $0.47, up to 1M tokens); MAI-Thinking-1 date, AIME scores and Foundry prices ($2 / $0.20 cached / $8, global); Command A+ specs and scores (launch post); DeepSeek V4 technical document date (April 27, 2026; read visually); Muse Glimmer / Muse Spark dates (batch 2).
 
-### Read only through the summarising fetcher (still to re-check before trusting)
+### Re-checked on 2026-10-03 (previously read only through a summarising fetcher)
 
-Command A+ release date (2026-05-20, docs page) and Command A context/output (256k / 8k); Command A weights licence (CC-BY-NC-4.0, Hugging Face API); Amazon Nova 2 Lite facts and dates (AWS docs and What's New post); Qwen3.6-Plus (2026-04-02) and Qwen3.7-Plus (2026-06-03) release dates; the NVIDIA Nano Omni post date (2026-04-28); the DataCamp, WinBuzzer and Hugging Face article titles, publishers and dates; the Amazon Nova Premier report date, the arXiv Command A paper date, the NVIDIA Ultra technical report date.
+All of these now match the rendered source page: Command A+ release date (May 20, 2026), 128K context, 64K output, Apache 2.0, model ID command-a-plus-05-2026; Command A blog date (March 12, 2025) and context/output (256k / 8k, Cohere models page); Command A weights licence (CC-BY-NC-4.0, Hugging Face API tags); Amazon Nova 2 Lite (What's New post dated Dec 2, 2025; 1M-token context and 65,536 max output on the Nova 2 user guide; AWS blog post exists and is dated 2025-12-02); Qwen3.6-Plus (April 2, 2026) and Qwen3.7-Plus (June 3, 2026) release dates; NVIDIA Nano Omni post (April 28, 2026); NVIDIA Ultra technical report page (June 4, 2026); arXiv Command A paper (v1 1 Apr 2025); Amazon Nova Premier report page (April 30, 2025); Hugging Face Muse Glimmer article (August 10, 2026) and WinBuzzer article (September 4, 2026).
+
+**One caveat found:** the DataCamp article shows "Updated Sep 3, 2026", not a publication date. The stored date (2026-09-03) is therefore the last-updated date; the original publication date is not shown on the page.
+
+### Amazon Nova 2 Lite price (resolved 2026-10-03)
+
+The earlier fetch could not read AWS's pricing tables. Rendering https://aws.amazon.com/nova/pricing/ with Playwright works: Amazon Nova 2 Lite, Standard tier, global cross-Region inference, US East (Ohio): **$0.30 per 1M input tokens, $2.50 per 1M output tokens** (stored with that unit label, effective 2026-10-03, OFFICIALLY_VERIFIED). The same page lists Priority ($0.525 / $4.375) and Flex/Batch ($0.15 / $1.25) tiers and Geo/in-region prices ($0.33 / $2.75); those variants are NOT stored. The page footnote says cache reads cost 75% less than the on-demand input price; no cached price is stored (that would be a derived value). The Nova 2 Lite model still has no benchmark scores (none read in an official source).
+
+### Self-audit (batch 3, 2026-10-03)
+
+Eight random records (fixed-seed pick across tables), source re-fetched and compared:
+
+| Record                                     | Stored            | Source says                                         | Result                                       |
+| ------------------------------------------ | ----------------- | --------------------------------------------------- | -------------------------------------------- |
+| Nemotron 3.5 Lightning, Terminal-Bench 2.1 | 24.58             | 24.58 (first column, Hugging Face card)             | match                                        |
+| Qwen3.8-Max, GPQA Diamond                  | 92.6              | 92.6 (last column "Qwen3.8-Max", Hugging Face card) | match                                        |
+| Qwen3.6-Plus release                       | 2026-04-02        | April 2, 2026 (Alibaba Cloud press release)         | match                                        |
+| MAI-Thinking-1 input price                 | $2 per 1M, global | $2 Global (Azure Foundry pricing)                   | match                                        |
+| Qwen3.7-Plus release                       | 2026-06-03        | June 3, 2026 (Alibaba Cloud blog)                   | match                                        |
+| DataCamp GPT-6 Astra article               | 2026-09-03        | "Updated Sep 3, 2026"                               | match, but it is an update date (see caveat) |
+| Muse Glimmer developer post                | 2026-08-12        | Aug 12, 2026                                        | match                                        |
+| Qwen3.8-Max output price                   | $6 per 1M         | $2 in / $6 out, 0 to 1M tokens, international       | match                                        |
+
+0 value mismatches; 1 labelling caveat (DataCamp date).
 
 ### Known gaps and decisions
 
-- **Amazon Nova 2 Lite has no price and no benchmark scores.** The Bedrock and Nova pricing tables are interactive widgets that do not render as page text, and AWS's public price-list JSON maps rate codes without model names. A search summary gave a price labelled "Nova Lite" (version 1), which was rejected.
 - **Cohere has no per-token prices** (the pricing page lists only legacy models; Command A+ production limits are "contact sales"), so both models are `pricingKind = custom` with no price rows.
 - **NVIDIA models have no prices** (open checkpoints; `pricingKind = free`, meaning the weights are free to download).
-- **Microsoft:** only MAI-Thinking-1 is included. MAI-Image-2.5, MAI-Code-1.1-Flash, MAI Transcribe and MAI-Voice were announced on 2026-06-02 without a dated availability, and MAI-Cyber-1 Flash was not read; Phi models are not in the current lineup read.
+- **Microsoft:** only MAI-Thinking-1 is included. MAI-Image-2.5, MAI-Code-1.1-Flash, MAI Transcribe and MAI-Voice were announced on 2026-06-02 without a dated availability, and MAI-Cyber-1 Flash was not read (it is on the Foundry pricing page at $0.60 / $0.06 / $3.50, but no release was read); Phi models are not in the current lineup read.
 - **Alibaba:** Qwen3.7-Plus and 3.6-Plus appear only as release entries (their listed prices carry a "limited-time 20% off" qualifier that was not interpreted); Qwen3.7-Max and the Omni/LiveTranslate models are not included. Qwen3.8-Max's scores come from the open-weight model card's "Qwen3.8-Max" column (repository created 2026-08-08), dated 2026-08-08.
-- **Muse Spark 1.3** is still omitted (see batch 2). Meta's own blog index (checked again) has no post for it.
 - **Muse Glimmer date caveat:** Meta's developer post is dated 2026-08-12 (used), but Hugging Face's day-zero article is dated 2026-08-10 and the model repository was created 2026-08-09, so the weights may have been public earlier than the date stored.
 - **News:** every summary is AI-written and flagged `isAiSummary`; 3 independent items (Hugging Face Blog, DataCamp, WinBuzzer) are `COMMUNITY_REPORTED`, not official. The WinBuzzer item mentions Muse Spark 1.3 only as news.
+
+### Excluded: no verified release date
+
+- **Muse Spark 1.3 (Meta).** Not stored as a model or release. The only source is a third-party article (WinBuzzer, 2026-09-04); Meta's own blog index has no post for it, so there is no official release date. Decision 2026-10-02: leave it out until an official source exists.

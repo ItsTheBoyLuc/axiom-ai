@@ -131,3 +131,31 @@ test('every internal link on the homepage resolves', async ({ page, request }) =
     expect(res.status(), href).toBeLessThan(400);
   }
 });
+
+test.describe('homepage releases and news come from the database', () => {
+  test('latest releases show real rows with external announcement links and a demo label', async ({
+    page,
+  }) => {
+    await gotoReady(page, '/');
+    const section = page.locator('section[aria-labelledby="releases-title"]');
+    await expect(section.getByRole('heading', { level: 3 }).first()).toBeVisible();
+    await expect(section.getByText('demo entry')).toHaveCount(0); // the old hardcoded copy is gone
+    // The e2e database holds only demo fixtures, so the section must say so.
+    await expect(section.getByText('DEMO DATA').first()).toBeVisible();
+    for (const a of await section.getByRole('link', { name: 'Announcement' }).all()) {
+      await expect(a).toHaveAttribute('rel', 'noopener noreferrer');
+      await expect(a).toHaveAttribute('target', '_blank');
+    }
+  });
+
+  test('latest news link to the source article and keep the labels', async ({ page }) => {
+    await gotoReady(page, '/');
+    const section = page.locator('section[aria-labelledby="news-title"]');
+    await expect(section.getByText('DEMO DATA').first()).toBeVisible();
+    const links = section.getByRole('link', { name: /^Read at / });
+    expect(await links.count()).toBeGreaterThan(0);
+    await expect(links.first()).toHaveAttribute('href', /^https:\/\//);
+    await expect(links.first()).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(section.getByText('AI summary').first()).toBeVisible();
+  });
+});

@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import { Calculator } from 'lucide-react';
-import { estimateCost, formatMoney } from '@/lib/pricing';
+import { TOKEN_UNIT, estimateCost, formatMoney } from '@/lib/pricing';
 import { NOT_DISCLOSED } from '@/lib/verification';
 import type { PricingEntry } from '@/types/model';
 
@@ -157,7 +157,14 @@ export function CostEstimator({
         )}
       </div>
       <p className="text-muted mt-4 text-xs">
-        Uses current listed prices only. Real bills can differ (tiers, minimums, rounding, taxes).
+        Uses current listed prices only
+        {result.ok && result.unit && result.unit !== TOKEN_UNIT
+          ? ` (${result.unit
+              .slice(TOKEN_UNIT.length)
+              .trim()
+              .replace(/^\(|\)$/g, '')})`
+          : ''}
+        . Real bills can differ (tiers, minimums, rounding, taxes).
       </p>
     </div>
   );

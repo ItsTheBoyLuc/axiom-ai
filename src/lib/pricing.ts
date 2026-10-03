@@ -31,7 +31,28 @@ export type EstimateResult =
       currency: string | null;
       /** True when some tokens could not be costed because a price is not disclosed. */
       partial: boolean;
+      /** The price unit used (may carry a qualifier such as a tier), or null when none applies. */
+      unit: string | null;
     };
+
+/**
+ * The one token unit the estimator prices against, or null when there is no unambiguous one.
+ * A plain `per 1M tokens` unit always wins. Otherwise the units may carry a qualifier (a tier,
+ * a deployment type): a single such unit is used, but with several variants (for example prompt
+ * length tiers) no flat price applies, so the estimator is unavailable rather than picking one.
+ */
+export function estimatorUnit(entries: PricingEntry[]): string | null {
+  const tokenRows = entries.filter((e) => e.isCurrent && e.unit.startsWith(TOKEN_UNIT));
+  if (tokenRows.some((e) => e.unit === TOKEN_UNIT)) return TOKEN_UNIT;
+  const units = [...new Set(tokenRows.map((e) => e.unit))];
+  const paired = units.filter(
+    (u) =>
+      tokenRows.some((e) => e.unit === u && e.type === 'INPUT') &&
+      tokenRows.some((e) => e.unit === u && e.type === 'OUTPUT'),
+  );
+  if (paired.length === 1) return paired[0]!;
+  return paired.length === 0 && units.length === 1 ? units[0]! : null;
+}
 
 const LINES: { type: EstimateLine['type']; label: string; key: keyof EstimatorInput }[] = [
   { type: 'INPUT', label: 'Input', key: 'inputTokens' },
@@ -55,7 +76,8 @@ export function estimateCost(entries: PricingEntry[], input: EstimatorInput): Es
     return { ok: false, error: 'INVALID_TOKENS' };
   }
 
-  const current = entries.filter((e) => e.isCurrent && e.unit === TOKEN_UNIT);
+  const unit = estimatorUnit(entries);
+  const current = entries.filter((e) => e.isCurrent && unit !== null && e.unit === unit);
   const priceFor = (type: EstimateLine['type']) => current.find((e) => e.type === type);
 
   // Total can only be summed in one currency.
@@ -83,7 +105,14 @@ export function estimateCost(entries: PricingEntry[], input: EstimatorInput): Es
     return { type, label, tokens, pricePerMillion, cost };
   });
 
-  return { ok: true, lines, total: clean(total), currency: [...currencies][0] ?? null, partial };
+  return {
+    ok: true,
+    lines,
+    total: clean(total),
+    currency: [...currencies][0] ?? null,
+    partial,
+    unit,
+  };
 }
 
 /** Money with at least 2 and at most 6 decimals (token costs are often fractions of a cent). */

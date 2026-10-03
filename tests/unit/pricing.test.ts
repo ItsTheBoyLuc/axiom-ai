@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_TOKENS, estimateCost, formatMoney, type EstimateResult } from '@/lib/pricing';
+import {
+  MAX_TOKENS,
+  estimateCost,
+  estimatorUnit,
+  formatMoney,
+  type EstimateResult,
+} from '@/lib/pricing';
 import type { PricingEntry } from '@/types/model';
 
 const entry = (over: Partial<PricingEntry>): PricingEntry => ({
@@ -149,5 +155,38 @@ describe('formatMoney', () => {
   it('defaults to USD and survives unknown currency codes', () => {
     expect(formatMoney(1, null)).toBe('$1.00');
     expect(formatMoney(1, 'ZZZZ')).toContain('1');
+  });
+});
+
+describe('estimatorUnit and qualified units', () => {
+  const qualified = (type: PricingEntry['type'], price: number, tier = 'Standard tier') =>
+    entry({ type, price, unit: `per 1M tokens (${tier})` });
+
+  it('prices against a single qualified unit and reports it', () => {
+    const p = [qualified('INPUT', 0.3), qualified('OUTPUT', 2.5)];
+    expect(estimatorUnit(p)).toBe('per 1M tokens (Standard tier)');
+    const r = ok(
+      estimateCost(p, { inputTokens: 1_000_000, outputTokens: 1_000_000, cachedInputTokens: 0 }),
+    );
+    expect(r.total).toBeCloseTo(2.8);
+    expect(r.unit).toBe('per 1M tokens (Standard tier)');
+  });
+
+  it('is unavailable with several qualified variants instead of picking one', () => {
+    const p = [
+      qualified('INPUT', 2, 'prompts up to 200K'),
+      qualified('OUTPUT', 12, 'prompts up to 200K'),
+      qualified('INPUT', 4, 'prompts over 200K'),
+      qualified('OUTPUT', 18, 'prompts over 200K'),
+    ];
+    expect(estimatorUnit(p)).toBeNull();
+    const r = ok(estimateCost(p, { inputTokens: 1, outputTokens: 1, cachedInputTokens: 0 }));
+    expect(r.lines.every((l) => l.pricePerMillion === null)).toBe(true);
+  });
+
+  it('prefers the plain unit and ignores historical and non-token units', () => {
+    expect(estimatorUnit([...prices, qualified('INPUT', 9)])).toBe('per 1M tokens');
+    expect(estimatorUnit([entry({ unit: 'per image' })])).toBeNull();
+    expect(estimatorUnit([{ ...qualified('INPUT', 1), isCurrent: false }])).toBeNull();
   });
 });

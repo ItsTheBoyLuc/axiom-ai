@@ -7,8 +7,8 @@ import { Card } from '@/components/ui/card';
 import { Counter } from '@/components/ui/counter';
 import { Container, Section } from '@/components/ui/section';
 import { RevealGroup, RevealItem, Reveal } from '@/components/ui/reveal';
-import { demoNews, demoReleases, providerBySlug } from '@/lib/demo-data';
 import { formatDate } from '@/lib/format';
+import { getRepositories } from '../../../server/repositories';
 import { getModelRepository } from '../../../server/repositories/model-repository';
 import { listProviders } from '../../../server/repositories/provider-repository';
 import { getStats } from '../../../server/services/stats';
@@ -60,7 +60,7 @@ export async function FeaturedModels() {
       eyebrow="Featured models"
       title="A directory built for precision."
       lead="Every model carries its source and verification status."
-      demo={<DemoBadge />}
+      demo={models.some((m) => m.isDemo) ? <DemoBadge /> : undefined}
       action={
         <ButtonLink href="/models" variant="secondary" arrow>
           Browse all models
@@ -86,7 +86,7 @@ export async function ProvidersOverview() {
       id="providers"
       eyebrow="Providers"
       title="The organisations behind the models."
-      demo={<DemoBadge />}
+      demo={providers.some((p) => p.isDemo) ? <DemoBadge /> : undefined}
       action={
         <ButtonLink href="/providers" variant="secondary" arrow>
           All providers
@@ -131,7 +131,7 @@ export async function ComparisonSection() {
       eyebrow="Comparison"
       title="Side by side, without the noise."
       lead="Compare up to four models. Benchmarks stay separate: there is no blended score."
-      demo={<DemoBadge />}
+      demo={models.some((m) => m.isDemo) ? <DemoBadge /> : undefined}
     >
       <Reveal>
         <ComparisonPreview models={models} />
@@ -140,13 +140,29 @@ export async function ComparisonSection() {
   );
 }
 
-export function LatestReleases() {
+/** Anchor to an official/independent source. External, so it never carries referrer or opener. */
+function SourceLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-accent inline-flex items-center gap-1 text-xs font-medium hover:underline"
+    >
+      {children} <ArrowUpRight size={12} aria-hidden />
+    </a>
+  );
+}
+
+export async function LatestReleases() {
+  const { items } = await getRepositories().releases.list({ page: 1, pageSize: 4 });
+  if (items.length === 0) return null; // no empty section
   return (
     <Section
       id="releases"
       eyebrow="Latest releases"
       title="A timeline of what shipped."
-      demo={<DemoBadge />}
+      demo={items.some((r) => r.isDemo) ? <DemoBadge /> : undefined}
       action={
         <ButtonLink href="/releases" variant="secondary" arrow>
           Full timeline
@@ -154,7 +170,7 @@ export function LatestReleases() {
       }
     >
       <RevealGroup as="ol" className="border-line-strong relative ml-2 space-y-8 border-l pl-8">
-        {demoReleases.map((r) => (
+        {items.map((r) => (
           <RevealItem as="li" key={r.id} className="relative">
             <span
               aria-hidden
@@ -164,13 +180,16 @@ export function LatestReleases() {
               {formatDate(r.date)}
             </time>
             <h3 className="t-h3 mt-1">
-              {r.model}{' '}
-              <span className="text-fg-2 font-normal">
-                &middot; {providerBySlug(r.providerSlug)?.name}
-              </span>
+              {r.title} <span className="text-fg-2 font-normal">&middot; {r.provider.name}</span>
             </h3>
             <p className="text-fg-2 mt-1 max-w-2xl">{r.description}</p>
-            <p className="text-muted mt-2 text-xs">No announcement link: demo entry.</p>
+            <p className="mt-2">
+              {r.announcementUrl ? (
+                <SourceLink href={r.announcementUrl}>Announcement</SourceLink>
+              ) : (
+                <span className="text-muted text-xs">No announcement link.</span>
+              )}
+            </p>
           </RevealItem>
         ))}
       </RevealGroup>
@@ -178,13 +197,15 @@ export function LatestReleases() {
   );
 }
 
-export function LatestNews() {
+export async function LatestNews() {
+  const { items } = await getRepositories().news.list({ page: 1, pageSize: 3 });
+  if (items.length === 0) return null; // no empty section
   return (
     <Section
       id="news"
       eyebrow="Latest news"
       title="Announcements and reporting, clearly labelled."
-      demo={<DemoBadge />}
+      demo={items.some((n) => n.isDemo) ? <DemoBadge /> : undefined}
       action={
         <ButtonLink href="/news" variant="secondary" arrow>
           All news
@@ -192,7 +213,7 @@ export function LatestNews() {
       }
     >
       <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {demoNews.map((n, i) => (
+        {items.map((n, i) => (
           // First story is featured: spans both columns at md so the 2-col grid (sm and up) has no orphan.
           <RevealItem key={n.id} className={i === 0 ? 'sm:col-span-2 lg:col-span-1' : undefined}>
             <Card as="article" className="flex h-full flex-col p-5">
@@ -203,10 +224,13 @@ export function LatestNews() {
               <h3 className="t-h3">{n.title}</h3>
               <p className="text-fg-2 mt-2 flex-1 text-sm">{n.summary}</p>
               <p className="text-muted mt-4 text-xs">
-                {n.publisher} &middot; <time dateTime={n.date}>{formatDate(n.date)}</time> &middot;{' '}
-                {providerBySlug(n.providerSlug)?.name}
+                {n.publisher} &middot;{' '}
+                <time dateTime={n.publishedAt}>{formatDate(n.publishedAt)}</time>
+                {n.provider && n.provider.name !== n.publisher && <> &middot; {n.provider.name}</>}
               </p>
-              <p className="text-muted mt-1 text-xs">No source link: demo entry.</p>
+              <p className="mt-1">
+                <SourceLink href={n.url}>Read at {n.publisher}</SourceLink>
+              </p>
             </Card>
           </RevealItem>
         ))}

@@ -59,12 +59,13 @@ docker compose down -v           # stop and wipe volumes
 - Do not put `inline-flex` (or any `display` utility) in a shared class string that is also combined with `hidden` / `lg:hidden`; the order in the CSS decides and the control leaks onto the wrong breakpoints.
 - Only animate transform/opacity, and wait for animations and pending transitions before axe scans or screenshots (dimmed/fading UI blends colours).
 - Playwright: use `gotoReady()` from `tests/e2e/helpers.ts` (waits for hydration); scope locators (`getByRole('combobox', { name })`, `main header`), since selects also have the combobox role.
+- Playwright e2e serves the existing production build (`next start`): run `npm run build` first or tests run against stale code. Reveal-on-scroll content is blank in full-page captures until you scroll through the page.
 - Full-page screenshots show sticky/fixed elements (navbar, tray) floating mid-page. That is a capture artifact, not a layout bug.
 - Data access goes through `server/repositories/*`. Never import the demo dataset from UI code.
 
 ## Status
 
-Step 0, Phases 1, 2 and 3a (Prisma schema, migrations, REST API + OpenAPI, Redis cache, seed pipeline) complete. In progress: Phase 3b (real sourced data, see Autopilot mode and docs/PROGRESS.md). Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
+Step 0, Phases 1, 2, 3a and 3b (real sourced data for 12 providers, 34 models) complete. Blocked on one decision: `npm audit` reports a dev-only `braces` advisory with no upstream fix (see docs/DECISIONS.md, 2026-10-03). Next: Phase 4 (Compare). Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
 
 ## Autopilot mode
 
