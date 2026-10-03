@@ -229,7 +229,7 @@ test.describe('comparison tray', () => {
     expect(href).toMatch(/^\/compare\?models=([a-z0-9-]+,){3}[a-z0-9-]+$/);
     await tray.getByRole('link', { name: 'Compare' }).click();
     await expect(page).toHaveURL(/\/compare\?models=/);
-    await expect(page.getByText('Not built yet')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Compare models' })).toBeVisible();
   });
 
   test('removing and clearing works', async ({ page }) => {

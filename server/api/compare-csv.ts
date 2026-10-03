@@ -7,9 +7,8 @@ import {
   type ModelDetail,
   type PricingType,
 } from '../../src/types/model';
+import { benchmarkText, priceLines } from '../../src/lib/compare/values';
 import { toCsv } from './csv';
-
-const TOKEN_UNIT = 'per 1M tokens';
 
 const orDisclosed = (v: string | number | boolean | null | undefined): string | number =>
   v === null || v === undefined || v === ''
@@ -20,11 +19,8 @@ const orDisclosed = (v: string | number | boolean | null | undefined): string | 
         : 'No'
       : v;
 
-/** Current price of one type, formatted with its currency and unit; undisclosed when absent/null. */
-function priceOf(m: ModelDetail, type: PricingType): string {
-  const p = m.pricing.find((x) => x.isCurrent && x.type === type && x.unit === TOKEN_UNIT);
-  return p && p.price !== null ? `${p.price} ${p.currency} ${p.unit}` : NOT_DISCLOSED;
-}
+/** Current price variants of one type, one per tier or deployment type, or undisclosed. */
+const priceOf = (m: ModelDetail, type: PricingType): string => priceLines(m, type).join('; ');
 
 /**
  * Rows for the comparison export: one column per model. Each benchmark is its own row (never
@@ -71,9 +67,7 @@ export function buildCompareRows(models: ModelDetail[]): (string | number)[][] {
       `Benchmark: ${name}`,
       ...models.map((m) => {
         const r = latestBenchmarkResult(m.benchmarks, slug);
-        return r
-          ? `${r.score}${r.scoreUnit} (${r.evaluationType.toLowerCase().replaceAll('_', ' ')}, ${r.evaluationDate}, model ${r.modelVersion})`
-          : 'No verified data';
+        return r ? benchmarkText(r) : 'No verified data';
       }),
     ]),
     row('Verification status', (m) => m.verificationStatus.replaceAll('_', ' ').toLowerCase()),

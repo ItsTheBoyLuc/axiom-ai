@@ -8,7 +8,12 @@ import { gotoReady } from './helpers';
  */
 const HYDRATION = /hydrat|Minified React error #(418|419|422|423|425)/i;
 
-const ROUTES = ['/', '/models', '/models/sample-model-2'];
+const ROUTES = [
+  '/',
+  '/models',
+  '/models/sample-model-2',
+  '/compare?models=sample-model-1,sample-model-2',
+];
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
   test.describe(`hydration, prefers-reduced-motion: ${reducedMotion}`, () => {

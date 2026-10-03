@@ -53,3 +53,9 @@ Running list of every motion value in the product, kept current so it can be tun
 - Reveal / RevealItem (`ui/reveal.tsx`): `fadeUp` when scrolled into view.
 - Search suggestions (`directory/search-box.tsx`): enter opacity 0, y -6, scale 0.98 with `snappy`; exit y -4.
 - Counters: `counter` duration, written straight to the DOM node.
+
+## Phase 4 (Compare)
+
+- Bar and radar charts (`components/charts`): Recharts draw-in, 700 ms (`animationDuration`), `ease-out`. Recharts animates SVG geometry, not CSS transforms, so this is the one place the "transform/opacity only" rule is relaxed; it is skipped content-wise for nobody (the table view is the static alternative) and the chart area is a single small SVG.
+- Model picker chevron (`compare-view.tsx`): `rotate-180` on open, 150 ms CSS transition (transform only).
+- The compare page uses the page template and `fadeUp` reveals already listed above; the table, rows and chips do not animate. Adding or removing a model is a URL change and a server re-render, shown with `aria-busy` rather than motion.

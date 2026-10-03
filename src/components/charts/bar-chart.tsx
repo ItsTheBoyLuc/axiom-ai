@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { formatTokens } from '@/lib/format';
 import { Download, Table2, BarChart3 } from 'lucide-react';
+import { chartCsv, csvFilename, downloadCsv } from './download';
 
 /** Serializable format key (functions cannot cross the server/client boundary). */
 export type ValueFormat = 'number' | 'tokens';
@@ -29,14 +30,6 @@ export type BarDatum = { label: string; value: number };
 const fills = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)', 'var(--text-2)'];
 
 const plain = (s: string) => s.replaceAll('\n', ' · ');
-
-function toCsv(rows: BarDatum[], valueHeader: string) {
-  const esc = (s: string) => `"${s.replaceAll('"', '""')}"`;
-  return [
-    'Label,' + esc(valueHeader),
-    ...rows.map((r) => `${esc(plain(r.label))},${r.value}`),
-  ].join('\n');
-}
 
 /** Two-line axis tick: first line normal, second line dimmer. */
 function AxisTick({
@@ -97,15 +90,11 @@ export function BarChart({
   const summary = `${title}. ${data.map((d) => `${plain(d.label)}: ${formatValue(d.value)} ${unit}`).join('; ')}.`;
   const height = Math.max(224, data.length * 52 + 48);
 
-  const download = () => {
-    const blob = new Blob([toCsv(data, `${title} (${unit})`)], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title.toLowerCase().replace(/\W+/g, '-')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const download = () =>
+    downloadCsv(
+      csvFilename(title),
+      chartCsv([[`Label`, `${title} (${unit})`], ...data.map((r) => [plain(r.label), r.value])]),
+    );
 
   const btn =
     'inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-2.5 text-xs text-fg-2 hover:border-line-strong hover:text-fg';

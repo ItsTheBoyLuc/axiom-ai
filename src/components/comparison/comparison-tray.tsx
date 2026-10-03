@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { MAX_COMPARE, compareHref } from '@/lib/comparison';
@@ -9,12 +10,13 @@ import { useComparison } from './comparison-store';
 
 /**
  * Sticky comparison tray (max 4). Lives in the root layout so the selection persists across
- * pages. Renders a spacer of the same height so it never covers the footer. The Compare
- * link goes to /compare (a "not built yet" page until Phase 4).
+ * pages. Renders a spacer of the same height so it never covers the footer. Hidden on
+ * /compare itself, which has its own selection controls (and keeps the tray in sync with the URL).
  */
 export function ComparisonTray() {
   const { list, remove, clear } = useComparison();
-  const open = list.length > 0;
+  const onCompare = usePathname() === '/compare';
+  const open = list.length > 0 && !onCompare;
 
   return (
     <>

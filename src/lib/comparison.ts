@@ -54,3 +54,30 @@ export function pushRecent(list: ModelRef[], ref: ModelRef, max = MAX_RECENT): M
 export function compareHref(list: ModelRef[]): string {
   return `/compare?models=${list.map((m) => encodeURIComponent(m.slug)).join(',')}`;
 }
+
+/** `/compare` URL for plain slugs (e.g. restored from history). */
+export const compareHrefForSlugs = (slugs: string[]): string =>
+  slugs.length ? `/compare?models=${slugs.map(encodeURIComponent).join(',')}` : '/compare';
+
+const SLUG = /^[a-z0-9][a-z0-9-]{0,99}$/;
+
+/**
+ * Parses the `models` query value into at most MAX_COMPARE unique, well-formed slugs. Anything
+ * malformed or beyond the limit is dropped (reported in `ignored`) so a hand-edited URL never
+ * breaks the page.
+ */
+export function parseModelsParam(raw: string | string[] | undefined): {
+  slugs: string[];
+  ignored: string[];
+} {
+  const text = Array.isArray(raw) ? raw.join(',') : (raw ?? '');
+  const slugs: string[] = [];
+  const ignored: string[] = [];
+  for (const part of text.split(',')) {
+    const s = part.trim().toLowerCase();
+    if (!s || slugs.includes(s) || ignored.includes(s)) continue;
+    if (!SLUG.test(s) || slugs.length >= MAX_COMPARE) ignored.push(s.slice(0, 60));
+    else slugs.push(s);
+  }
+  return { slugs, ignored };
+}

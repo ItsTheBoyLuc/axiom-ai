@@ -31,6 +31,16 @@ export function useComparison() {
     compareStore.set(compareStore.getSnapshot().filter((m) => m.slug !== slug));
   }, []);
   const clear = useCallback(() => compareStore.set([]), []);
+  /** Replaces the whole selection (used when /compare is opened from a shared URL). */
+  const replace = useCallback((refs: ModelRef[]) => {
+    if (
+      refs.length === compareStore.getSnapshot().length &&
+      refs.every((r, i) => r.slug === compareStore.getSnapshot()[i]?.slug)
+    ) {
+      return;
+    }
+    compareStore.set(refs.slice(0, MAX_COMPARE));
+  }, []);
   return {
     list,
     has: (slug: string) => list.some((m) => m.slug === slug),
@@ -38,6 +48,7 @@ export function useComparison() {
     toggle,
     remove,
     clear,
+    replace,
   };
 }
 

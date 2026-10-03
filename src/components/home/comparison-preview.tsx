@@ -88,7 +88,7 @@ export function ComparisonPreview({ models: all }: { models: ModelListItem[] }) 
             className="border-line bg-card overflow-x-auto rounded-2xl border"
           >
             <table className="w-full min-w-[520px] border-collapse text-sm">
-              <caption className="sr-only">Comparison of selected demo models</caption>
+              <caption className="sr-only">Comparison of the selected models</caption>
               <thead>
                 <tr className="border-line border-b">
                   <th scope="col" className={th}>
@@ -213,7 +213,7 @@ export function ComparisonPreview({ models: all }: { models: ModelListItem[] }) 
               unit="tokens"
               data={chartModels.map((m) => ({ label: m.name, value: m.contextWindow ?? 0 }))}
               valueFormat="tokens"
-              footnote={`Demo values for layout testing.${
+              footnote={`${models.some((m) => m.isDemo) ? 'Demo values for layout testing. ' : ''}Maximum input context as stated by each provider.${
                 undisclosed.length
                   ? ` Not shown (${NOT_DISCLOSED.toLowerCase()}): ${undisclosed.map((m) => m.name).join(', ')}.`
                   : ''

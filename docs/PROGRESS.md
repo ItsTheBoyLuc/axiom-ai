@@ -4,14 +4,15 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 
 ## Phases
 
-| Phase | Scope                                                         | Status                                                                                                                                              |
-| ----- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0     | Foundation (Next.js, worker, Compose, CI)                     | Done                                                                                                                                                |
-| 1     | Brand, design system, homepage                                | Done                                                                                                                                                |
-| 2     | Model directory and profiles (demo data)                      | Done                                                                                                                                                |
-| 3a    | Prisma schema, migrations, REST API, seed pipeline            | Done (2026-10-02, CI green)                                                                                                                         |
-| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`               | Data and UI work done 2026-10-03 (all 3 batches loaded, checked, audited, demo removed from pages). Done once CI is green on the audit change below |
-| 4-10  | Compare, Benchmarks, Providers, News, Admin, Auth, Production | Not started                                                                                                                                         |
+| Phase | Scope                                                 | Status                                                                                      |
+| ----- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 0     | Foundation (Next.js, worker, Compose, CI)             | Done                                                                                        |
+| 1     | Brand, design system, homepage                        | Done                                                                                        |
+| 2     | Model directory and profiles (demo data)              | Done                                                                                        |
+| 3a    | Prisma schema, migrations, REST API, seed pipeline    | Done (2026-10-02, CI green)                                                                 |
+| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`       | Done 2026-10-03 (all 3 batches loaded, checked, audited, demo removed from pages, CI green) |
+| 4     | Compare (`/compare`, charts, share URL, CSV, history) | Done 2026-10-03 (see below)                                                                 |
+| 5-10  | Benchmarks, Providers, News, Admin, Auth, Production  | Not started                                                                                 |
 
 ## Phase 3b status
 
@@ -24,6 +25,13 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - **Next step:** Phase 4 (Compare) per `CLAUDE.md` Autopilot rules.
 
 - **Phase 7 must label the DataCamp news item's date as "updated", not "published"** (the source shows only an update date; see `docs/DATA_STATUS.md`).
+
+## Phase 4 status
+
+- **Built (2026-10-03):** `/compare?models=a,b,c` (max 4): table in 5 groups with a differences toggle and a shared-benchmarks filter; charts (context window, input and output price, one benchmark at a time, radar only for comparable % benchmarks) with table view and CSV; selector with search, provider and category filters, recently viewed and comparison history; copy link; CSV export; tray follows the URL. Save-to-account is deferred to Phase 9 and not rendered.
+- **Real-data fixes found on the way:** CSV priced only the plain unit (now every variant); the homepage preview had hard-coded demo wording; radar labels were clipped.
+- **Gates:** prettier, typecheck, lint, 260 unit, 206 integration, 105 Playwright (axe in both themes on `/compare`, mobile no-overflow, reduced motion, hydration), build, BOM: green. Screenshots reviewed at 390, 768 and 1440 with real data (Claude Opus 5.5 / GPT-6 Sol / Gemini 3.8 Flash; Gemini 3.7 vs 3.8 Flash for the radar).
+- **Known limitation:** real benchmark results overlap little between models (variants are separate records), so the table has many "No verified data" cells and the radar appears only for closely related models. That is the data, not a bug.
 
 ## Verification log
 
