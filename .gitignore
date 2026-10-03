@@ -11,3 +11,5 @@ prisma/generated/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+# Generated admin password (npm run admin:create); never commit
+.admin-credentials.local

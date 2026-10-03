@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@node-rs/argon2": "^2.2.1",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@radix-ui/react-dialog": "^1.1.23",
@@ -72,7 +73,8 @@
     "db:seed": "tsx --env-file-if-exists=.env prisma/seed/run.ts",
     "db:seed:demo": "cross-env SEED_DEMO=true tsx --env-file-if-exists=.env prisma/seed/run.ts",
     "db:status": "prisma migrate status",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "admin:create": "tsx --env-file-if-exists=.env scripts/admin-create.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [

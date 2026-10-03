@@ -69,13 +69,31 @@ const sourced = (r: {
  * Writes a validated bundle in ONE transaction (all or nothing) and is idempotent: running it
  * twice changes nothing. Records blocked by the trust guard are reported, not written.
  */
-export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<LoadReport> {
+export type LoadOptions = {
+  /**
+   * Explicit admin approval: the trust guard is skipped, so a record may replace one of higher
+   * trust. Used only by admin edits and by approved imports that the admin confirmed.
+   */
+  override?: boolean;
+  /** Runs inside the transaction before the writes (e.g. to remove the row a key change replaces). */
+  beforeWrite?: (tx: Prisma.TransactionClient) => Promise<void>;
+  /** Runs inside the same transaction after the writes (the admin audit entry commits with them). */
+  afterWrite?: (tx: Prisma.TransactionClient) => Promise<void>;
+};
+
+export async function loadBundle(
+  db: PrismaClient,
+  bundle: SeedBundle,
+  options: LoadOptions = {},
+): Promise<LoadReport> {
+  const protect = options.override ? () => null : protectExisting;
   const counts: Record<string, number> = {};
   const skipped: Skipped[] = [];
   const bump = (k: string) => (counts[k] = (counts[k] ?? 0) + 1);
 
   await db.$transaction(
     async (tx: Prisma.TransactionClient) => {
+      await options.beforeWrite?.(tx);
       // Taxonomy (idempotent, independent of the data files).
       for (const name of CAPABILITIES) {
         await tx.capability.upsert({
@@ -101,7 +119,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { slug: p.slug },
           select: { id: true, name: true, verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, p);
+        const why = protect(existing, p);
         if (why) {
           skipped.push({ entity: 'Provider', key: p.slug, reason: why });
           providerIds.set(p.slug, existing!.id);
@@ -136,7 +154,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { slug: b.slug },
           select: { id: true, verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, b);
+        const why = protect(existing, b);
         if (why) {
           skipped.push({ entity: 'Benchmark', key: b.slug, reason: why });
           benchmarkIds.set(b.slug, existing!.id);
@@ -190,7 +208,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { slug: m.slug },
           select: { id: true, verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, m);
+        const why = protect(existing, m);
         if (why) {
           skipped.push({ entity: 'Model', key: m.slug, reason: why });
           modelIds.set(m.slug, existing!.id);
@@ -292,7 +310,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { modelId_benchmarkId_evaluationDate_evaluationType_modelVersion: key },
           select: { verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, r);
+        const why = protect(existing, r);
         if (why) {
           skipped.push({
             entity: 'BenchmarkResult',
@@ -329,7 +347,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { modelId_pricingType_unit_effectiveFrom: key },
           select: { verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, p);
+        const why = protect(existing, p);
         if (why) {
           skipped.push({
             entity: 'Pricing',
@@ -362,7 +380,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { providerId_releaseDate_title: key },
           select: { verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, r);
+        const why = protect(existing, r);
         if (why) {
           skipped.push({
             entity: 'Release',
@@ -396,7 +414,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { articleUrl: n.articleUrl },
           select: { verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, n);
+        const why = protect(existing, n);
         if (why) {
           skipped.push({ entity: 'NewsArticle', key: n.articleUrl, reason: why });
           continue;
@@ -429,7 +447,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           where: { providerId_url: key },
           select: { verificationStatus: true, isDemo: true },
         });
-        const why = protectExisting(existing, p);
+        const why = protect(existing, p);
         if (why) {
           skipped.push({ entity: 'Publication', key: p.url, reason: why });
           continue;
@@ -447,6 +465,8 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
         });
         bump('publications');
       }
+
+      await options.afterWrite?.(tx);
     },
     { timeout: 120_000, maxWait: 10_000 },
   );

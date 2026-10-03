@@ -401,9 +401,12 @@ describe('OpenAPI and docs routes', () => {
 });
 
 describe('route modules', () => {
-  const modules = import.meta.glob<{ GET: unknown; dynamic?: string }>(
+  const modules = import.meta.glob<{ GET: unknown; dynamic?: string }>([
     '../../src/app/api/v1/**/route.ts',
-  );
+    // Session-bound routes are not part of the public, documented read API (see admin-rbac tests).
+    '!../../src/app/api/v1/auth/**',
+    '!../../src/app/api/v1/admin/**',
+  ]);
 
   it('all export a GET handler and render on request (never prerendered at build)', async () => {
     const entries = Object.entries(modules);

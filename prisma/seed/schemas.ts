@@ -298,7 +298,18 @@ export const emptyBundle = (): SeedBundle => ({
  */
 export function validateBundle(
   raw: Partial<Record<SeedFile, unknown>>,
-  opts: { allowDemo: boolean },
+  opts: {
+    allowDemo: boolean;
+    /**
+     * Slugs that already exist in the database. A single record (an admin edit, an import) may
+     * reference them without bundling the referenced records.
+     */
+    known?: {
+      providers?: Iterable<string>;
+      models?: Iterable<string>;
+      benchmarks?: Iterable<string>;
+    };
+  },
 ): { ok: true; bundle: SeedBundle } | { ok: false; errors: SeedError[] } {
   const errors: SeedError[] = [];
   const bundle = emptyBundle();
@@ -372,9 +383,15 @@ export function validateBundle(
     }) => [r.model, r.benchmark, r.evaluationDate, r.evaluationType, r.modelVersion].join('|'),
   );
 
-  const providers = new Set(bundle.providers.map((p) => p.slug));
-  const models = new Set(bundle.models.map((m) => m.slug));
-  const benchmarks = new Set(bundle.benchmarks.map((b) => b.slug));
+  const providers = new Set([
+    ...bundle.providers.map((p) => p.slug),
+    ...(opts.known?.providers ?? []),
+  ]);
+  const models = new Set([...bundle.models.map((m) => m.slug), ...(opts.known?.models ?? [])]);
+  const benchmarks = new Set([
+    ...bundle.benchmarks.map((b) => b.slug),
+    ...(opts.known?.benchmarks ?? []),
+  ]);
   const ref = (
     file: SeedFile,
     index: number,

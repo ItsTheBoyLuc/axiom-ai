@@ -11,6 +11,7 @@ export class ApiError extends Error {
     public readonly code: string,
     message: string,
     public readonly details?: unknown,
+    public readonly headers: Record<string, string> = {},
   ) {
     super(message);
     this.name = 'ApiError';
@@ -25,13 +26,18 @@ export function errorResponse(
   code: string,
   message: string,
   details?: unknown,
+  headers: Record<string, string> = {},
 ): Response {
   const body: ErrorBody = {
     error: { code, message, ...(details === undefined ? {} : { details }) },
   };
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      ...headers,
+    },
   });
 }
 
@@ -116,7 +122,9 @@ export function parseParams<T>(schema: z.ZodType<T>, params: unknown): T {
 
 /** Turns any thrown value into the spec error envelope. Unknown errors are logged, never leaked. */
 export function toErrorResponse(err: unknown): Response {
-  if (err instanceof ApiError) return errorResponse(err.status, err.code, err.message, err.details);
+  if (err instanceof ApiError) {
+    return errorResponse(err.status, err.code, err.message, err.details, err.headers);
+  }
   console.error('[api] unhandled error', err);
   return errorResponse(500, 'INTERNAL_ERROR', 'Something went wrong');
 }
