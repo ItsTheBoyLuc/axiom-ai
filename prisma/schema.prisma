@@ -394,6 +394,9 @@ model NewsArticle {
   category        NewsCategory
   isOfficial      Boolean      @default(false)
   isAiSummary     Boolean      @default(false)
+  /// True when `publicationDate` is the date the page was last UPDATED, because the page shows no
+  /// publication date. The UI must then say "Updated", never "Published".
+  dateIsUpdated   Boolean      @default(false)
   providerId      String?
   provider        Provider?    @relation(fields: [providerId], references: [id], onDelete: SetNull)
   models          Model[]

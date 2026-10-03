@@ -234,6 +234,8 @@ export const newsSchema = z
     category: z.enum(NEWS_CATEGORIES),
     isOfficial: z.boolean().default(false),
     isAiSummary: z.boolean().default(false),
+    /** True when publicationDate is a page's "updated" date because no publication date is shown. */
+    dateIsUpdated: z.boolean().default(false),
     provider: slug.nullable().default(null),
     models: z.array(slug).default([]),
     ...sourcedShape,

@@ -165,6 +165,8 @@ export type NewsItem = {
   category: NewsCategoryKey;
   isOfficial: boolean;
   isAiSummary: boolean;
+  /** `publishedAt` is the page's last-updated date (no publication date is shown): label it "Updated". */
+  dateIsUpdated: boolean;
   provider: { slug: string; name: string } | null;
   models: { slug: string; name: string }[];
   verificationStatus: VerificationStatus;
@@ -174,6 +176,35 @@ export type NewsItem = {
 export type NewsQuery = {
   q?: string;
   category?: NewsCategoryKey;
+  provider?: string;
+  /** true: only official sources; false: only independent reporting; undefined: both. */
+  official?: boolean;
+  page: number;
+  pageSize: number;
+};
+
+/** Counts for the news filters (over all stories, ignoring the current filters). */
+export type NewsFacets = {
+  total: number;
+  official: number;
+  independent: number;
+  byCategory: Record<NewsCategoryKey, number>;
+};
+
+/** A research publication (paper, technical report) with its provider. */
+export type ResearchItem = {
+  id: string;
+  title: string;
+  url: string;
+  publishedAt: string;
+  venue: string | null;
+  provider: { slug: string; name: string };
+  verificationStatus: VerificationStatus;
+  isDemo: boolean;
+};
+
+export type ResearchQuery = {
+  q?: string;
   provider?: string;
   page: number;
   pageSize: number;

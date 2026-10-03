@@ -23,6 +23,7 @@ import {
   providerSummarySchema,
   releaseHistoryEntrySchema,
   releaseItemSchema,
+  researchItemSchema,
   searchResultsSchema,
   statsSchema,
 } from './response-schemas';
@@ -34,6 +35,7 @@ import {
   providersQuerySchema,
   relatedQuerySchema,
   releasesQuerySchema,
+  researchQuerySchema,
   searchQuerySchema,
   slugParams,
   suggestQuerySchema,
@@ -330,9 +332,9 @@ export const endpoints = {
     id: 'news',
     method: 'GET',
     path: '/news',
-    summary: 'News and research',
+    summary: 'News',
     description:
-      'Official announcements and AI-generated summaries are flagged (`isOfficial`, `isAiSummary`).',
+      'Official announcements and AI-generated summaries are flagged (`isOfficial`, `isAiSummary`). `official=true` keeps official sources only, `official=false` independent reporting only.',
     tag: 'News',
     query: newsQuerySchema,
     response: paged(newsItemSchema),
@@ -340,6 +342,24 @@ export const endpoints = {
     policy: READ,
     handler: async (ctx) => {
       const r = await ctx.repos.news.list(q(ctx));
+      return { data: r.items, meta: pageMeta(r) };
+    },
+  },
+
+  research: {
+    id: 'research',
+    method: 'GET',
+    path: '/research',
+    summary: 'Research publications',
+    description:
+      'Papers and technical reports on record, newest first. `q` matches the title and venue.',
+    tag: 'News',
+    query: researchQuerySchema,
+    response: paged(researchItemSchema),
+    cache: { ttlSeconds: 60, tags: () => ['research', 'providers'] },
+    policy: READ,
+    handler: async (ctx) => {
+      const r = await ctx.repos.research.list(q(ctx));
       return { data: r.items, meta: pageMeta(r) };
     },
   },

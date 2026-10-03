@@ -9,6 +9,7 @@ import {
   type ProviderDetail,
   type ProviderSummary,
   type ReleaseItem,
+  type ResearchItem,
   type SearchHit,
 } from '../../src/types/catalog';
 import {
@@ -263,11 +264,23 @@ export const newsItemSchema = z.object({
   category: z.enum(NEWS_CATEGORIES),
   isOfficial: z.boolean(),
   isAiSummary: z.boolean(),
+  dateIsUpdated: z.boolean(),
   provider: z.object({ slug: z.string(), name: z.string() }).nullable(),
   models: z.array(z.object({ slug: z.string(), name: z.string() })),
   verificationStatus: status,
   isDemo: z.boolean(),
 }) satisfies z.ZodType<NewsItem>;
+
+export const researchItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  url: z.string(),
+  publishedAt: z.string(),
+  venue: nullableString,
+  provider: z.object({ slug: z.string(), name: z.string() }),
+  verificationStatus: status,
+  isDemo: z.boolean(),
+}) satisfies z.ZodType<ResearchItem>;
 
 const searchHit = z.object({
   type: z.enum(SEARCH_TYPES),

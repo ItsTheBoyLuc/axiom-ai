@@ -77,3 +77,8 @@ Running list of every motion value in the product, kept current so it can be tun
 | Provider card hover       | border colour only (150 ms), no transform                                                           |
 
 Tests check that the effects run (the line's transform changes with scroll, entries reach opacity 1) and that under reduced motion nothing is hidden or transformed.
+
+## Phase 7 (News and search)
+
+- Command palette (`layout/command-palette.tsx`): unchanged dialog motion from Phase 1 (overlay 200 ms `out`; content spring `soft`, scale 0.97 and y -8 px in, 0.98 and -4 px out). Selection and chip changes are colour transitions only (100 ms and 150 ms). Results appear without animation so typing never feels laggy.
+- News and search pages: no motion beyond the page template; filters change the URL.

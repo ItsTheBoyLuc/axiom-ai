@@ -87,4 +87,13 @@ describe('real seed data', () => {
         expect(r.verificationStatus).toBe('PROVIDER_REPORTED');
     }
   });
+
+  it('flags the DataCamp article date as an "updated" date (its page shows no publication date)', () => {
+    if (!bundle) return;
+    const dc = bundle.news.filter((n) => n.publisher === 'DataCamp');
+    expect(dc).toHaveLength(1);
+    expect(dc[0]!.dateIsUpdated).toBe(true);
+    // Nothing else is flagged: first-party posts carry a real publication date.
+    expect(bundle.news.filter((n) => n.dateIsUpdated)).toHaveLength(1);
+  });
 });

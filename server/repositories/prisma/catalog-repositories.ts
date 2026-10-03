@@ -5,16 +5,18 @@ import type {
   BenchmarkResultRow,
   BenchmarkSummary,
   NewsCategoryKey,
+  NewsFacets,
   NewsItem,
   Page,
   ProviderDetail,
   ProviderSummary,
   ReleaseItem,
+  ResearchItem,
   SearchHit,
   SearchResults,
   SearchType,
 } from '../../../src/types/catalog';
-import { SEARCH_TYPES } from '../../../src/types/catalog';
+import { NEWS_CATEGORIES, SEARCH_TYPES } from '../../../src/types/catalog';
 import type { EvaluationType, ReleaseKind } from '../../../src/types/model';
 import type { Db } from '../../db/client';
 import { isoDate, isoDateTime, isoDateTimeOrNull, monogramOf } from '../../db/mappers';
@@ -23,6 +25,7 @@ import type {
   NewsRepository,
   ProviderRepository,
   ReleaseRepository,
+  ResearchRepository,
   SearchRepository,
 } from '../catalog';
 import { byName, paginate } from '../model-query';
@@ -410,12 +413,15 @@ export function createPrismaReleaseRepository(db: Db): ReleaseRepository {
 
 export function createPrismaNewsRepository(db: Db): NewsRepository {
   return {
+    facets: () => newsFacets(db),
+
     async list(q) {
       const where = {
         AND: [
           ...tokenFilter(q.q, ['title', 'summary', 'publisher']),
           ...(q.provider ? [{ provider: { slug: q.provider } }] : []),
           ...(q.category ? [{ category: q.category }] : []),
+          ...(q.official === undefined ? [] : [{ isOfficial: q.official }]),
         ],
       } as Prisma.NewsArticleWhereInput;
       const total = await db.newsArticle.count({ where });
@@ -435,6 +441,7 @@ export function createPrismaNewsRepository(db: Db): NewsRepository {
           category: true,
           isOfficial: true,
           isAiSummary: true,
+          dateIsUpdated: true,
           verificationStatus: true,
           isDemo: true,
           provider: { select: { slug: true, name: true } },
@@ -451,8 +458,71 @@ export function createPrismaNewsRepository(db: Db): NewsRepository {
         category: r.category as NewsCategoryKey,
         isOfficial: r.isOfficial,
         isAiSummary: r.isAiSummary,
+        dateIsUpdated: r.dateIsUpdated,
         provider: r.provider,
         models: r.models,
+        verificationStatus: r.verificationStatus as VerificationStatus,
+        isDemo: r.isDemo,
+      }));
+      return pageOf(items, total, p.page, q.pageSize, p.pageCount);
+    },
+  };
+}
+
+/** News counts by source type and category in one grouped statement. */
+async function newsFacets(db: Db): Promise<NewsFacets> {
+  const rows = await db.newsArticle.groupBy({
+    by: ['category', 'isOfficial'],
+    _count: { _all: true },
+  });
+  const byCategory = Object.fromEntries(NEWS_CATEGORIES.map((c) => [c, 0])) as Record<
+    NewsCategoryKey,
+    number
+  >;
+  let official = 0;
+  let independent = 0;
+  for (const r of rows) {
+    byCategory[r.category as NewsCategoryKey] += r._count._all;
+    if (r.isOfficial) official += r._count._all;
+    else independent += r._count._all;
+  }
+  return { total: official + independent, official, independent, byCategory };
+}
+
+export function createPrismaResearchRepository(db: Db): ResearchRepository {
+  return {
+    async list(q) {
+      const where = {
+        AND: [
+          ...tokenFilter(q.q, ['title', 'venue']),
+          ...(q.provider ? [{ provider: { slug: q.provider } }] : []),
+        ],
+      } as Prisma.PublicationWhereInput;
+      const total = await db.publication.count({ where });
+      const p = paginate(total, q.page, q.pageSize);
+      const rows = await db.publication.findMany({
+        where,
+        orderBy: [{ publishedAt: 'desc' }, { id: 'asc' }],
+        skip: p.start,
+        take: q.pageSize,
+        select: {
+          id: true,
+          title: true,
+          url: true,
+          publishedAt: true,
+          venue: true,
+          verificationStatus: true,
+          isDemo: true,
+          provider: { select: { slug: true, name: true } },
+        },
+      });
+      const items: ResearchItem[] = rows.map((r) => ({
+        id: r.id,
+        title: r.title,
+        url: r.url,
+        publishedAt: isoDate(r.publishedAt),
+        venue: r.venue,
+        provider: r.provider,
         verificationStatus: r.verificationStatus as VerificationStatus,
         isDemo: r.isDemo,
       }));
@@ -540,7 +610,7 @@ export function createPrismaSearchRepository(db: Db, models: ModelRepository): S
                 id: true,
                 title: true,
                 releaseDate: true,
-                provider: { select: { name: true } },
+                provider: { select: { slug: true, name: true } },
                 isDemo: true,
               },
             }),
@@ -549,7 +619,8 @@ export function createPrismaSearchRepository(db: Db, models: ModelRepository): S
             id: r.id,
             title: r.title,
             subtitle: `${r.provider.name} · ${isoDate(r.releaseDate)}`,
-            href: `/releases#${r.id}`,
+            // The provider profile lists every release with an anchor, so the link always lands on it.
+            href: `/providers/${r.provider.slug}#release-${r.id}`,
             isDemo: r.isDemo,
           }),
         ),

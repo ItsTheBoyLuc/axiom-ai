@@ -44,6 +44,7 @@ const samples: [Id, string, Record<string, string>?][] = [
   ['benchmarkResults', '/benchmarks/results?pageSize=5'],
   ['releases', '/releases'],
   ['news', '/news'],
+  ['research', '/research'],
   ['search', '/search?q=sample'],
   ['compare', '/compare?models=sample-model-1,sample-model-2'],
   ['compareCsv', '/compare/export.csv?models=sample-model-1,sample-model-2'],
@@ -267,6 +268,8 @@ describe('validation and errors use the spec envelope', () => {
     ['models', '/models?categroy=coding', ''],
     ['modelsSuggest', '/models/suggest', 'q'],
     ['releases', '/releases?from=2026-02-01&to=2026-01-01', 'to'],
+    ['news', '/news?official=maybe', 'official'],
+    ['research', '/research?pageSize=0', 'pageSize'],
     ['search', '/search?q=x&types=bogus', 'types'],
     ['stats', '/stats?unexpected=1', ''],
   ];

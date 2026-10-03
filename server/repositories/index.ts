@@ -4,6 +4,7 @@ import type {
   NewsRepository,
   ProviderRepository,
   ReleaseRepository,
+  ResearchRepository,
   SearchRepository,
 } from './catalog';
 import type { ModelRepository } from './model-repository';
@@ -12,6 +13,7 @@ import {
   createPrismaNewsRepository,
   createPrismaProviderRepository,
   createPrismaReleaseRepository,
+  createPrismaResearchRepository,
   createPrismaSearchRepository,
 } from './prisma/catalog-repositories';
 import { createPrismaModelRepository } from './prisma/model-repository';
@@ -22,6 +24,7 @@ export type Repositories = {
   benchmarks: BenchmarkRepository;
   releases: ReleaseRepository;
   news: NewsRepository;
+  research: ResearchRepository;
   search: SearchRepository;
 };
 
@@ -34,6 +37,7 @@ export function createRepositories(db: Db): Repositories {
     benchmarks: createPrismaBenchmarkRepository(db),
     releases: createPrismaReleaseRepository(db),
     news: createPrismaNewsRepository(db),
+    research: createPrismaResearchRepository(db),
     search: createPrismaSearchRepository(db, models),
   };
 }

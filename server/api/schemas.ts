@@ -150,6 +150,17 @@ export const newsQuerySchema = z.strictObject({
     .optional()
     .transform((v) => (v ? (toDbEnum(v) as (typeof NEWS_CATEGORIES)[number]) : undefined)),
   provider: slug.optional(),
+  /** true = official sources only, false = independent reporting only. */
+  official: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === 'true')),
+  ...pagination,
+});
+
+export const researchQuerySchema = z.strictObject({
+  q,
+  provider: slug.optional(),
   ...pagination,
 });
 

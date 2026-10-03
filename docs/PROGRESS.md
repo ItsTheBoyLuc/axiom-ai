@@ -14,7 +14,8 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 | 4     | Compare (`/compare`, charts, share URL, CSV, history)           | Done 2026-10-03 (see below)                                                                 |
 | 5     | Benchmarks (`/benchmarks` explorer, charts, filters)            | Done 2026-10-03 (see below)                                                                 |
 | 6     | Providers and releases (directory, profiles, `/releases`, GSAP) | Done 2026-10-03 (see below)                                                                 |
-| 7-10  | News and search, Admin, Auth, Production                        | Not started                                                                                 |
+| 7     | News and global search (`/news`, `/search`, palette)            | Done 2026-10-03 (see below)                                                                 |
+| 8-10  | Admin, Auth, Production                                         | Not started                                                                                 |
 
 ## Phase 3b status
 
@@ -47,6 +48,12 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - **Real data:** 12 providers (none has a verified headquarters, so none is shown), 48 releases (all confirmed), 6 publications, 18 news items. Reviewed with real data at 390 and 1440 (directory, OpenAI and Google DeepMind profiles, timeline and list), and fixture data at 390, 768 and 1440.
 - **Gates:** prettier, typecheck, lint, 360+ unit, 208 integration, Playwright (axe in both themes on directory, profile, timeline, list and empty states; GSAP effect and reduced-motion checks; mobile no-overflow; hydration), build, production audit, BOM: green.
 
+## Phase 7 status
+
+- **Built (2026-10-03):** `/news` (News and Research tabs, featured official announcements, source and category chips with counts, search and provider filters, pager, JSON-LD), `/search` (grouped results, type chips, highlighting), and the command palette wired to the real search API (chips, recent searches, suggestions, "See all", keyboard operation, external hits in a new tab). Backend: news `official` filter and facets, `GET /api/v1/research`, `NewsArticle.dateIsUpdated` (migration) and release search links to the provider anchor.
+- **DataCamp:** now labelled "Updated 3 Sept 2026" everywhere (flag in the data, schema, API, card, JSON-LD).
+- **Gates:** see the commit; prettier, typecheck, lint, unit, integration, Playwright (axe in both themes on news, research, search and the open palette; mobile; reduced motion; hydration), build, production audit, BOM.
+
 ## Verification log
 
 - Phase 3a (2026-10-02): migrations from empty, 206 integration tests, 70 Playwright tests, production build without a database, full Docker stack healthy and non-root, Prisma overrides reviewed (still required).
@@ -58,6 +65,4 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - CI has no Docker image build job yet (hardening phase).
 - Review the Prisma `overrides` at the start of Phase 10 (hard limit 2026-12-31).
 - Image-model profiles show "Not publicly disclosed" for inapplicable fields (context window, tool calling).
-- Phase 7: label the DataCamp news item's date as "updated", not "published".
-- Phase 7: `/news` should reuse `NewsCard` and the `Pager`.
 - Phase 10 at the latest: restore the strict all-dependency `npm audit` gate if a patched `braces` or fixed `eslint-config-next` exists (CI currently blocks on `--omit=dev` only).

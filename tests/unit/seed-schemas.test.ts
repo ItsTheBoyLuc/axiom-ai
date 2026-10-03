@@ -348,3 +348,28 @@ describe('the demo fixtures', () => {
     if (!r.ok) expect(r.errors.every((e) => e.path === 'isDemo')).toBe(true);
   });
 });
+
+describe('news date kind', () => {
+  const news = (over: Record<string, unknown> = {}) => ({
+    title: 't',
+    summary: 's',
+    publisher: 'p',
+    articleUrl: 'https://a.test/1',
+    publicationDate: '2026-01-01',
+    category: 'RESEARCH',
+    ...sourcing(),
+    ...over,
+  });
+
+  it('defaults dateIsUpdated to false (a normal publication date)', () => {
+    const r = check({ news: [news()] });
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.bundle.news[0]!.dateIsUpdated).toBe(false);
+  });
+
+  it('accepts true for a page that only shows an updated date, and rejects other types', () => {
+    const r = check({ news: [news({ dateIsUpdated: true })] });
+    expect(r.ok && r.bundle.news[0]!.dateIsUpdated).toBe(true);
+    expect(check({ news: [news({ dateIsUpdated: 'yes' })] }).ok).toBe(false);
+  });
+});

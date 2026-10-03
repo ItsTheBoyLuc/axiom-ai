@@ -19,6 +19,9 @@ const ROUTES = [
   '/providers/demo-provider-a',
   '/releases',
   '/releases?view=list',
+  '/news',
+  '/news?tab=research',
+  '/search?q=sample',
 ];
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {

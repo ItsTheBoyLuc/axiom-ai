@@ -2,6 +2,7 @@ import type {
   BenchmarkResultRow,
   BenchmarkResultsQuery,
   BenchmarkSummary,
+  NewsFacets,
   NewsItem,
   NewsQuery,
   Page,
@@ -9,6 +10,8 @@ import type {
   ProviderSummary,
   ReleaseItem,
   ReleaseQuery,
+  ResearchItem,
+  ResearchQuery,
   SearchResults,
   SearchType,
 } from '../../src/types/catalog';
@@ -33,6 +36,12 @@ export interface ReleaseRepository {
 
 export interface NewsRepository {
   list(q: NewsQuery): Promise<Page<NewsItem>>;
+  /** Story counts by source type and category, for the filter UI. */
+  facets(): Promise<NewsFacets>;
+}
+
+export interface ResearchRepository {
+  list(q: ResearchQuery): Promise<Page<ResearchItem>>;
 }
 
 export interface SearchRepository {

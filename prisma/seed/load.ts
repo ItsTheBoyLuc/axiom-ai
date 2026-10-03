@@ -409,6 +409,7 @@ export async function loadBundle(db: PrismaClient, bundle: SeedBundle): Promise<
           category: n.category,
           isOfficial: n.isOfficial,
           isAiSummary: n.isAiSummary,
+          dateIsUpdated: n.dateIsUpdated,
           providerId: pid ?? null,
           ...sourced(n),
         };

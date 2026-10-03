@@ -265,6 +265,7 @@ describe('NewsCard', () => {
     category: 'MODEL_RELEASES',
     isOfficial: true,
     isAiSummary: true,
+    dateIsUpdated: false,
     provider: { slug: 'openai', name: 'OpenAI' },
     models: [],
     verificationStatus: 'OFFICIALLY_VERIFIED',
@@ -294,6 +295,37 @@ describe('NewsCard', () => {
       />,
     );
     expect(screen.queryByText(/· OpenAI/)).toBeNull();
+  });
+});
+
+describe('NewsCard dates', () => {
+  const base: NewsItem = {
+    id: 'n2',
+    title: 'T',
+    summary: 'S',
+    publisher: 'DataCamp',
+    url: 'https://example.invalid/t',
+    publishedAt: '2026-09-03T00:00:00Z',
+    category: 'MODEL_RELEASES',
+    isOfficial: false,
+    isAiSummary: true,
+    dateIsUpdated: false,
+    provider: null,
+    models: [],
+    verificationStatus: 'COMMUNITY_REPORTED',
+    isDemo: false,
+  };
+
+  it('shows a plain date for a published story', () => {
+    render(<NewsCard item={base} />);
+    expect(screen.getByText('3 Sept 2026')).toBeInTheDocument();
+    expect(screen.queryByText(/Updated/)).toBeNull();
+  });
+
+  it('says "Updated" when the date is only a last-updated date, never "Published"', () => {
+    render(<NewsCard item={{ ...base, dateIsUpdated: true }} />);
+    expect(screen.getByText('Updated 3 Sept 2026')).toBeInTheDocument();
+    expect(screen.queryByText(/Published/i)).toBeNull();
   });
 });
 

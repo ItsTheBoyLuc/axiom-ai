@@ -28,7 +28,11 @@ export function NewsCard({
       <p className="text-fg-2 mt-2 flex-1 text-sm">{item.summary}</p>
       <p className="text-muted mt-4 text-xs">
         {item.publisher} &middot;{' '}
-        <time dateTime={item.publishedAt}>{formatDate(item.publishedAt)}</time>
+        {/* Some pages show only a last-updated date: say "Updated", never "Published". */}
+        <time dateTime={item.publishedAt}>
+          {item.dateIsUpdated ? 'Updated ' : ''}
+          {formatDate(item.publishedAt)}
+        </time>
         {provider && <> &middot; {item.provider!.name}</>}
       </p>
       <p className="mt-1">
