@@ -65,7 +65,7 @@ docker compose down -v           # stop and wipe volumes
 
 ## Status
 
-Step 0, Phases 1, 2, 3a and 3b (real sourced data for 12 providers, 34 models) complete. Blocked on one decision: `npm audit` reports a dev-only `braces` advisory with no upstream fix (see docs/DECISIONS.md, 2026-10-03). Next: Phase 4 (Compare). Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
+Step 0, Phases 1, 2, 3a and 3b (real sourced data for 12 providers, 34 models) complete. The blocking CI audit is `npm audit --omit=dev` (dev-only `braces` advisory, no upstream fix; revisit by Phase 10, see docs/DECISIONS.md). Next: Phase 4 (Compare). Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
 
 ## Autopilot mode
 

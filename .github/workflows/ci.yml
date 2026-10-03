@@ -31,5 +31,10 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-      - run: npm audit --audit-level=high
+      # Blocking gate: production dependencies only (see docs/DECISIONS.md, 2026-10-03).
+      - run: npm audit --omit=dev --audit-level=high
+      # Keeps dev-dependency advisories visible in the log without failing the build.
+      - name: Full audit (informational)
+        run: npm audit --audit-level=high
+        continue-on-error: true
       # A Docker image build job is added in the hardening phase.

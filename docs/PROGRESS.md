@@ -4,14 +4,14 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 
 ## Phases
 
-| Phase | Scope                                                         | Status                                                                                                                                                 |
-| ----- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0     | Foundation (Next.js, worker, Compose, CI)                     | Done                                                                                                                                                   |
-| 1     | Brand, design system, homepage                                | Done                                                                                                                                                   |
-| 2     | Model directory and profiles (demo data)                      | Done                                                                                                                                                   |
-| 3a    | Prisma schema, migrations, REST API, seed pipeline            | Done (2026-10-02, CI green)                                                                                                                            |
-| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`               | Data and UI work done 2026-10-03 (all 3 batches loaded, checked, audited, demo removed from pages). **Blocked on the `npm audit` decision**, see below |
-| 4-10  | Compare, Benchmarks, Providers, News, Admin, Auth, Production | Not started                                                                                                                                            |
+| Phase | Scope                                                         | Status                                                                                                                                              |
+| ----- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0     | Foundation (Next.js, worker, Compose, CI)                     | Done                                                                                                                                                |
+| 1     | Brand, design system, homepage                                | Done                                                                                                                                                |
+| 2     | Model directory and profiles (demo data)                      | Done                                                                                                                                                |
+| 3a    | Prisma schema, migrations, REST API, seed pipeline            | Done (2026-10-02, CI green)                                                                                                                         |
+| 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`               | Data and UI work done 2026-10-03 (all 3 batches loaded, checked, audited, demo removed from pages). Done once CI is green on the audit change below |
+| 4-10  | Compare, Benchmarks, Providers, News, Admin, Auth, Production | Not started                                                                                                                                         |
 
 ## Phase 3b status
 
@@ -20,8 +20,10 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - **Batch 2 (2026-10-02):** 4 providers, 11 models, 36 prices, 37 benchmark results, 12 new benchmark variants, 15 releases; every source verified directly (see `docs/DATA_STATUS.md`). Also fixed: card price summary for tiered pricing, and two CI-only e2e flakes (streaming staging element; axe scanning a moving sheet). CI is green on `c86acb7`.
 - **Batch 3 (2026-10-03):** 5 providers, 8 models, 9 prices (incl. Nova 2 Lite via a rendered AWS page), 46 benchmark results, 12 releases, 18 news items, 6 publications. Source re-check of every item that was read only through the summarising fetcher, and a self-audit of 8 random records: 0 value mismatches (1 labelling caveat: DataCamp's date is an "Updated" date); see `docs/DATA_STATUS.md`. Loaded into the dev database (34 models, 12 providers, 122 prices, 150 results, 48 releases, 18 news); `/models`, profiles of every new provider and the homepage reviewed at 390/768/1440 (no horizontal overflow, no console errors).
 - **Fixed on the way:** cost estimator rejected qualified units (Nova 2 Lite); homepage releases and news were hardcoded demo content (now from the database with source links); a news card repeated the publisher as provider. Demo dataset moved to `prisma/seed/demo/fixtures.ts` (fixtures only).
-- **Gates 2026-10-03:** prettier, typecheck, lint, 219 unit, 206 integration, 78 Playwright (axe, both themes), production build, BOM check: all green. `npm audit` (all deps): 5 high, one dev-only chain (`braces`, no patched release); `--omit=dev`: 0. **Waiting for your decision** (options in `docs/DECISIONS.md`, 2026-10-03). Until then the CI audit step fails; every earlier CI step is unaffected.
-- **Next step after your decision:** Phase 4 (Compare) per `CLAUDE.md` Autopilot rules.
+- **Gates 2026-10-03:** prettier, typecheck, lint, 219 unit, 206 integration, 78 Playwright (axe, both themes), production build, BOM check: all green. `npm audit` (all deps) reports 5 high, one dev-only chain (`braces`, no patched release); `--omit=dev` reports 0. **Decided 2026-10-03:** the blocking CI audit is now `--omit=dev`, plus a non-blocking "Full audit (informational)" step. Revisit when `braces` or `eslint-config-next` is fixed, and at the latest in Phase 10 (restore the strict gate if possible); see `docs/DECISIONS.md`.
+- **Next step:** Phase 4 (Compare) per `CLAUDE.md` Autopilot rules.
+
+- **Phase 7 must label the DataCamp news item's date as "updated", not "published"** (the source shows only an update date; see `docs/DATA_STATUS.md`).
 
 ## Verification log
 
@@ -34,3 +36,5 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - CI has no Docker image build job yet (hardening phase).
 - Review the Prisma `overrides` at the start of Phase 10 (hard limit 2026-12-31).
 - Image-model profiles show "Not publicly disclosed" for inapplicable fields (context window, tool calling).
+- Phase 7: label the DataCamp news item's date as "updated", not "published".
+- Phase 10 at the latest: restore the strict all-dependency `npm audit` gate if a patched `braces` or fixed `eslint-config-next` exists (CI currently blocks on `--omit=dev` only).
