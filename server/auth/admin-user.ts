@@ -42,7 +42,7 @@ export async function createOrRotateAdmin(
     await recordAudit(db, {
       actorId: null,
       action: 'admin.create',
-      entityType: 'User',
+      entityType: 'users',
       entityId: user.id,
       after: { email, role: 'ADMIN' },
     });
@@ -58,7 +58,7 @@ export async function createOrRotateAdmin(
   await recordAudit(db, {
     actorId: null,
     action: wasAdmin ? 'admin.rotate' : 'admin.promote',
-    entityType: 'User',
+    entityType: 'users',
     entityId: existing.id,
     before: { role: existing.role },
     after: { role: 'ADMIN' },

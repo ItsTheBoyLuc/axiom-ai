@@ -9,9 +9,16 @@ const E2E_DATABASE_URL = urlForDatabase('axiom_e2e');
 
 export default defineConfig({
   testDir: 'tests/e2e',
+  globalSetup: './tests/e2e/global-setup.ts',
   timeout: 60_000,
   fullyParallel: true,
   reporter: [['list']],
+  // The admin write specs create and delete real records, so they run only after every other
+  // spec has finished (they never overlap with the count-based public-page specs).
+  projects: [
+    { name: 'main', testIgnore: /admin-write.spec.ts/ },
+    { name: 'admin-write', testMatch: /admin-write.spec.ts/, dependencies: ['main'] },
+  ],
   use: { baseURL: `http://localhost:${PORT}`, browserName: 'chromium' },
   // Serves the production build. ENABLE_DESIGN_PAGE exposes /design for the scans.
   webServer: {

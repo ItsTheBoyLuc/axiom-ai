@@ -13,3 +13,7 @@ next-env.d.ts
 .DS_Store
 # Generated admin password (npm run admin:create); never commit
 .admin-credentials.local
+
+# E2E credentials and sessions generated per run (random passwords); never commit
+.e2e-credentials.local
+.e2e-auth/

@@ -391,7 +391,7 @@ describe('createOrRotateAdmin', () => {
     expect(log).toHaveLength(1);
     expect(log[0]).toMatchObject({
       action: 'admin.create',
-      entityType: 'User',
+      entityType: 'users',
       entityId: u.id,
       actorId: null,
     });

@@ -53,8 +53,13 @@ export function createRedisLimiter(
       try {
         const k = `${prefix}:${key}`;
         const count = await redis.incr(k);
-        if (count === 1) await redis.expire(k, rule.windowSeconds);
-        const ttl = await redis.pttl(k);
+        let ttl = await redis.pttl(k);
+        // Also repair a counter that lost its expiry (a crash between INCR and EXPIRE would
+        // otherwise lock that key out forever).
+        if (count === 1 || ttl === -1) {
+          await redis.expire(k, rule.windowSeconds);
+          ttl = rule.windowSeconds * 1000;
+        }
         return {
           allowed: count <= rule.limit,
           remaining: Math.max(0, rule.limit - count),
