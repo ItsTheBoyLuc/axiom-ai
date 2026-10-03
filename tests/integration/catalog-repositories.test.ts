@@ -88,6 +88,34 @@ describe('benchmarks', () => {
     });
   });
 
+  it('aggregates per benchmark (models, latest date, evaluation mix, units) agree with its results', async () => {
+    const list = await repos.benchmarks.list();
+    for (const b of list) {
+      const { items } = await repos.benchmarks.results({
+        benchmark: b.slug,
+        page: 1,
+        pageSize: 100,
+      });
+      expect(b.resultCount, b.slug).toBe(items.length);
+      expect(b.modelCount, b.slug).toBe(new Set(items.map((r) => r.model.slug)).size);
+      expect(b.latestDate, b.slug).toBe(
+        items
+          .map((r) => r.evaluationDate)
+          .sort()
+          .pop() ?? null,
+      );
+      expect(b.units, b.slug).toEqual([...new Set(items.map((r) => r.scoreUnit))].sort());
+      expect(b.byType, b.slug).toEqual({
+        INDEPENDENT: items.filter((r) => r.evaluationType === 'INDEPENDENT').length,
+        PROVIDER_REPORTED: items.filter((r) => r.evaluationType === 'PROVIDER_REPORTED').length,
+        COMMUNITY: items.filter((r) => r.evaluationType === 'COMMUNITY').length,
+      });
+    }
+    // The demo fixtures include at least one benchmark with several models and mixed types.
+    expect(list.some((b) => b.modelCount > 1)).toBe(true);
+    expect(list.some((b) => b.byType.INDEPENDENT > 0 && b.byType.PROVIDER_REPORTED > 0)).toBe(true);
+  });
+
   it('filters results without ever merging them', async () => {
     const b1 = await repos.benchmarks.results({
       benchmark: 'sample-benchmark-1',

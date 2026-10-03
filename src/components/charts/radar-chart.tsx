@@ -12,26 +12,7 @@ import {
 } from 'recharts';
 import { BarChart3, Download, Table2 } from 'lucide-react';
 import { chartCsv, csvFilename, downloadCsv } from './download';
-
-/** Series colours; each series also gets its own marker shape and dash pattern. */
-const strokes = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)', 'var(--text-2)'];
-const dashes = [undefined, '6 3', '2 3', '10 3 2 3'];
-const shapes = ['circle', 'square', 'triangle', 'diamond'] as const;
-type Shape = (typeof shapes)[number];
-
-function Marker({ shape, color, size = 5 }: { shape: Shape; color: string; size?: number }) {
-  const s = size;
-  switch (shape) {
-    case 'square':
-      return <rect x={-s} y={-s} width={s * 2} height={s * 2} fill={color} />;
-    case 'triangle':
-      return <polygon points={`0,${-s - 1} ${s + 1},${s} ${-s - 1},${s}`} fill={color} />;
-    case 'diamond':
-      return <polygon points={`0,${-s - 1} ${s + 1},0 0,${s + 1} ${-s - 1},0`} fill={color} />;
-    default:
-      return <circle r={s} fill={color} />;
-  }
-}
+import { Marker, SeriesLegend, chartButton, seriesStyle, tooltipStyle } from './series-style';
 
 /** Axis label that wraps onto up to three short lines so it is never clipped at the chart edge. */
 function AngleTick({
@@ -108,8 +89,7 @@ export function RadarChart({
       ]),
     );
 
-  const btn =
-    'inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-2.5 text-xs text-fg-2 hover:border-line-strong hover:text-fg';
+  const btn = chartButton;
 
   return (
     <figure aria-labelledby={`${id}-t`} className="border-line bg-card rounded-2xl border p-5">
@@ -156,67 +136,33 @@ export function RadarChart({
                   tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                   stroke="var(--border-strong)"
                 />
-                {series.map((s, j) => (
-                  <Radar
-                    key={s.name}
-                    name={s.name}
-                    dataKey={`s${j}`}
-                    stroke={strokes[j % strokes.length]}
-                    strokeWidth={2}
-                    strokeDasharray={dashes[j % dashes.length]}
-                    fill={strokes[j % strokes.length]}
-                    fillOpacity={0.08}
-                    isAnimationActive
-                    animationDuration={700}
-                    dot={(p: { cx?: number; cy?: number }) => (
-                      <g key={`${j}-${p.cx}-${p.cy}`} transform={`translate(${p.cx},${p.cy})`}>
-                        <Marker
-                          shape={shapes[j % shapes.length]!}
-                          color={strokes[j % strokes.length]!}
-                        />
-                      </g>
-                    )}
-                  />
-                ))}
-                <Tooltip
-                  formatter={(v, n) => [`${v}${unit}`, String(n)]}
-                  contentStyle={{
-                    background: 'var(--bg-elevated)',
-                    border: '1px solid var(--border-strong)',
-                    borderRadius: 10,
-                    color: 'var(--text)',
-                  }}
-                  labelStyle={{ color: 'var(--text)' }}
-                  itemStyle={{ color: 'var(--text-2)' }}
-                />
+                {series.map((s, j) => {
+                  const st = seriesStyle(j);
+                  return (
+                    <Radar
+                      key={s.name}
+                      name={s.name}
+                      dataKey={`s${j}`}
+                      stroke={st.stroke}
+                      strokeWidth={2}
+                      strokeDasharray={st.dash}
+                      fill={st.stroke}
+                      fillOpacity={0.08}
+                      isAnimationActive
+                      animationDuration={700}
+                      dot={(p: { cx?: number; cy?: number }) => (
+                        <g key={`${j}-${p.cx}-${p.cy}`} transform={`translate(${p.cx},${p.cy})`}>
+                          <Marker shape={st.shape} color={st.stroke} />
+                        </g>
+                      )}
+                    />
+                  );
+                })}
+                <Tooltip formatter={(v, n) => [`${v}${unit}`, String(n)]} {...tooltipStyle} />
               </RRadarChart>
             </ResponsiveContainer>
           </div>
-          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5" aria-label="Legend">
-            {series.map((s, j) => (
-              <li key={s.name} className="text-fg-2 flex items-center gap-2 text-xs">
-                <svg width="28" height="12" aria-hidden>
-                  <line
-                    x1="0"
-                    y1="6"
-                    x2="28"
-                    y2="6"
-                    stroke={strokes[j % strokes.length]}
-                    strokeWidth="2"
-                    strokeDasharray={dashes[j % dashes.length]}
-                  />
-                  <g transform="translate(14,6)">
-                    <Marker
-                      shape={shapes[j % shapes.length]!}
-                      color={strokes[j % strokes.length]!}
-                      size={4}
-                    />
-                  </g>
-                </svg>
-                {s.name}
-              </li>
-            ))}
-          </ul>
+          <SeriesLegend names={series.map((s) => s.name)} />
         </>
       ) : (
         <div className="overflow-x-auto">

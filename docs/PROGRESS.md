@@ -12,7 +12,8 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 | 3a    | Prisma schema, migrations, REST API, seed pipeline    | Done (2026-10-02, CI green)                                                                 |
 | 3b    | Real, sourced seed data + `docs/DATA_STATUS.md`       | Done 2026-10-03 (all 3 batches loaded, checked, audited, demo removed from pages, CI green) |
 | 4     | Compare (`/compare`, charts, share URL, CSV, history) | Done 2026-10-03 (see below)                                                                 |
-| 5-10  | Benchmarks, Providers, News, Admin, Auth, Production  | Not started                                                                                 |
+| 5     | Benchmarks (`/benchmarks` explorer, charts, filters)  | Done 2026-10-03 (see below)                                                                 |
+| 6-10  | Providers, News, Admin, Auth, Production              | Not started                                                                                 |
 
 ## Phase 3b status
 
@@ -32,6 +33,12 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - **Real-data fixes found on the way:** CSV priced only the plain unit (now every variant); the homepage preview had hard-coded demo wording; radar labels were clipped.
 - **Gates:** prettier, typecheck, lint, 260 unit, 206 integration, 105 Playwright (axe in both themes on `/compare`, mobile no-overflow, reduced motion, hydration), build, BOM: green. Screenshots reviewed at 390, 768 and 1440 with real data (Claude Opus 5.5 / GPT-6 Sol / Gemini 3.8 Flash; Gemini 3.7 vs 3.8 Flash for the radar).
 - **Known limitation:** real benchmark results overlap little between models (variants are separate records), so the table has many "No verified data" cells and the radar appears only for closely related models. That is the data, not a bug.
+
+## Phase 5 status
+
+- **Built (2026-10-03):** `/benchmarks` index (59 benchmarks by category, totals, evaluation-type mix per card) and a per-benchmark detail view with URL-state filters (provider, family, model version, evaluation type, date range), four charts (latest per model, scores over time, distribution, provider dot plot; each with table view and CSV) and a results table showing evaluation type, date, model and benchmark version, methodology and source on every row. Benchmark summaries gained `modelCount`, `latestDate`, `byType` and `units` (one aggregate SQL statement).
+- **Honest about sparse, provider-reported data:** all 150 results are provider reported and the median benchmark has 2 results, so the overview always prints the independent count (0) with a note, and charts that would be meaningless (distribution under 5 models, provider comparison under 2 providers, history on one date) are replaced by a note saying why. No aggregate, ranking or "best" is computed.
+- **Gates:** prettier, typecheck, lint, 313 unit, 207 integration (incl. an N+1 guard that caught my first 4-query aggregate and an aggregate-vs-results invariant), 139 Playwright (axe in both themes on index, detail and filtered detail; mobile no-overflow; reduced motion; hydration), build, production audit, BOM: green. Screenshots reviewed at 390, 768 and 1440 with real and fixture data.
 
 ## Verification log
 

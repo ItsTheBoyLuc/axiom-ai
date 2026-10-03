@@ -228,6 +228,14 @@ export const benchmarkSummarySchema = z.object({
   description: z.string(),
   methodologyUrl: nullableString,
   resultCount: z.number().int(),
+  modelCount: z.number().int(),
+  latestDate: nullableString,
+  byType: z.object({
+    INDEPENDENT: z.number().int(),
+    PROVIDER_REPORTED: z.number().int(),
+    COMMUNITY: z.number().int(),
+  }),
+  units: z.array(z.string()),
   verificationStatus: status,
   isDemo: z.boolean(),
 }) satisfies z.ZodType<BenchmarkSummary>;

@@ -1,5 +1,11 @@
 import type { VerificationStatus } from '@/lib/verification';
-import type { BenchmarkOption, BenchmarkResult, ModelListItem, ReleaseKind } from './model';
+import type {
+  BenchmarkOption,
+  BenchmarkResult,
+  EvaluationType,
+  ModelListItem,
+  ReleaseKind,
+} from './model';
 
 /** Shapes for the read side beyond models: providers, benchmarks, releases, news, search. */
 
@@ -45,6 +51,14 @@ export type ProviderDetail = ProviderSummary & {
 
 export type BenchmarkSummary = BenchmarkOption & {
   resultCount: number;
+  /** Distinct models with at least one result. */
+  modelCount: number;
+  /** Newest evaluation date (YYYY-MM-DD), null without results. */
+  latestDate: string | null;
+  /** Result count per evaluation type (all three keys always present). */
+  byType: Record<EvaluationType, number>;
+  /** Distinct score units used by this benchmark's results, sorted. */
+  units: string[];
   verificationStatus: VerificationStatus;
   isDemo: boolean;
 };

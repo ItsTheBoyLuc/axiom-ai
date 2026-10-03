@@ -73,6 +73,7 @@ export function BarChart({
   showTableToggle = true,
   yAxisWidth = 124,
   rowHeader = 'Model',
+  uniform = false,
 }: {
   title: string;
   unit: string;
@@ -83,6 +84,8 @@ export function BarChart({
   showTableToggle?: boolean;
   yAxisWidth?: number;
   rowHeader?: string;
+  /** One series: draw every bar in the same colour (colour must not suggest groups that do not exist). */
+  uniform?: boolean;
 }) {
   const formatValue = formatters[valueFormat];
   const [view, setView] = useState<'chart' | 'table'>('chart');
@@ -173,7 +176,10 @@ export function BarChart({
                 strokeWidth={2}
               >
                 {data.map((d, i) => (
-                  <Cell key={`${d.label}-${i}`} fill={fills[i % fills.length]} />
+                  <Cell
+                    key={`${d.label}-${i}`}
+                    fill={uniform ? fills[0] : fills[i % fills.length]}
+                  />
                 ))}
               </Bar>
             </RBarChart>

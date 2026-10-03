@@ -47,7 +47,6 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
  */
 export const pendingRoutes: Record<string, { title: string; phase: string }> = {
   providers: { title: 'Providers', phase: 'Phase 6' },
-  benchmarks: { title: 'Benchmarks', phase: 'Phase 5' },
   releases: { title: 'Releases', phase: 'Phase 6' },
   news: { title: 'News', phase: 'Phase 7' },
   about: { title: 'About', phase: 'Phase 10' },

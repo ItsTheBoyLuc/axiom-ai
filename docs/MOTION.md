@@ -59,3 +59,8 @@ Running list of every motion value in the product, kept current so it can be tun
 - Bar and radar charts (`components/charts`): Recharts draw-in, 700 ms (`animationDuration`), `ease-out`. Recharts animates SVG geometry, not CSS transforms, so this is the one place the "transform/opacity only" rule is relaxed; it is skipped content-wise for nobody (the table view is the static alternative) and the chart area is a single small SVG.
 - Model picker chevron (`compare-view.tsx`): `rotate-180` on open, 150 ms CSS transition (transform only).
 - The compare page uses the page template and `fadeUp` reveals already listed above; the table, rows and chips do not animate. Adding or removing a model is a URL change and a server re-render, shown with `aria-busy` rather than motion.
+
+## Phase 5 (Benchmarks)
+
+- Score-over-time, distribution and provider dot charts (`components/charts`): Recharts draw-in, 700 ms (`animationDuration`), `ease-out`, the same value as the Phase 4 charts; the table view is the static alternative. Series differ by colour, dash and marker shape, so nothing depends on motion or colour.
+- The explorer index and filters have no motion of their own beyond the page template and the card hover border colour (150 ms colour transition, no transform). Filter changes are URL replacements with `aria-busy`, not animations.

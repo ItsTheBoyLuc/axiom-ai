@@ -189,31 +189,70 @@ export function createPrismaProviderRepository(db: Db): ProviderRepository {
 export function createPrismaBenchmarkRepository(db: Db): BenchmarkRepository {
   return {
     async list(): Promise<BenchmarkSummary[]> {
-      const rows = await db.benchmark.findMany({
-        select: {
-          slug: true,
-          name: true,
-          category: true,
-          version: true,
-          description: true,
-          methodologyUrl: true,
-          verificationStatus: true,
-          isDemo: true,
-          _count: { select: { results: true } },
-        },
-      });
+      // Two statements however many results exist: the benchmarks, and one grouped aggregate
+      // computed in the database (never by loading every result).
+      const [rows, stats] = await Promise.all([
+        db.benchmark.findMany({
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            category: true,
+            version: true,
+            description: true,
+            methodologyUrl: true,
+            verificationStatus: true,
+            isDemo: true,
+          },
+        }),
+        db.$queryRaw<
+          {
+            benchmarkId: string;
+            n: bigint;
+            models: bigint;
+            latest: Date | null;
+            independent: bigint;
+            providerReported: bigint;
+            community: bigint;
+            units: string[];
+          }[]
+        >`
+          SELECT r."benchmarkId" AS "benchmarkId",
+                 count(*) AS n,
+                 count(DISTINCT r."modelId") AS models,
+                 max(r."evaluationDate") AS latest,
+                 count(*) FILTER (WHERE r."evaluationType" = 'INDEPENDENT') AS independent,
+                 count(*) FILTER (WHERE r."evaluationType" = 'PROVIDER_REPORTED') AS "providerReported",
+                 count(*) FILTER (WHERE r."evaluationType" = 'COMMUNITY') AS community,
+                 array_agg(DISTINCT r."scoreUnit" ORDER BY r."scoreUnit") AS units
+          FROM "BenchmarkResult" r
+          GROUP BY r."benchmarkId"
+        `,
+      ]);
+      const byBenchmark = new Map(stats.map((s) => [s.benchmarkId, s]));
       return rows
-        .map((r) => ({
-          slug: r.slug,
-          name: r.name,
-          category: r.category,
-          version: r.version,
-          description: r.description,
-          methodologyUrl: r.methodologyUrl,
-          resultCount: r._count.results,
-          verificationStatus: r.verificationStatus as VerificationStatus,
-          isDemo: r.isDemo,
-        }))
+        .map((r) => {
+          const s = byBenchmark.get(r.id);
+          return {
+            slug: r.slug,
+            name: r.name,
+            category: r.category,
+            version: r.version,
+            description: r.description,
+            methodologyUrl: r.methodologyUrl,
+            resultCount: Number(s?.n ?? 0),
+            modelCount: Number(s?.models ?? 0),
+            latestDate: s?.latest ? isoDate(s.latest) : null,
+            byType: {
+              INDEPENDENT: Number(s?.independent ?? 0),
+              PROVIDER_REPORTED: Number(s?.providerReported ?? 0),
+              COMMUNITY: Number(s?.community ?? 0),
+            },
+            units: s?.units ?? [],
+            verificationStatus: r.verificationStatus as VerificationStatus,
+            isDemo: r.isDemo,
+          };
+        })
         .sort(byName);
     },
 

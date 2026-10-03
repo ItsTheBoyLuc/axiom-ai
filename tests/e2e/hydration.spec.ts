@@ -13,6 +13,8 @@ const ROUTES = [
   '/models',
   '/models/sample-model-2',
   '/compare?models=sample-model-1,sample-model-2',
+  '/benchmarks',
+  '/benchmarks?benchmark=sample-benchmark-1',
 ];
 
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
