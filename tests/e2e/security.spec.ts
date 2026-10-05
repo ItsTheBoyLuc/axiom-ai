@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { ADMIN_STATE } from './accounts';
 import { gotoReady } from './helpers';
@@ -129,5 +131,35 @@ test.describe('CSP: the admin area', () => {
       await gotoReady(page, route);
       expect(await violations(), route).toEqual([]);
     }
+  });
+});
+
+test.describe('no server secrets in the client bundles', () => {
+  function walk(dir: string): string[] {
+    return readdirSync(dir).flatMap((f) => {
+      const p = join(dir, f);
+      return statSync(p).isDirectory() ? walk(p) : /\.(js|css|map)$/.test(f) ? [p] : [];
+    });
+  }
+
+  test('connection strings, password hashing and server-only modules never reach the browser', () => {
+    const files = walk('.next/static');
+    expect(files.length).toBeGreaterThan(5);
+    const forbidden = [
+      /postgres(ql)?:\/\//i,
+      /redis:\/\//i,
+      /passwordHash/,
+      /@node-rs\/argon2/,
+      /DATABASE_URL/,
+      /REDIS_URL/,
+      /POSTGRES_PASSWORD/,
+      /APP_DB_PASSWORD/,
+    ];
+    const hits: string[] = [];
+    for (const f of files) {
+      const text = readFileSync(f, 'utf8');
+      for (const re of forbidden) if (re.test(text)) hits.push(`${f}: ${re}`);
+    }
+    expect(hits).toEqual([]);
   });
 });

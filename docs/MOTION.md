@@ -48,7 +48,7 @@ Running list of every motion value in the product, kept current so it can be tun
 
 ## Where used (Phases 1-3)
 
-- Page template (`src/app/template.tsx`): opacity 0 to 1 and y 8 px to 0, `base`, `out`.
+- Page template (`src/app/template.tsx`): opacity 0 to 1 and y 8 px to 0, `base`, `out` (client-side navigations only since Phase 10, see the end of this file).
 - Hero (`hero.tsx`): staggered `fadeUp`; canvas network (`hero-network.tsx`) and GSAP scroll effect (`hero-scroll.tsx`, dynamic import, skipped for reduced motion).
 - Reveal / RevealItem (`ui/reveal.tsx`): `fadeUp` when scrolled into view.
 - Search suggestions (`directory/search-box.tsx`): enter opacity 0, y -6, scale 0.98 with `snappy`; exit y -4.
@@ -86,3 +86,12 @@ Tests check that the effects run (the line's transform changes with scroll, entr
 ## Phase 8 (Admin)
 
 No new motion. Admin pages use the existing button press (`whileTap` scale 0.97, `spring.snappy`) and CSS colour transitions only; there are no scroll or entrance effects in the admin area.
+
+## Phase 10 (Core Web Vitals): what changed and why
+
+The server-rendered page must be visible as sent. Hiding content until JavaScript hydrated it made Largest Contentful Paint equal to "time to load and run the scripts" (4 to 5 s on a throttled phone).
+
+- **Page template** (`src/app/template.tsx`): the first page load is **not** animated (`initial={false}`). Later client-side navigations still fade in (opacity 0 to 1, y 8 px to 0, `base`, `out`). Detected with a module flag that flips after mount, so the server and the first client render agree.
+- **Reveal / RevealGroup** (`ui/reveal.tsx`): rendered visible on the server. After hydration, only reveals entirely **below the fold** are armed (dropped to `hidden` off screen) and animate in with `fadeUp` when scrolled to (same viewport margin, `-80px`). Reveals already on screen simply stay.
+- **Home hero**: the headline and lead no longer fade; they only rise (`y` 16 px to 0, `base`, `out`). The logo mark and the buttons keep the `fadeUp` stagger.
+- Tune: `distance.md` (16 px) and `duration.base` (0.40 s) in `src/lib/motion.ts` affect all of the above.

@@ -4,6 +4,39 @@ What is in the real catalogue (`prisma/seed/data/*.json`), where it came from, w
 
 **Method.** Every value was read in-session from the cited official page on **2026-10-02** (no training-data recall). Pages that block plain HTTP fetchers (`openai.com`, `anthropic.com` announcements, `deepmind.google` model cards) were read in a normal browser session as any visitor would. Each record carries `sourceUrl`, `verificationStatus`, `verifiedAt`, `collectedAt` and `isDemo = false`; the database also enforces these rules with CHECK constraints. `tests/unit/real-seed-data.test.ts` guards the files in CI.
 
+## Final status (Phase 10, 2026-10-05)
+
+**What is loaded** (checked against the development database after the last load; the `/sources` and `/methodology` pages show the live numbers):
+
+| Table                                   | Rows | Demo rows |
+| --------------------------------------- | ---- | --------- |
+| Providers                               | 12   | 0         |
+| Models                                  | 34   | 0         |
+| Model capabilities                      | 197  | 0         |
+| Pricing entries                         | 122  | 0         |
+| Benchmark definitions (one per variant) | 59   | 0         |
+| Benchmark results                       | 150  | 0         |
+| Releases                                | 48   | 0         |
+| News articles                           | 18   | 0         |
+| Publications                            | 6    | 0         |
+
+**Verified, by status.** 646 factual records, **every one with a source URL** (31 websites): 434 `OFFICIALLY_VERIFIED`, 209 `PROVIDER_REPORTED`, 3 `COMMUNITY_REPORTED` (the Hugging Face Blog, DataCamp and WinBuzzer news items). None is `UNVERIFIED`, and there are no demo rows anywhere in the real catalogue.
+
+**What is demo.** Nothing on any public page. The 16 fictional "Sample Model" records exist only as test fixtures (`prisma/seed/demo/fixtures.ts`, `SEED_DEMO=true`, never in production); they are excluded from the public Sources and Methodology counts and from the sitemap in production data. The **DEMO DATA** badge still works for them and is covered by tests.
+
+**What is independent.** Nothing. All 150 benchmark results are `PROVIDER_REPORTED`: published by the provider in its own model card or announcement, or quoted there from a third party (those are noted per record in `methodologyNotes`). No independent leaderboard was read in-session, so the explorer shows "independent: 0" with an explanation rather than implying otherwise. This is the largest gap in the catalogue.
+
+**What is missing, and why.**
+
+- No verified headquarters for any provider (not shown anywhere).
+- No prices for Cohere (contact sales) and NVIDIA (open checkpoints); no per-token price for the Alibaba promotional models.
+- Older and legacy models, media and realtime models, and several announced but undated models are deliberately not included (see each batch below).
+- Benchmark coverage is thin: the median benchmark has two results, so comparison tables contain many "No verified data" cells.
+- Model categories and capability lists are editorial summaries of how providers describe the models, not provider fields.
+- Sync sources: none are pre-configured (feed URLs would have to come from memory); add real ones in `/admin/sync`. The worker has been tested with scripted network responses only, never against a live feed.
+
+**Records least certain**: the ten with the lowest confidence across the three batches are listed in the final report; the full per-batch lists are below.
+
 ## Batch 1: OpenAI, Anthropic, Google DeepMind (2026-10-02)
 
 | Provider        | Models | Prices | Benchmark results | Releases |

@@ -76,6 +76,7 @@
     "db:seed:demo": "cross-env SEED_DEMO=true tsx --env-file-if-exists=.env prisma/seed/run.ts",
     "db:status": "prisma migrate status",
     "test:integration": "vitest run --config vitest.integration.config.ts",
+    "docs:api": "tsx scripts/gen-api-doc.ts",
     "admin:create": "tsx --env-file-if-exists=.env scripts/admin-create.ts"
   },
   "lint-staged": {

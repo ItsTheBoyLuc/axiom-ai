@@ -20,3 +20,6 @@ next-env.d.ts
 
 # Postgres dumps (docs/DEPLOYMENT.md)
 /backups/
+
+# Generated admin credentials written by the migrate container (docs/DEPLOYMENT.md)
+/secrets/

@@ -1,15 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 import { ButtonLink } from '@/components/ui/button';
 import { DemoBadge } from '@/components/ui/badges';
 import { LogoMark } from '@/components/ui/logo';
-import { fadeUp, stagger } from '@/lib/motion';
+import { distance, duration, ease, fadeUp, stagger } from '@/lib/motion';
 import type { GraphSeed } from './graph';
 import { HeroScroll } from './hero-scroll';
 import { HeroVisual } from './hero-visual';
 import { StaticNetwork } from './static-network';
+
+/**
+ * The headline and lead only rise into place; they never start transparent. They are the largest
+ * content on the page, so they must be visible in the server-rendered HTML: a fade-in that waits
+ * for hydration would make Largest Contentful Paint equal to "time to load and run the scripts".
+ */
+const rise: Variants = {
+  hidden: { y: distance.md },
+  show: { y: 0, transition: { duration: duration.base, ease: ease.out } },
+};
 
 export function Hero({ seed }: { seed: GraphSeed }) {
   // Reduced motion is applied by MotionProvider (fade only); never branch on it while rendering.
@@ -49,10 +59,10 @@ export function Hero({ seed }: { seed: GraphSeed }) {
           <motion.div variants={item} className="text-fg mb-8">
             <LogoMark size={44} />
           </motion.div>
-          <motion.h1 id="hero-title" variants={item} className="t-display max-w-4xl text-balance">
+          <motion.h1 id="hero-title" variants={rise} className="t-display max-w-4xl text-balance">
             Explore the Intelligence Shaping Our Future.
           </motion.h1>
-          <motion.p variants={item} className="t-lead mt-6 max-w-2xl text-balance">
+          <motion.p variants={rise} className="t-lead mt-6 max-w-2xl text-balance">
             Discover, compare, and understand the world&apos;s most advanced AI models in one place.
           </motion.p>
           <motion.div

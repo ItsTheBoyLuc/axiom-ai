@@ -17,7 +17,7 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 | 7     | News and global search (`/news`, `/search`, palette)            | Done 2026-10-03 (see below)                                                                 |
 | 8     | Admin, auth core, data sync                                     | Done 2026-10-03 (see below)                                                                 |
 | 9     | Accounts and personalization                                    | Done 2026-10-05 (see below)                                                                 |
-| 10    | Production readiness                                            | In progress                                                                                 |
+| 10    | Production readiness                                            | Done 2026-10-05 (see below)                                                                 |
 
 ## Phase 3b status
 
@@ -63,11 +63,7 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 
 ## Open items
 
-- Redis rate limiting for `/api/v1/*` (hardening phase).
-- CI has no Docker image build job yet (hardening phase).
-- Review the Prisma `overrides` at the start of Phase 10 (hard limit 2026-12-31).
-- Image-model profiles show "Not publicly disclosed" for inapplicable fields (context window, tool calling).
-- Phase 10 at the latest: restore the strict all-dependency `npm audit` gate if a patched `braces` or fixed `eslint-config-next` exists (CI currently blocks on `--omit=dev` only).
+See `docs/SECURITY.md` (known limitations: email verification, password reset, MFA, absolute session lifetime, image scanning) and `docs/DECISIONS.md` (GitHub sign-in skipped, strict audit gate not restorable yet, Prisma overrides until 2026-12-31). Data: all 150 benchmark results are provider reported (no independent leaderboard was read), no sync sources are configured.
 
 ## Phase 8 status
 
@@ -83,3 +79,19 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 
 - **Built (2026-10-05):** sign-up, account menu in the navbar and mobile drawer, `/account` (saved models, saved comparisons, recently viewed), `/settings` (theme, preferred providers, "For you" switch, change password, delete account), `/api/v1/me/*`, Save buttons on profiles and `/compare`, "For you" on the home page, anonymous parity. GitHub sign-in skipped (needs OAuth credentials), email verification and password reset not built (need mail credentials); see `docs/DECISIONS.md`.
 - **Gates:** prettier, typecheck, lint, 520 unit, 451 integration, 353 Playwright (axe in both themes on sign-up, account, settings, the open account menu and the home page), production build, production audit, BOM, web/worker/migrate image builds: green. Screenshots reviewed at 390, 768 and 1440 (signed in and out).
+
+## Phase 10 status
+
+- **Built (2026-10-05):** nonce-based CSP, HSTS, COOP and tighter Permissions-Policy; Redis rate limiting for `/api/v1/*`; session rotation and cookie sliding; least-privilege DB role and hardened Compose (read-only, no capabilities, loopback ports, optional Cloudflare Tunnel profile); backup, restore-test and restore scripts; CI Docker job; real About, Methodology, Sources, Contact, Privacy, Terms and Cookies pages (replacing the placeholders); `robots.txt`, `sitemap.xml`, indexable `/models`; LCP fixes; `docs/SECURITY.md`, `docs/DEPLOYMENT.md`, `docs/API.md` (generated), README, final `docs/DATA_STATUS.md`.
+- **Bugs found by actually exercising it:** `admin:create` created an administrator and then lost the password inside a container (EACCES) and is now fail-first with `--out`; deleting an account left the email and IP in the audit log; `/models` was `noindex`; the sign-up password hint never showed (`??` on `''`); every page was invisible until hydration, which made LCP 4 to 5 s; ISR pages cannot carry a CSP nonce.
+- **Gates:** prettier, typecheck, lint, 532 unit, 461 integration, 379 Playwright (axe in both themes on every page incl. content pages and the open account menu, CSP violation listener on every main route and the admin pages, mobile no-overflow, reduced motion, hydration), production build, production audit (0), BOM check, web, worker and migrate image builds, full Compose stack healthy with a real backup, restore test and destructive restore.
+- **Lighthouse and Core Web Vitals** (production container, real data, 2026-10-05, Lighthouse 13.5, Chrome headless; budget LCP < 2.5 s, CLS < 0.1, INP < 200 ms):
+
+| Page                  | Desktop perf / LCP / TBT / CLS | Mobile (slow 4G, 4x CPU, applied throttling) perf / LCP / TBT / CLS | Mobile (Lighthouse simulated) perf / LCP |
+| --------------------- | ------------------------------ | ------------------------------------------------------------------- | ---------------------------------------- |
+| `/`                   | 98 / 1.1 s / 0 ms / 0          | 81 / 2.5 s / 530 ms / 0                                             | 76 / 5.1 s                               |
+| `/models`             | 100 / 0.7 s / 0 ms / 0         | 95 / 2.1 s / 130 ms / 0                                             | 88 / 3.9 s                               |
+| `/models/<slug>`      | 99 / 0.9 s / 0 ms / 0.001      | 95 / 2.1 s / 170 ms / 0                                             | 89 / 3.7 s                               |
+| `/compare?models=a,b` | 99 / 0.8 s / 0 ms / 0.004      | 75 / 2.0 s / 930 ms / 0.07                                          | 80 / 4.3 s                               |
+
+Accessibility 100 and best practices 100 on all four; SEO 100 except `/compare?models=...` (91: the metadata of that noindex page streams into the body). Real unthrottled LCP measured with a PerformanceObserver on an emulated Pixel 7 was 0.4 to 1.1 s. **Honest reading:** under applied throttling every page is at or within rounding of the 2.5 s LCP budget (home is exactly 2.5 s); Lighthouse's simulated mobile mode, which also models all script work as a dependency of the paint, still reports 3.7 to 5.1 s, so mobile LCP on a slow phone is borderline, not comfortably passing. The remaining cost is about 250 to 470 kB of JavaScript (framework, Motion, Recharts on `/` and `/compare`) and TBT on `/compare` (930 ms throttled). INP was not measured (no field data; Lighthouse does not report it). Before this phase LCP was 4.1 to 5.7 s: the page was invisible until hydration (fixed), and `/models` shipped Zod to the browser (removed).
