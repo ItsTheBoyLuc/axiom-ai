@@ -67,7 +67,10 @@ export default async function RunPage({ params }: Props) {
 
       {staged > 0 && (
         <p className="text-sm">
-          <Link href={`/admin/sync/imports?run=${run.id}`} className="text-accent hover:underline">
+          <Link
+            href={`/admin/sync/imports?run=${run.id}`}
+            className="text-accent underline underline-offset-2"
+          >
             Review the {staged} import{staged === 1 ? '' : 's'} staged by this run
           </Link>
         </p>

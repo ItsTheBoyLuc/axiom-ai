@@ -248,7 +248,7 @@ describe('route files and the registry stay in sync', () => {
     // Session-bound routes (/auth, /admin) are internal to the web app, not part of the public API
     // described by the OpenAPI document; tests/integration/admin-rbac covers them.
     return out
-      .filter((r) => !/^\/(auth|admin)(\/|$)/.test(r))
+      .filter((r) => !/^\/(auth|admin|me)(\/|$)/.test(r))
       .map((r) => r.replace(/\[(\w+)\]/g, '{$1}'))
       .sort();
   })();

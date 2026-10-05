@@ -13,6 +13,7 @@ import { CompareTable } from './compare-table';
 import { useComparison } from './comparison-store';
 import { useCompareHistory } from './history-store';
 import { ModelPicker, type ProviderOption } from './model-picker';
+import { SaveComparison } from '@/components/account/save-comparison';
 
 const toRef = (m: ModelDetail): ModelRef => ({
   slug: m.slug,
@@ -178,6 +179,7 @@ export function CompareView({
                   {label}
                 </button>
               ))}
+              <SaveComparison slugs={slugs} names={models.map((m) => m.name)} />
               <Button variant="secondary" onClick={copyLink}>
                 <Link2 size={15} aria-hidden />
                 {copied === 'ok'

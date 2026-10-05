@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { PaletteProvider } from '@/components/layout/command-palette';
 import { SmoothScroll } from '@/components/layout/smooth-scroll';
 import { MotionProvider } from '@/components/layout/motion-provider';
+import { SessionProvider } from '@/components/account/session-provider';
 import { ThemeProvider, themeInitScript } from '@/components/layout/theme-provider';
 import '../styles/globals.css';
 
@@ -45,21 +46,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-sans antialiased">
         <ThemeProvider>
-          <MotionProvider>
-            <PaletteProvider>
-              <a
-                href="#main"
-                className="sr-only-focusable bg-accent text-accent-fg fixed top-3 left-3 z-[100] rounded-lg px-4 py-2 text-sm font-medium"
-              >
-                Skip to content
-              </a>
-              <SmoothScroll />
-              <Navbar />
-              <main id="main">{children}</main>
-              <Footer />
-              <ComparisonTray />
-            </PaletteProvider>
-          </MotionProvider>
+          <SessionProvider>
+            <MotionProvider>
+              <PaletteProvider>
+                <a
+                  href="#main"
+                  className="sr-only-focusable bg-accent text-accent-fg fixed top-3 left-3 z-[100] rounded-lg px-4 py-2 text-sm font-medium"
+                >
+                  Skip to content
+                </a>
+                <SmoothScroll />
+                <Navbar />
+                <main id="main">{children}</main>
+                <Footer />
+                <ComparisonTray />
+              </PaletteProvider>
+            </MotionProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

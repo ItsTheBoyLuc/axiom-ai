@@ -5,6 +5,7 @@ import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { MobileAccount } from '@/components/account/mobile-account';
 import { Logo } from '@/components/ui/logo';
 import { primaryNav } from '@/lib/routes';
 import { duration, ease, spring, staggerDelay } from '@/lib/motion';
@@ -78,6 +79,7 @@ export function MobileNav() {
                     ))}
                   </ul>
                 </nav>
+                <MobileAccount onNavigate={() => setOpen(false)} />
               </motion.div>
             </Dialog.Content>
           </Dialog.Portal>

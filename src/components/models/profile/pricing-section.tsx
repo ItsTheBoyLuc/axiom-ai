@@ -63,7 +63,7 @@ function PriceRow({ p }: { p: PricingEntry }) {
             href={p.sourceUrl}
             rel="noopener noreferrer"
             target="_blank"
-            className="text-accent hover:underline"
+            className="text-accent underline underline-offset-2"
           >
             Source
           </a>

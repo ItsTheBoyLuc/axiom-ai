@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Search } from 'lucide-react';
 import { motion } from 'motion/react';
+import { AccountMenu } from '@/components/account/account-menu';
 import { Logo } from '@/components/ui/logo';
 import { primaryNav } from '@/lib/routes';
 import { spring } from '@/lib/motion';
@@ -86,6 +87,7 @@ export function Navbar() {
           >
             <Search size={18} aria-hidden />
           </button>
+          <AccountMenu />
           <ThemeToggle />
           <MobileNav />
         </div>

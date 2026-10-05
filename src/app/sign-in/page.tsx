@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { Container } from '@/components/ui/section';
@@ -27,12 +28,21 @@ export default async function SignInPage({ searchParams }: Props) {
       <div className="border-line bg-card mx-auto w-full max-w-md rounded-2xl border p-6 sm:p-8">
         <h1 className="t-h2">Sign in</h1>
         <p className="text-fg-2 mt-2 text-sm">
-          Browsing AXIOM AI never needs an account. Sign in is for administrators, and later for
-          saving comparisons.
+          Browsing AXIOM AI never needs an account. Sign in to see your saved models and
+          comparisons, or to administer the site.
         </p>
         <div className="mt-6">
           <SignInForm next={safeNextPath(raw, '')} />
         </div>
+        <p className="text-fg-2 mt-6 text-sm">
+          New here?{' '}
+          <Link
+            href={`/sign-up${raw ? `?next=${encodeURIComponent(safeNextPath(raw, ''))}` : ''}`}
+            className="text-accent underline underline-offset-2"
+          >
+            Create an account
+          </Link>
+        </p>
       </div>
     </Container>
   );

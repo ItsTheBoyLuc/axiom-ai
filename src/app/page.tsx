@@ -1,4 +1,5 @@
 import { Hero } from '@/components/hero/hero';
+import { ForYou } from '@/components/home/for-you';
 import {
   ComparisonSection,
   FeaturedModels,
@@ -8,17 +9,22 @@ import {
   ProvidersOverview,
   StatsSection,
 } from '@/components/home/sections';
+import { getPreferences } from '../../server/account/service';
+import { getCurrentUser } from '../../server/auth/current-user';
+import { getPrisma } from '../../server/db/client';
 import { getRepositories } from '../../server/repositories';
 
-// Rendered per request: the content comes from PostgreSQL, which is not available at build time.
+// Rendered per request: the content comes from PostgreSQL, which is not available at build time,
+// and the signed-in "For you" section depends on the session.
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // The hero network is seeded through the repository layer.
   const repos = getRepositories();
-  const [models, providers] = await Promise.all([
+  const [models, providers, user] = await Promise.all([
     repos.models.featured(8),
     repos.providers.listAll(),
+    getCurrentUser(),
   ]);
   const seed = {
     providers: providers
@@ -28,9 +34,15 @@ export default async function Home() {
     isDemo: models.some((m) => m.isDemo),
   };
 
+  // Signed in and not switched off in settings: a personalised section right under the hero.
+  const prefs = user ? await getPreferences(getPrisma(), user.id) : null;
+
   return (
     <>
       <Hero seed={seed} />
+      {user && prefs?.personalized && (
+        <ForYou userId={user.id} providers={prefs.preferredProviders} />
+      )}
       <StatsSection />
       <FeaturedModels />
       <ProvidersOverview />

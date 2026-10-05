@@ -406,7 +406,7 @@ describe('route modules', () => {
   );
   // Session-bound routes are not part of the public, documented read API (see admin-rbac tests).
   const modules = Object.fromEntries(
-    Object.entries(all).filter(([file]) => !/\/api\/v1\/(auth|admin)\//.test(file)),
+    Object.entries(all).filter(([file]) => !/\/api\/v1\/(auth|admin|me)\//.test(file)),
   );
 
   it('all export a GET handler and render on request (never prerendered at build)', async () => {

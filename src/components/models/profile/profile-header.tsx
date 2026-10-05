@@ -1,4 +1,6 @@
 import { BookOpen } from 'lucide-react';
+import { SaveModelButton } from '@/components/account/save-model-button';
+import { TrackView } from '@/components/account/track-view';
 import { CompareToggle } from '@/components/comparison/compare-toggle';
 import { DemoBadge, VerificationBadge } from '@/components/ui/badges';
 import { formatDate } from '@/lib/format';
@@ -8,7 +10,7 @@ import { ShareButton } from './share-button';
 
 /**
  * Profile header: identity, key dates, verification/demo flags and actions.
- * "Save" requires an account and arrives in Phase 9; it is intentionally not rendered yet.
+ * "Save" needs an account: anonymous visitors see a "Sign in to save" link, never a dead button.
  * "Documentation" only renders when a documentation URL is on record.
  */
 export function ProfileHeader({ model }: { model: ModelDetail }) {
@@ -68,6 +70,8 @@ export function ProfileHeader({ model }: { model: ModelDetail }) {
           providerName={model.providerName}
           variant="header"
         />
+        <SaveModelButton slug={model.slug} name={model.name} />
+        <TrackView slug={model.slug} />
         {model.documentationUrl && (
           <a
             href={model.documentationUrl}

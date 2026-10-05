@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { announceSessionChange } from '@/components/account/session-provider';
 import { Button } from '@/components/ui/button';
 
 const field =
@@ -34,6 +35,7 @@ export function SignInForm({ next }: { next: string }) {
       });
       if (res.ok) {
         const body = (await res.json()) as { data: { next: string } };
+        announceSessionChange();
         router.replace(body.data.next);
         router.refresh();
         return;

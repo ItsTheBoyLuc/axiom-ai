@@ -65,7 +65,7 @@ docker compose down -v           # stop and wipe volumes
 
 ## Status
 
-Step 0, Phases 1, 2, 3a and 3b (real sourced data for 12 providers, 34 models) complete. The blocking CI audit is `npm audit --omit=dev` (dev-only `braces` advisory, no upstream fix; revisit by Phase 10, see docs/DECISIONS.md). Phases 4 (Compare), 5 (Benchmarks), 6 (Providers + releases), 7 (News + search) and 8 (Admin, auth core, data sync) complete. Next: Phase 9 (accounts and personalization). Auth is custom DB sessions (not Auth.js, see docs/DECISIONS.md); every admin route must go through `adminRoute` (server/admin/handler.ts); admin and import writes go through the seed schemas and loader. Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
+Step 0, Phases 1, 2, 3a and 3b (real sourced data for 12 providers, 34 models) complete. The blocking CI audit is `npm audit --omit=dev` (dev-only `braces` advisory, no upstream fix; revisit by Phase 10, see docs/DECISIONS.md). Phases 4 (Compare), 5 (Benchmarks), 6 (Providers + releases), 7 (News + search) and 8 (Admin, auth core, data sync) complete. Phase 9 (accounts, sign-up, saved items, preferences, `/api/v1/me/*` via `meRoute`) complete. Next: Phase 10 (production readiness). Auth is custom DB sessions (not Auth.js, see docs/DECISIONS.md); every admin route must go through `adminRoute` and every `/api/v1/me` route through `meRoute` (both wrap `server/auth/guard.ts`); admin and import writes go through the seed schemas and loader. Remove the Prisma `overrides` in package.json when a Prisma 7.x release fixes them (see docs/DECISIONS.md).
 
 ## Autopilot mode
 

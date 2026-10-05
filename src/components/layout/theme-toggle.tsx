@@ -4,6 +4,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Check, Monitor, Moon, Sun } from 'lucide-react';
 import { motion } from 'motion/react';
 import { spring } from '@/lib/motion';
+import { useSession } from '@/components/account/session-provider';
 import { useTheme, type ThemePreference } from './theme-provider';
 
 const options: { value: ThemePreference; label: string; icon: typeof Sun }[] = [
@@ -15,6 +16,7 @@ const options: { value: ThemePreference; label: string; icon: typeof Sun }[] = [
 /** system / dark / light selector, persisted by ThemeProvider. */
 export function ThemeToggle() {
   const { preference, resolved, setPreference } = useTheme();
+  const session = useSession();
   const Icon = resolved === 'dark' ? Moon : Sun;
 
   return (
@@ -35,7 +37,12 @@ export function ThemeToggle() {
           >
             <DropdownMenu.RadioGroup
               value={preference}
-              onValueChange={(v) => setPreference(v as ThemePreference)}
+              onValueChange={(v) => {
+                const theme = v as ThemePreference;
+                setPreference(theme);
+                // Signed in: remember the choice on the account too (best effort, never blocks).
+                if (session.status === 'user') void session.updatePreferences({ theme });
+              }}
             >
               {options.map(({ value, label, icon: I }) => (
                 <DropdownMenu.RadioItem

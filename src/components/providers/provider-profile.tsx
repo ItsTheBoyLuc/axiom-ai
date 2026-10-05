@@ -135,7 +135,10 @@ export function ReleasesSection({ p, releases }: { p: ProviderDetail; releases: 
             ))}
           </ol>
           <p className="text-sm">
-            <Link href={`/releases?provider=${p.slug}`} className="text-accent hover:underline">
+            <Link
+              href={`/releases?provider=${p.slug}`}
+              className="text-accent underline underline-offset-2"
+            >
               Open these in the full releases view
             </Link>
           </p>

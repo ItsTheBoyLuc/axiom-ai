@@ -28,3 +28,10 @@ export async function requireAdminPage(nextPath: string): Promise<SessionUser> {
   if (user.role !== 'ADMIN') notFound();
   return user;
 }
+
+/** For account pages: anonymous visitors go to sign-in and come back; any signed-in user passes. */
+export async function requireUserPage(nextPath: string): Promise<SessionUser> {
+  const user = await getCurrentUser();
+  if (!user) redirect(`/sign-in?next=${encodeURIComponent(nextPath)}`);
+  return user;
+}

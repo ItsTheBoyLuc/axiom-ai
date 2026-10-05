@@ -98,8 +98,15 @@ export function getRateLimiter(): RateLimiter {
   return (shared = createRedisLimiter(redis, memory));
 }
 
-/** The caller's address for rate limiting and audit logs (the first hop set by our proxy). */
+/**
+ * The caller's address for rate limiting and audit logs. It is read from a request header that
+ * the REVERSE PROXY in front of the app sets (default `x-forwarded-for`, first entry; set
+ * CLIENT_IP_HEADER=cf-connecting-ip behind Cloudflare). The app must therefore never be reachable
+ * directly from the internet: a client could otherwise choose its own address and dodge per-IP
+ * limits. Per-account and global limits do not depend on this value.
+ */
 export function clientIp(request: { headers: Pick<Headers, 'get'> }): string {
-  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  return forwarded || request.headers.get('x-real-ip') || 'unknown';
+  const header = (process.env.CLIENT_IP_HEADER || 'x-forwarded-for').toLowerCase();
+  const first = request.headers.get(header)?.split(',')[0]?.trim();
+  return first || request.headers.get('x-real-ip') || 'unknown';
 }

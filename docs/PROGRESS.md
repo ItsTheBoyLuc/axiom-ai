@@ -15,7 +15,9 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 | 5     | Benchmarks (`/benchmarks` explorer, charts, filters)            | Done 2026-10-03 (see below)                                                                 |
 | 6     | Providers and releases (directory, profiles, `/releases`, GSAP) | Done 2026-10-03 (see below)                                                                 |
 | 7     | News and global search (`/news`, `/search`, palette)            | Done 2026-10-03 (see below)                                                                 |
-| 8-10  | Admin, Auth, Production                                         | Not started                                                                                 |
+| 8     | Admin, auth core, data sync                                     | Done 2026-10-03 (see below)                                                                 |
+| 9     | Accounts and personalization                                    | Done 2026-10-05 (see below)                                                                 |
+| 10    | Production readiness                                            | In progress                                                                                 |
 
 ## Phase 3b status
 
@@ -76,3 +78,8 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 - **Not done on purpose:** no sync sources are pre-configured (feed URLs would have to come from memory); add real ones from `/admin/sync`. The worker has not fetched anything real yet: all network behaviour is covered with scripted responses.
 - **Gates:** see the commits (prettier, typecheck, lint, unit, integration, Playwright with axe in both themes on every admin page, production build, production audit, BOM, worker image build).
 - **Next:** Phase 9 (sign-up, saved comparisons and models, preferences, recently viewed, account menu, optional GitHub sign-in) on top of the auth core.
+
+## Phase 9 status
+
+- **Built (2026-10-05):** sign-up, account menu in the navbar and mobile drawer, `/account` (saved models, saved comparisons, recently viewed), `/settings` (theme, preferred providers, "For you" switch, change password, delete account), `/api/v1/me/*`, Save buttons on profiles and `/compare`, "For you" on the home page, anonymous parity. GitHub sign-in skipped (needs OAuth credentials), email verification and password reset not built (need mail credentials); see `docs/DECISIONS.md`.
+- **Gates:** prettier, typecheck, lint, 520 unit, 451 integration, 353 Playwright (axe in both themes on sign-up, account, settings, the open account menu and the home page), production build, production audit, BOM, web/worker/migrate image builds: green. Screenshots reviewed at 390, 768 and 1440 (signed in and out).

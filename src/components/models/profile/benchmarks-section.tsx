@@ -144,7 +144,7 @@ export function BenchmarksView({ results }: { results: BenchmarkResult[] }) {
                         href={r.sourceUrl}
                         rel="noopener noreferrer"
                         target="_blank"
-                        className="text-accent hover:underline"
+                        className="text-accent underline underline-offset-2"
                       >
                         Source
                       </a>
