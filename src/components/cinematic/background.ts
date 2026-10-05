@@ -27,6 +27,8 @@ export type BackgroundOptions = {
   navigate: (href: string) => void;
   /** Seconds the network takes to fade in from the centre (0 = immediately). */
   reveal: number;
+  /** Opacity of the whole layer (1 on the home page, lower on text-heavy pages). */
+  opacity?: number;
 };
 
 export type BackgroundStatus = {
@@ -379,6 +381,10 @@ export function createBackground(
     pointerEvents: 'none',
   });
   canvas.before(glowCanvas);
+  if (opts.opacity !== undefined && opts.opacity < 1) {
+    glowCanvas.style.opacity = String(opts.opacity);
+    canvas.style.opacity = String(opts.opacity);
+  }
   const gctx = glowCanvas.getContext('2d', { alpha: true });
   if (!gctx) {
     glowCanvas.remove();
@@ -500,7 +506,12 @@ export function createBackground(
     {
       const ad = cfg.adaptive;
       smoothDt += (dt - smoothDt) * 0.08;
-      if (frames > 45) {
+      // `window.__cineLockQuality` is set by the end-to-end tests so the picture does not depend on
+      // how busy the machine is; nothing else sets it.
+      if (
+        frames > 45 &&
+        !(window as unknown as { __cineLockQuality?: boolean }).__cineLockQuality
+      ) {
         slowFor = smoothDt > ad.slowMs ? slowFor + dt : 0;
         fastFor = smoothDt < ad.fastMs ? fastFor + dt : 0;
         if (slowFor > ad.degradeAfterMs && quality < ad.maxLevel) {

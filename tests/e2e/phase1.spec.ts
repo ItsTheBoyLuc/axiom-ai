@@ -96,7 +96,9 @@ test('mobile drawer opens and closes with Escape', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: 'Mobile' })).toBeHidden();
 });
 
-test('reduced motion: no canvas, static hero, content visible', async ({ browser }) => {
+test('reduced motion: no canvas, static hero, content visible (the OS setting alone is enough)', async ({
+  browser,
+}) => {
   const ctx = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await ctx.newPage();
   await gotoReady(page, '/');
@@ -106,9 +108,14 @@ test('reduced motion: no canvas, static hero, content visible', async ({ browser
   await ctx.close();
 });
 
-test('hero canvas mounts with motion and keyboard list is reachable', async ({ page }) => {
+test('the background canvas mounts with motion and the keyboard list is reachable', async ({
+  page,
+}) => {
   await gotoReady(page, '/');
-  await expect(page.locator('canvas')).toHaveCount(1);
+  // Phase 11: the network is one fixed canvas behind the whole page (plus a low-resolution glow
+  // canvas), created by the cinematic engine after load. It used to live inside the hero.
+  await expect(page.locator('canvas[data-cine-canvas]')).toHaveCount(1);
+  await expect(page.locator('canvas[data-cine-glow]')).toHaveCount(1);
   await page.keyboard.press('Tab'); // skip link
   const nav = page.getByRole('navigation', { name: /Providers and models/ });
   await nav.getByRole('link').first().focus();

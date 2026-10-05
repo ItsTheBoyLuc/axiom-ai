@@ -2,13 +2,16 @@
 
 import { useEffect } from 'react';
 import { motion } from 'motion/react';
-import { distance, duration, ease } from '@/lib/motion';
+import { duration, ease } from '@/lib/motion';
 
 /**
  * True once the first page has hydrated. Module state, so it is `false` on the server (always) and
  * during hydration in the browser, and `true` for every later client-side navigation.
  */
 let hydrated = false;
+
+/** Route transition (docs/MOTION.md): short and subtle so content is never held back. */
+const ROUTE_RISE = 6;
 
 /**
  * Page transition: re-mounts per navigation, opacity plus a small rise.
@@ -29,9 +32,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
   return (
     <motion.div
-      initial={hydrated ? { opacity: 0, y: distance.sm } : false}
+      initial={hydrated ? { opacity: 0, y: ROUTE_RISE } : false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: duration.base, ease: ease.out }}
+      transition={{ duration: duration.fast, ease: ease.out }}
     >
       {children}
     </motion.div>

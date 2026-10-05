@@ -300,16 +300,16 @@ Sessions are random tokens in an HttpOnly, SameSite=Lax cookie (`__Host-axiom_se
 
 Every handler only touches rows owned by the caller. `401` without a session; writes are same-origin only and limited to 120 per minute.
 
-| Endpoint                          | Purpose                                                                                                                  |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `GET`, `PUT /me/preferences`      | `{ theme: "system" \| "dark" \| "light" \| null, preferredProviders: slug[] (≤ 20, must exist), personalized: boolean }` |
-| `GET`, `POST /me/saved-models`    | List, or save `{ slug }`                                                                                                 |
-| `DELETE /me/saved-models/:slug`   | Remove a saved model                                                                                                     |
-| `GET`, `POST /me/comparisons`     | List, or save `{ name, models: slug[] (2 to 4) }`                                                                        |
-| `DELETE /me/comparisons/:id`      | Remove a saved comparison                                                                                                |
-| `GET`, `POST /me/recently-viewed` | List, or record `{ slug }`                                                                                               |
-| `PUT /me/password`                | `{ currentPassword, newPassword }`; revokes every other session. 5 attempts per window.                                  |
-| `DELETE /me`                      | `{ password }`; deletes the account and everything saved with it, scrubs personal data from the audit log.               |
+| Endpoint                          | Purpose                                                                                                                                                                                            |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET`, `PUT /me/preferences`      | `{ theme: "system" \| "dark" \| "light" \| null, preferredProviders: slug[] (≤ 20, must exist), personalized: boolean, motion: "system" \| "full" \| "reduced" \| null (optional, default null) }` |
+| `GET`, `POST /me/saved-models`    | List, or save `{ slug }`                                                                                                                                                                           |
+| `DELETE /me/saved-models/:slug`   | Remove a saved model                                                                                                                                                                               |
+| `GET`, `POST /me/comparisons`     | List, or save `{ name, models: slug[] (2 to 4) }`                                                                                                                                                  |
+| `DELETE /me/comparisons/:id`      | Remove a saved comparison                                                                                                                                                                          |
+| `GET`, `POST /me/recently-viewed` | List, or record `{ slug }`                                                                                                                                                                         |
+| `PUT /me/password`                | `{ currentPassword, newPassword }`; revokes every other session. 5 attempts per window.                                                                                                            |
+| `DELETE /me`                      | `{ password }`; deletes the account and everything saved with it, scrubs personal data from the audit log.                                                                                         |
 
 ## Admin (`/admin/*`, role ADMIN)
 

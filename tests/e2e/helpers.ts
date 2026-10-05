@@ -35,9 +35,29 @@ async function waitForHydrationAndStreaming(page: Page) {
   await page.waitForFunction(() => document.querySelector('[id^="S:"]') === null);
 }
 
+/**
+ * Cinematic pages (Phase 11) start their scroll engine after `load` and an idle callback. A test
+ * that scans or measures while it starts would see text switch to its hidden "built on scroll"
+ * state mid-test (an axe false positive, a screenshot of half a headline). So when a page has a
+ * cinematic root and motion is not reduced, wait until the engine is up. Reduced-motion pages and
+ * every other route return immediately.
+ */
+async function waitForCinematicEngine(page: Page) {
+  await page.waitForFunction(
+    () => {
+      if (!document.querySelector('[data-cine-root]')) return true;
+      if (document.documentElement.getAttribute('data-motion') === 'reduced') return true;
+      return !!(window as unknown as { __cine?: unknown }).__cine;
+    },
+    undefined,
+    { timeout: 30_000 },
+  );
+}
+
 export async function gotoReady(page: Page, url: string) {
   const res = await page.goto(url);
   await waitForHydrationAndStreaming(page);
+  await waitForCinematicEngine(page);
   return res;
 }
 
@@ -45,6 +65,7 @@ export async function gotoReady(page: Page, url: string) {
 export async function reloadReady(page: Page) {
   const res = await page.reload();
   await waitForHydrationAndStreaming(page);
+  await waitForCinematicEngine(page);
   return res;
 }
 

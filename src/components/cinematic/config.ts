@@ -76,16 +76,15 @@ export const sceneConfig = {
   ],
   /** Mobile: smaller travel, vertical only. */
   cardFromMobile: { x: 0, y: 44, scale: 0.97, rotate: 0 },
-  cardStart: 'top 98%',
-  cardEnd: 'top 62%',
+  /** A card starts arriving when its top reaches this percentage of the viewport height (from the top) and has arrived at the end value. */
+  cardStartPct: 98,
+  cardEndPct: 62,
   /** Extra start offset (% of viewport) per column so siblings arrive one after another. */
   cardStagger: 4,
   /** Hero exit: how far and how much the headline block recedes while the page scrolls on. */
   heroExit: { y: -90, scale: 1.06, blur: 8 },
   /** Counters count from 0 over the pinned scene. */
   counterEase: 'power1.out',
-  /** Parallax of marked decoration/cards: pixels of travel across the viewport (desktop / mobile). */
-  drift: { desktop: 36, mobile: 14 },
 } as const;
 
 /** The fixed background layer. */
@@ -102,6 +101,8 @@ export const backgroundConfig = {
    *  drops a level (1: no proximity links, half the particles; 2: also no pulses or grid, glows redrawn
    *  less often); when they stay under `fastMs` for `recoverAfterMs` it climbs back. */
   adaptive: { slowMs: 24, fastMs: 15, degradeAfterMs: 1500, recoverAfterMs: 6000, maxLevel: 2 },
+  /** Opacity of the whole layer on the light level (text-heavy pages: /about, provider profiles, /releases), so lines and nodes behind paragraphs stay quiet. */
+  lightLevelOpacity: 0.5,
   /** The network always has at least this many provider and model nodes; when the data has fewer,
    *  unlabelled decorative model nodes (not links) are added so the picture stays dense. */
   minNodes: 40,

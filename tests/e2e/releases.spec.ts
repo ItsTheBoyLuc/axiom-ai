@@ -115,25 +115,35 @@ test.describe('release filters', () => {
 });
 
 test.describe('scroll effects (GSAP)', () => {
-  test('the timeline line draws and entries rise in as the page scrolls', async ({ page }) => {
+  test('the timeline line draws and entries come into focus as the page scrolls', async ({
+    page,
+  }) => {
     await gotoReady(page, TIMELINE);
     const line = page.locator('[data-timeline-progress]');
-    // The scroll effects start after hydration and a dynamic import of GSAP.
+    // The scroll effects start after the page has loaded and the browser is idle (Phase 11), via a
+    // dynamic import of GSAP: allow for that on a busy machine.
     await expect
-      .poll(async () => line.evaluate((el) => getComputedStyle(el).transform))
+      .poll(async () => line.evaluate((el) => getComputedStyle(el).transform), { timeout: 20_000 })
       .not.toBe('none');
     const scaleAt = async () =>
       line.evaluate((el) => {
-        const m = getComputedStyle(el).transform.match(/matrix\(([^)]+)\)/);
-        return m ? Number(m[1]!.split(',')[3]) : 1;
+        // GSAP writes matrix() at rest and matrix3d() while it moves: scaleY is index 3 or 5.
+        const t = getComputedStyle(el).transform;
+        const m = t.match(/matrix(3d)?\(([^)]+)\)/);
+        if (!m) return 1;
+        const v = m[2]!.split(',').map(Number);
+        return m[1] ? v[5]! : v[3]!;
       });
     const top = await scaleAt();
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await expect.poll(scaleAt).toBeGreaterThan(top);
+    await expect.poll(scaleAt, { timeout: 15_000 }).toBeGreaterThan(top);
     // An entry far below the fold is visible once it has been scrolled to.
     const last = entries(page).last();
     await last.scrollIntoViewIfNeeded();
-    await expect.poll(() => last.evaluate((el) => Number(getComputedStyle(el).opacity))).toBe(1);
+    // In focus (or at least never faded: out-of-focus entries blur but keep full opacity).
+    await expect
+      .poll(() => last.evaluate((el) => Number(getComputedStyle(el).opacity)), { timeout: 15_000 })
+      .toBe(1);
   });
 
   test.describe('reduced motion', () => {

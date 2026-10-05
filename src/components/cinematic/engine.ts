@@ -1,4 +1,10 @@
-import { introConfig as intro, sceneConfig as scene, smoothConfig, startConfig } from './config';
+import {
+  backgroundConfig as bgConfig,
+  introConfig as intro,
+  sceneConfig as scene,
+  smoothConfig,
+  startConfig,
+} from './config';
 import { splitSentences, splitWords, type Split } from './split';
 import type Lenis from 'lenis';
 import type { Background, BackgroundSeed, BackgroundStatus } from './background';
@@ -113,6 +119,7 @@ export async function startEngine(
       mobile,
       navigate: opts.navigate,
       reveal: playIntro ? intro.networkReveal : 0.9,
+      opacity: opts.level === 'light' ? bgConfig.lightLevelOpacity : 1,
     });
     canvas.dataset.ready = 'true';
     // The server-rendered static network gives way to the live one.
@@ -287,8 +294,8 @@ export async function startEngine(
           ease: 'none',
           scrollTrigger: {
             trigger: el,
-            start: `top ${98 - stagger}%`,
-            end: `top ${62 - stagger}%`,
+            start: `top ${scene.cardStartPct - stagger}%`,
+            end: `top ${scene.cardEndPct - stagger}%`,
             scrub: scene.scrub,
           },
         },

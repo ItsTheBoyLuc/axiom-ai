@@ -17,7 +17,7 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 | 7     | News and global search (`/news`, `/search`, palette)            | Done 2026-10-03 (see below)                                                                 |
 | 8     | Admin, auth core, data sync                                     | Done 2026-10-03 (see below)                                                                 |
 | 9     | Accounts and personalization                                    | Done 2026-10-05 (see below)                                                                 |
-| 11    | Cinematic scroll experience (deliberate plan change)            | In progress (see Phase 11 status below)                                                     |
+| 11    | Cinematic scroll experience (deliberate plan change)            | Stopped part-way on request (2026-10-05); see Phase 11 status below                         |
 | 10    | Production readiness                                            | Done 2026-10-05 (see below)                                                                 |
 
 ## Phase 3b status
@@ -110,3 +110,21 @@ Accessibility 100 and best practices 100 on all four; SEO 100 except `/compare?m
 - With `reducedMotion: 'no-preference'`: Lenis **was** running (`html.lenis`, smooth wheel scrolling) and one GSAP ScrollTrigger **was** created, but it only moved the hero headline up by about 80 px and faded it to 15% over the first screen, and the hero canvas drifted a little. The canvas lived inside the hero only and its hash stopped changing after the first screen; **everything below the hero had no scroll-linked effect at all**, only once-only fades (Phase 10 reveals). No pins, no scrub, no background change per section.
 - With `reducedMotion: 'reduce'` (what Windows does when "Show animations in Windows" is off): no canvas, no Lenis, no ScrollTrigger, nothing moves. **If your OS has that setting off, you see a completely static page.**
 - So: not a bug in the libraries (they were initialised), but effects that were far too small and confined to the first screen, and none of it for reduced-motion users. No real bug to fix there.
+
+### Phase 11: where it stands (stopped on request, 2026-10-05)
+
+**Done and committed (steps 0 to 4 of the plan, plus most of 5 and 8):**
+
+- Plan change recorded (CLAUDE.md, PROGRESS, DECISIONS). Diagnosis written above. Baseline and AFTER Lighthouse (median of 3, three modes, 5 routes) and frame stats are in `docs/PERFORMANCE.md`: LCP not worse anywhere, `/` mobile applied 2.73 to 2.46 s, TBT lower; 60 fps at 1x CPU, 43 to 48 fps average at 4x.
+- Motion setting (System default / Full motion / Reduced): `/settings`, footer, account sync, `data-motion` inline script.
+- Cinematic engine (`src/components/cinematic/*`): scroll-scrubbed fixed canvas (8 formations, 3 depth layers, labels and click on hover in the hero), word and sentence text scenes, pinned headers (desktop), cards from different directions, counters, hero load sequence, magnetic CTAs, progress bar, `?debug=scroll` overlay, adaptive quality, anchors. Light level on `/about`, `/releases`, provider profiles; releases timeline focus effect; shorter route transition.
+- Tests: `tests/e2e/cinematic.spec.ts` (22 tests: pixels differ across 8 positions, monotonic text build and reverse, pins, counters, hero alive vs static, reduced motion, motion setting, keyboard, anchors, no-JS, mobile, CSP and console clean, frame stats, filmstrip), unit tests for split and motion preference. Filmstrip is written to `test-results/scroll-filmstrip/` (1440 and 390, dark) by the e2e run; I looked at it and at real-data screenshots.
+- Docs written: MOTION.md (all tunables), PERFORMANCE.md, DECISIONS (Phase 11 entries), API.md, `.env.example`.
+
+**In this last commit but NOT verified end to end:** the e2e helper changes (`gotoReady` now waits for the cinematic engine; `__cineLockQuality` for tests; releases line test reads `matrix3d`; canvas-diff test uses polling), the `npm update` patch and minor bumps (next 16.3.8, motion 13.5.1, lucide, pg, vitest, postcss, bullmq, eslint-config-next; lockfile rewritten), the light-level canvas opacity (0.5) and the 0.20 s route transition. Typecheck passes. The previous full Playwright runs on the build before these helper changes gave 387 to 388 of 389 passing; the failures differed each run and were timing flakes under 8 parallel workers: the canvas-difference test, the home axe test (axe racing the engine start) and the releases line test (matrix3d parsing). The helper changes above are the fix for exactly these; they have not been re-run. The last background e2e run was killed by the system for low memory.
+
+**Not done:** repeat the full Playwright suite 2 to 3 times to confirm those flakes are gone; unit (542) and integration (461) were green after the dependency bump; production audit (prod 0 vulnerabilities; full audit unchanged, `braces` has no patched release) and BOM check were green; web and worker Docker image builds and the Compose smoke were not re-run; README, DEPLOYMENT, SECURITY, CLAUDE.md status and gotchas not updated for Phase 11; CI not yet run on the last two commits; screenshots at 768 not reviewed for the home page.
+
+**Next step:** restart with low memory use (run the full e2e suite once, alone), fix any remaining flake, rebuild images, update README, DEPLOYMENT, SECURITY and CLAUDE.md, push, check CI.
+
+**Open decisions for you:** (1) judge by eye the scroll pace (pin lengths), the density of the background and the hero intro blur; (2) the hero is deliberately not pinned; (3) whether `lightLevelOpacity` 0.5 is the right strength; (4) the 4x-CPU frame rate (43 to 48 fps) is acceptable or the canvas should be simplified further; (5) the dependency patch bumps were applied (no majors).
