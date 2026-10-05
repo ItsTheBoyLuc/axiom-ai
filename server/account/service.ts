@@ -6,6 +6,7 @@ import {
   type Preferences,
 } from '../../src/lib/account/schemas';
 import { passwordIssueText, passwordIssues } from '../../src/lib/auth/credentials';
+import { isMotionPreference } from '../../src/lib/motion-preference';
 import { compareHrefForSlugs } from '../../src/lib/comparison';
 import { ApiError } from '../api/http';
 import { recordAudit } from '../audit';
@@ -42,13 +43,14 @@ type PrefRow = { theme: string | null; preferredProviders: string[]; settings: u
 
 export function toPreferences(row: PrefRow): Preferences {
   if (!row) return { ...DEFAULT_PREFERENCES };
-  const settings = (row.settings ?? {}) as { personalized?: unknown };
+  const settings = (row.settings ?? {}) as { personalized?: unknown; motion?: unknown };
   const theme =
     row.theme === 'system' || row.theme === 'dark' || row.theme === 'light' ? row.theme : null;
   return {
     theme,
     preferredProviders: row.preferredProviders,
     personalized: settings.personalized !== false,
+    motion: isMotionPreference(settings.motion) ? settings.motion : null,
   };
 }
 
@@ -84,7 +86,7 @@ export async function setPreferences(
   const data = {
     theme: prefs.theme,
     preferredProviders: prefs.preferredProviders,
-    settings: { personalized: prefs.personalized },
+    settings: { personalized: prefs.personalized, motion: prefs.motion },
   };
   await db.userPreference.upsert({
     where: { userId },

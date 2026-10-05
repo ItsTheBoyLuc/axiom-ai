@@ -32,6 +32,7 @@ export default defineConfig({
       ENABLE_DESIGN_PAGE: 'true',
       // Every spec shares one client address; the limiter itself is covered by integration tests.
       API_RATE_LIMIT_PER_MINUTE: '0',
+      ENABLE_DEBUG_OVERLAY: 'true',
       CONTACT_EMAIL: 'contact@axiom.test',
       APP_URL: `http://localhost:${PORT}`,
       DATABASE_URL: E2E_DATABASE_URL,

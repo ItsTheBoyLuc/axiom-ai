@@ -31,10 +31,16 @@ export function ContentPage({
           { name: title, href: path },
         ]}
       />
-      <header className="mb-10 max-w-3xl">
-        <p className="t-eyebrow mb-3">{eyebrow}</p>
-        <h1 className="t-h2">{title}</h1>
-        <p className="t-lead mt-4">{lead}</p>
+      <header className="mb-10 max-w-3xl" data-cine-state="featured" data-cine-head>
+        <p data-cine-eyebrow className="t-eyebrow mb-3">
+          {eyebrow}
+        </p>
+        <h1 data-cine-title className="t-h2">
+          {title}
+        </h1>
+        <p data-cine-lead className="t-lead mt-4">
+          {lead}
+        </p>
         {updated && (
           <p className="text-muted mt-4 font-mono text-xs">
             Last updated{' '}
@@ -64,11 +70,16 @@ export function ContentSection({
   children: React.ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="scroll-mt-24">
-      <h2 id={id} className="t-h3 mb-4">
-        {title}
-      </h2>
-      <div className="text-fg-2 [&_a]:text-accent [&_strong]:text-fg space-y-4 leading-relaxed [&_a]:underline [&_a]:underline-offset-2 [&_li]:pl-1 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
+    <section aria-labelledby={id} className="scroll-mt-24" data-cine-state={id}>
+      <div data-cine-head>
+        <h2 id={id} data-cine-title className="t-h3 mb-4">
+          {title}
+        </h2>
+      </div>
+      <div
+        data-cine-block
+        className="text-fg-2 [&_a]:text-accent [&_strong]:text-fg space-y-4 leading-relaxed [&_a]:underline [&_a]:underline-offset-2 [&_li]:pl-1 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5"
+      >
         {children}
       </div>
     </section>

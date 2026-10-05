@@ -9,6 +9,7 @@ import {
   useRef,
   useSyncExternalStore,
 } from 'react';
+import { useMotionPreference } from '@/components/layout/motion-preference-provider';
 import { useTheme } from '@/components/layout/theme-provider';
 import type { Preferences } from '@/lib/account/schemas';
 import {
@@ -46,6 +47,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   );
   const { preference: localTheme, setPreference } = useTheme();
   const themeAdopted = useRef(false);
+  const { preference: localMotion, setPreference: setMotion } = useMotionPreference();
+  const motionAdopted = useRef(false);
 
   // The account is the source of truth across devices: adopt the saved theme once per page load.
   const savedTheme = state.status === 'user' ? state.preferences.theme : null;
@@ -55,6 +58,15 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       if (savedTheme !== localTheme) setPreference(savedTheme);
     }
   }, [savedTheme, localTheme, setPreference]);
+
+  // Same for the motion setting.
+  const savedMotion = state.status === 'user' ? state.preferences.motion : null;
+  useEffect(() => {
+    if (savedMotion && !motionAdopted.current) {
+      motionAdopted.current = true;
+      if (savedMotion !== localMotion) setMotion(savedMotion);
+    }
+  }, [savedMotion, localMotion, setMotion]);
 
   const updatePreferences = useCallback(async (patch: Partial<Preferences>) => {
     const current = getSessionSnapshot();

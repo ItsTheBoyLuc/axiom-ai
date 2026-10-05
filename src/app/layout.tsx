@@ -7,10 +7,12 @@ import { CspNonce } from '@/components/layout/csp-nonce';
 import { Footer } from '@/components/layout/footer';
 import { Navbar } from '@/components/layout/navbar';
 import { PaletteProvider } from '@/components/layout/command-palette';
-import { SmoothScroll } from '@/components/layout/smooth-scroll';
+import { MotionPreferenceProvider } from '@/components/layout/motion-preference-provider';
 import { MotionProvider } from '@/components/layout/motion-provider';
 import { SessionProvider } from '@/components/account/session-provider';
-import { ThemeProvider, themeInitScript } from '@/components/layout/theme-provider';
+import { ThemeProvider } from '@/components/layout/theme-provider';
+import { themeInitScript } from '@/lib/theme-script';
+import { motionInitScript } from '@/lib/motion-preference';
 import '../styles/globals.css';
 
 const siteUrl = process.env.APP_URL ?? 'http://localhost:3000';
@@ -46,33 +48,34 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
-        {/* Applies the saved theme before first paint: no flash. */}
+        {/* Applies the saved theme and the motion mode before first paint: no flash. */}
         <script
           nonce={nonce}
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+          dangerouslySetInnerHTML={{ __html: themeInitScript + motionInitScript }}
         />
       </head>
       <body className="font-sans antialiased">
         <CspNonce nonce={nonce} />
         <ThemeProvider>
-          <SessionProvider>
-            <MotionProvider>
-              <PaletteProvider>
-                <a
-                  href="#main"
-                  className="sr-only-focusable bg-accent text-accent-fg fixed top-3 left-3 z-[100] rounded-lg px-4 py-2 text-sm font-medium"
-                >
-                  Skip to content
-                </a>
-                <SmoothScroll />
-                <Navbar />
-                <main id="main">{children}</main>
-                <Footer />
-                <ComparisonTray />
-              </PaletteProvider>
-            </MotionProvider>
-          </SessionProvider>
+          <MotionPreferenceProvider>
+            <SessionProvider>
+              <MotionProvider>
+                <PaletteProvider>
+                  <a
+                    href="#main"
+                    className="sr-only-focusable bg-accent text-accent-fg fixed top-3 left-3 z-[100] rounded-lg px-4 py-2 text-sm font-medium"
+                  >
+                    Skip to content
+                  </a>
+                  <Navbar />
+                  <main id="main">{children}</main>
+                  <Footer />
+                  <ComparisonTray />
+                </PaletteProvider>
+              </MotionProvider>
+            </SessionProvider>
+          </MotionPreferenceProvider>
         </ThemeProvider>
       </body>
     </html>

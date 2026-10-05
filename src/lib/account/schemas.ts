@@ -2,6 +2,7 @@ import '../zod-browser';
 import { z } from 'zod';
 import { MAX_PASSWORD_LENGTH, normalizeEmail } from '@/lib/auth/credentials';
 import { MAX_COMPARE } from '@/lib/comparison';
+import { MOTION_PREFERENCES } from '@/lib/motion-preference';
 
 /**
  * Request shapes for sign-up and the signed-in account API (/api/v1/me/*). Shared by the server
@@ -38,12 +39,15 @@ export const preferencesSchema = z.strictObject({
     .refine((a) => new Set(a).size === a.length, 'duplicate provider'),
   /** Show the personalised "For you" section on the home page. */
   personalized: z.boolean(),
+  /** Motion setting (System default, Full motion, Reduced); null = never chosen. */
+  motion: z.enum(MOTION_PREFERENCES).nullable().default(null),
 });
 export type Preferences = z.infer<typeof preferencesSchema>;
 export const DEFAULT_PREFERENCES: Preferences = {
   theme: null,
   preferredProviders: [],
   personalized: true,
+  motion: null,
 };
 
 export const slugBody = z.strictObject({ slug });

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Logo } from '@/components/ui/logo';
 import { Container } from '@/components/ui/section';
+import { MotionSetting } from './motion-setting';
 import { footerColumns } from '@/lib/routes';
 import { getLastDataUpdate } from '../../../server/services/site';
 
@@ -64,9 +65,12 @@ export async function Footer() {
         </div>
         <div className="border-line text-muted mt-12 flex flex-col gap-2 border-t pt-6 text-xs sm:flex-row sm:justify-between">
           <p>&copy; {new Date().getFullYear()} AXIOM AI. All rights reserved.</p>
-          <p>
-            Last data update: <span className="font-mono">{updated}</span>
-          </p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+            <MotionSetting />
+            <p>
+              Last data update: <span className="font-mono">{updated}</span>
+            </p>
+          </div>
         </div>
       </Container>
     </footer>

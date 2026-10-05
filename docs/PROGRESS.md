@@ -102,3 +102,11 @@ Accessibility 100 and best practices 100 on all four; SEO 100 except `/compare?m
 **Plan change (2026-10-05):** order is now Phase 11 -> sync-up -> final audit. Phase 10 was already done and is only re-checked in the sync-up step. Step log (one line per step, commit and push after each):
 
 - Step 0: plan change recorded in CLAUDE.md, PROGRESS.md and DECISIONS.md.
+- Step 1 (2026-10-05): **diagnosed** (see below), baseline Lighthouse saved in `docs/PERFORMANCE.md`, motion setting added (System default / Full motion / Reduced, in `/settings` and the footer, persisted locally and in the account). Bug found on the way: `themeInitScript` was imported from a `'use client'` module into the server layout; concatenating it with another script produced `function(){throw Error(...)` as the inline script, which the new e2e test caught.
+- Steps 2-4 (2026-10-05): `src/components/cinematic/*` (engine, canvas background, text splitter, config), homepage markup contract (`data-cine-*`), hero and CTA magnetic buttons, `/about`, `/releases`, provider profiles on the light level, releases timeline focus effect. Verification in progress.
+
+### Diagnosis: why no scroll animation was visible (Chromium 1440x900, before Phase 11)
+
+- With `reducedMotion: 'no-preference'`: Lenis **was** running (`html.lenis`, smooth wheel scrolling) and one GSAP ScrollTrigger **was** created, but it only moved the hero headline up by about 80 px and faded it to 15% over the first screen, and the hero canvas drifted a little. The canvas lived inside the hero only and its hash stopped changing after the first screen; **everything below the hero had no scroll-linked effect at all**, only once-only fades (Phase 10 reveals). No pins, no scrub, no background change per section.
+- With `reducedMotion: 'reduce'` (what Windows does when "Show animations in Windows" is off): no canvas, no Lenis, no ScrollTrigger, nothing moves. **If your OS has that setting off, you see a completely static page.**
+- So: not a bug in the libraries (they were initialised), but effects that were far too small and confined to the first screen, and none of it for reduced-motion users. No real bug to fix there.

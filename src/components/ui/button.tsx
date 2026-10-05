@@ -41,7 +41,14 @@ const Arrow = () => (
 /** Link styled as a button. Hover: arrow nudge. Pressed: scale down. */
 export function ButtonLink({ href, ...p }: Common & { href: string }) {
   return (
-    <motion.span whileTap={{ scale: 0.97 }} transition={spring.snappy} className="inline-flex">
+    // tabIndex -1: Motion makes elements with a press gesture focusable (tabindex 0), which gave
+    // every ButtonLink two tab stops (the wrapper and the link inside it). The link is the control.
+    <motion.span
+      whileTap={{ scale: 0.97 }}
+      transition={spring.snappy}
+      tabIndex={-1}
+      className="inline-flex"
+    >
       <Link href={href} className={classes(p)}>
         {p.children}
         {p.arrow && <Arrow />}

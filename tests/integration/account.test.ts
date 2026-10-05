@@ -231,6 +231,7 @@ describe('session endpoint', () => {
       theme: 'dark',
       preferredProviders: [],
       personalized: false,
+      motion: null,
     });
     expect(JSON.stringify(ok)).not.toContain('passwordHash');
 
@@ -351,14 +352,19 @@ describe('preferences', () => {
     const first = await json(
       await call(getPreferencesRoute, req('GET', '/x', undefined, a.headers)),
     );
-    expect(first.data).toEqual({ theme: null, preferredProviders: [], personalized: true });
+    expect(first.data).toEqual({
+      theme: null,
+      preferredProviders: [],
+      personalized: true,
+      motion: null,
+    });
 
     const put = await call(
       putPreferencesRoute,
       req(
         'PUT',
         '/x',
-        { theme: 'light', preferredProviders: ['acme'], personalized: false },
+        { theme: 'light', preferredProviders: ['acme'], personalized: false, motion: 'full' },
         a.headers,
       ),
     );
@@ -370,6 +376,7 @@ describe('preferences', () => {
       theme: 'light',
       preferredProviders: ['acme'],
       personalized: false,
+      motion: 'full', // the motion setting follows the account across devices
     });
     const other = await json(
       await call(getPreferencesRoute, req('GET', '/x', undefined, b.headers)),
@@ -381,6 +388,7 @@ describe('preferences', () => {
       { theme: null, preferredProviders: ['ghost'], personalized: true },
       { theme: null, preferredProviders: ['acme', 'acme'], personalized: true },
       { theme: null, preferredProviders: [], personalized: true, extra: 1 },
+      { theme: null, preferredProviders: [], personalized: true, motion: 'turbo' },
       { theme: null, preferredProviders: [] },
     ]) {
       const r = await call(putPreferencesRoute, req('PUT', '/x', bad, a.headers));

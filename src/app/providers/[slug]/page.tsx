@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { CinematicRoot } from '@/components/cinematic/cinematic-root';
 import { SectionNav } from '@/components/models/profile/section-nav';
 import {
   AccessSection,
@@ -15,6 +16,7 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Container } from '@/components/ui/section';
 import { jsonLd } from '@/lib/json-ld';
 import { getRepositories } from '../../../../server/repositories';
+import { getCinematicSeed } from '../../../../server/services/cinematic-seed';
 
 /**
  * Rendered per request: the CSP nonce (src/proxy.ts) cannot be applied to pages cached as static
@@ -45,7 +47,8 @@ export default async function ProviderPage({ params }: Props) {
   const repos = getRepositories();
   const p = await repos.providers.getBySlug(slug);
   if (!p) notFound();
-  const [{ items: releases }, { items: news }] = await Promise.all([
+  const [seed, { items: releases }, { items: news }] = await Promise.all([
+    getCinematicSeed(),
     repos.releases.list({ provider: slug, page: 1, pageSize: 100 }),
     repos.news.list({ provider: slug, page: 1, pageSize: 6 }),
   ]);
@@ -61,23 +64,36 @@ export default async function ProviderPage({ params }: Props) {
   };
 
   return (
-    <Container className="pt-10 pb-6 sm:pt-14">
-      <Breadcrumbs
-        items={[
-          { name: 'Home', href: '/' },
-          { name: 'Providers', href: '/providers' },
-          { name: p.name, href: `/providers/${p.slug}` },
-        ]}
-      />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structured) }} />
-      <ProviderHeader p={p} />
-      <SectionNav sections={PROVIDER_SECTIONS} />
-      <OverviewSection p={p} releases={releases} />
-      <ModelsSection p={p} />
-      <ReleasesSection p={p} releases={releases} />
-      <AccessSection p={p} />
-      <ResearchSection p={p} />
-      <AnnouncementsSection p={p} news={news} />
-    </Container>
+    <CinematicRoot level="light" seed={seed}>
+      <Container className="pt-10 pb-6 sm:pt-14">
+        <Breadcrumbs
+          items={[
+            { name: 'Home', href: '/' },
+            { name: 'Providers', href: '/providers' },
+            { name: p.name, href: `/providers/${p.slug}` },
+          ]}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd(structured) }}
+        />
+        <div data-cine-state="providers">
+          <ProviderHeader p={p} />
+        </div>
+        <SectionNav sections={PROVIDER_SECTIONS} />
+        <div data-cine-state="featured">
+          <OverviewSection p={p} releases={releases} />
+          <ModelsSection p={p} />
+        </div>
+        <div data-cine-state="releases">
+          <ReleasesSection p={p} releases={releases} />
+        </div>
+        <div data-cine-state="news">
+          <AccessSection p={p} />
+          <ResearchSection p={p} />
+          <AnnouncementsSection p={p} news={news} />
+        </div>
+      </Container>
+    </CinematicRoot>
   );
 }

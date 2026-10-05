@@ -24,7 +24,7 @@ export const PROVIDER_SECTIONS = [
 /** Identity, type, website and verification of the provider. */
 export function ProviderHeader({ p }: { p: ProviderDetail }) {
   return (
-    <header className="pb-8">
+    <header className="pb-8" data-cine-head>
       <div className="flex flex-wrap items-start gap-5">
         <Monogram letter={p.monogram} size={64} />
         <div className="min-w-0 flex-1">
@@ -32,7 +32,9 @@ export function ProviderHeader({ p }: { p: ProviderDetail }) {
             {orgTypeText(p.orgType)}
             {p.headquarters && <> &middot; {p.headquarters}</>}
           </p>
-          <h1 className="t-h2 mt-1">{p.name}</h1>
+          <h1 data-cine-title className="t-h2 mt-1">
+            {p.name}
+          </h1>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <VerificationBadge status={p.verificationStatus} />
             {p.isDemo && <DemoBadge />}

@@ -23,6 +23,13 @@ export const STORAGE_ITEMS: StorageItem[] = [
     when: 'When you change the theme',
   },
   {
+    name: 'axiom-motion',
+    kind: 'Local storage',
+    purpose: 'Remembers your motion setting (system default, full motion or reduced).',
+    lasts: 'Until you clear site data',
+    when: 'When you change the motion setting',
+  },
+  {
     name: 'axiom-compare',
     kind: 'Local storage',
     purpose: 'Keeps the models you added to the comparison tray.',

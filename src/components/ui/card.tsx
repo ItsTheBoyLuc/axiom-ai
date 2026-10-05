@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
+import { useReducedMode } from '@/components/layout/motion-preference-provider';
 import { cardLift, pointerThrottleMs, spring } from '@/lib/motion';
 
 /**
@@ -19,7 +20,7 @@ export function Card({
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const last = useRef(0);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMode();
   const MotionTag = motion[Tag];
 
   const onMove = (e: React.PointerEvent<HTMLElement>) => {

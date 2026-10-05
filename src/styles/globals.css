@@ -80,8 +80,9 @@ html {
   scroll-behavior: auto; /* Lenis handles smooth scrolling; disabled under reduced motion */
 }
 
+/* No background on body: the page background is on <html>, and the fixed canvas of the cinematic
+   routes (z-index -1) must not be painted over by an opaque body. */
 body {
-  background: var(--bg-primary);
   color: var(--text);
   font-family: var(--font-sans);
   line-height: 1.6;
@@ -205,17 +206,47 @@ body {
   white-space: nowrap;
 }
 
-/* Reduced motion: keep only short opacity fades */
+/*
+ * Reduced motion: keep only short opacity fades. Keyed on <html data-motion="reduced">, which an
+ * inline script sets before first paint from the user's motion setting (System default follows
+ * the OS media query; "Full motion" overrides it). Without JavaScript the media query applies.
+ */
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.12s !important;
+  scroll-behavior: auto !important;
+}
+html[data-motion='reduced'] .skeleton {
+  animation: none;
+}
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.12s !important;
     scroll-behavior: auto !important;
   }
-  .skeleton {
-    animation: none;
-  }
+}
+
+/* Lenis (cinematic routes): the recommended base rules from its documentation. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Anchor links scroll smoothly on every route unless motion is reduced (Lenis takes over on the
+   cinematic routes and switches this off itself). */
+html:not([data-motion='reduced']) {
+  scroll-behavior: smooth;
 }

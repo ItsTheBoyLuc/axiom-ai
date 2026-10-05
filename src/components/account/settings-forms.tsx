@@ -5,7 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ConfirmButton } from '@/components/admin/confirm-button';
 import { controlClass } from '@/components/admin/field-input';
+import { useMotionPreference } from '@/components/layout/motion-preference-provider';
 import { useTheme, type ThemePreference } from '@/components/layout/theme-provider';
+import {
+  MOTION_PREFERENCES,
+  motionHelp,
+  motionLabel,
+  type MotionPreference,
+} from '@/lib/motion-preference';
 import { MAX_PREFERRED_PROVIDERS, type Preferences } from '@/lib/account/schemas';
 import { announceSessionChange } from './session-provider';
 
@@ -34,6 +41,8 @@ export function PreferencesForm({
   const id = useId();
   const { preference, setPreference } = useTheme();
   const [theme, setTheme] = useState<ThemePreference>(initial.theme ?? preference);
+  const { preference: motionPref, setPreference: setMotionPref } = useMotionPreference();
+  const [motion, setMotion] = useState<MotionPreference>(initial.motion ?? motionPref);
   const [chosen, setChosen] = useState<string[]>(initial.preferredProviders);
   const [personalized, setPersonalized] = useState(initial.personalized);
   const [busy, setBusy] = useState(false);
@@ -49,10 +58,11 @@ export function PreferencesForm({
         method: 'PUT',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme, preferredProviders: chosen, personalized }),
+        body: JSON.stringify({ theme, preferredProviders: chosen, personalized, motion }),
       });
       if (res.ok) {
         setPreference(theme);
+        setMotionPref(motion);
         announceSessionChange();
         setMessage({ text: 'Settings saved.', error: false });
       } else {
@@ -100,6 +110,37 @@ export function PreferencesForm({
               />
               <span>
                 {o.label} <span className="text-muted text-xs">· {o.help}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="text-fg text-sm font-medium">Motion</legend>
+        <p className="text-muted mt-1 text-xs">
+          The home page and a few editorial pages animate with scrolling. Data pages stay calm
+          whatever you choose.
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {MOTION_PREFERENCES.map((m) => (
+            <label
+              key={m}
+              className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border px-3 text-sm ${motion === m ? 'border-accent bg-accent/10 text-fg' : 'border-line text-fg-2'}`}
+            >
+              <input
+                type="radio"
+                name={`${id}-motion`}
+                value={m}
+                checked={motion === m}
+                onChange={() => {
+                  setMotion(m);
+                  setMotionPref(m);
+                }}
+                className="accent-accent size-4"
+              />
+              <span>
+                {motionLabel[m]} <span className="text-muted text-xs">· {motionHelp[m]}</span>
               </span>
             </label>
           ))}

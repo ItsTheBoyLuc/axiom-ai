@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from 'react';
+import { THEME_STORAGE_KEY as STORAGE_KEY } from '@/lib/theme-script';
 
 export type ThemePreference = 'system' | 'dark' | 'light';
 type Resolved = 'dark' | 'light';
@@ -10,14 +11,7 @@ type Ctx = {
   setPreference: (t: ThemePreference) => void;
 };
 
-const STORAGE_KEY = 'axiom-theme';
 const ThemeContext = createContext<Ctx | null>(null);
-
-/**
- * Inline script run before first paint (see layout.tsx) so the correct theme is applied
- * with no flash. Keep in sync with resolve() below.
- */
-export const themeInitScript = `(function(){try{var p=localStorage.getItem('${STORAGE_KEY}')||'system';var d=p==='system'?(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):p;document.documentElement.setAttribute('data-theme',d);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`;
 
 /** In-memory copy so the toggle still works when localStorage is blocked. */
 let memoryPreference: ThemePreference | null = null;

@@ -6,7 +6,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Counter } from '@/components/ui/counter';
 import { Container, Section } from '@/components/ui/section';
-import { RevealGroup, RevealItem, Reveal } from '@/components/ui/reveal';
+import { Magnetic } from '@/components/cinematic/magnetic';
 import { formatDate } from '@/lib/format';
 import { getRepositories } from '../../../server/repositories';
 import { getModelRepository } from '../../../server/repositories/model-repository';
@@ -27,26 +27,29 @@ export async function StatsSection() {
   return (
     <section
       aria-labelledby="stats-title"
-      className="border-line bg-bg-2 border-y"
-      style={{ background: 'var(--bg-secondary)' }}
+      className="border-line border-y"
+      data-cine-state="stats"
+      data-cine-pin=""
     >
       <Container className="py-12">
-        <div className="mb-8 flex items-center gap-3">
-          <h2 id="stats-title" className="t-eyebrow">
-            Platform statistics
-          </h2>
-          {s.isDemo && <DemoBadge />}
+        <div data-cine-head>
+          <div className="mb-8 flex items-center gap-3">
+            <h2 id="stats-title" data-cine-eyebrow className="t-eyebrow">
+              Platform statistics
+            </h2>
+            {s.isDemo && <DemoBadge />}
+          </div>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-5">
+            {items.map((i) => (
+              <div key={i.label} data-cine-stat>
+                <p className="text-fg text-4xl font-medium tracking-tight sm:text-5xl">
+                  <Counter value={i.value} driven />
+                </p>
+                <p className="text-fg-2 mt-1 text-sm">{i.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <RevealGroup as="div" className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-5">
-          {items.map((i) => (
-            <RevealItem key={i.label}>
-              <p className="text-fg text-4xl font-medium tracking-tight sm:text-5xl">
-                <Counter value={i.value} />
-              </p>
-              <p className="text-fg-2 mt-1 text-sm">{i.label}</p>
-            </RevealItem>
-          ))}
-        </RevealGroup>
       </Container>
     </section>
   );
@@ -68,13 +71,13 @@ export async function FeaturedModels() {
         </ButtonLink>
       }
     >
-      <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-cine-cards className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {models.map((m) => (
-          <RevealItem key={m.slug}>
+          <div key={m.slug}>
             <ModelCard model={m} />
-          </RevealItem>
+          </div>
         ))}
-      </RevealGroup>
+      </div>
     </Section>
   );
 }
@@ -94,9 +97,9 @@ export async function ProvidersOverview() {
         </ButtonLink>
       }
     >
-      <RevealGroup as="ul" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul data-cine-cards className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {providers.map((p) => (
-          <RevealItem as="li" key={p.slug}>
+          <li key={p.slug}>
             <Card className="flex h-full items-start gap-4 p-5">
               <Monogram letter={p.monogram} size={44} />
               <div className="min-w-0 flex-1">
@@ -116,9 +119,9 @@ export async function ProvidersOverview() {
                 </p>
               </div>
             </Card>
-          </RevealItem>
+          </li>
         ))}
-      </RevealGroup>
+      </ul>
     </Section>
   );
 }
@@ -134,9 +137,9 @@ export async function ComparisonSection() {
       lead="Compare up to four models. Benchmarks stay separate: there is no blended score."
       demo={models.some((m) => m.isDemo) ? <DemoBadge /> : undefined}
     >
-      <Reveal>
+      <div data-cine-block>
         <ComparisonPreview models={models} />
-      </Reveal>
+      </div>
     </Section>
   );
 }
@@ -170,9 +173,9 @@ export async function LatestReleases() {
         </ButtonLink>
       }
     >
-      <RevealGroup as="ol" className="border-line-strong relative ml-2 space-y-8 border-l pl-8">
+      <ol data-cine-cards className="border-line-strong relative ml-2 space-y-8 border-l pl-8">
         {items.map((r) => (
-          <RevealItem as="li" key={r.id} className="relative">
+          <li key={r.id} className="relative">
             <span
               aria-hidden
               className="border-accent bg-bg absolute top-2 -left-[37px] size-2.5 rounded-full border-2"
@@ -191,9 +194,9 @@ export async function LatestReleases() {
                 <span className="text-muted text-xs">No announcement link.</span>
               )}
             </p>
-          </RevealItem>
+          </li>
         ))}
-      </RevealGroup>
+      </ol>
     </Section>
   );
 }
@@ -213,14 +216,14 @@ export async function LatestNews() {
         </ButtonLink>
       }
     >
-      <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-cine-cards className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((n, i) => (
           // First story is featured: spans both columns at md so the 2-col grid (sm and up) has no orphan.
-          <RevealItem key={n.id} className={i === 0 ? 'sm:col-span-2 lg:col-span-1' : undefined}>
+          <div key={n.id} className={i === 0 ? 'sm:col-span-2 lg:col-span-1' : undefined}>
             <NewsCard item={n} />
-          </RevealItem>
+          </div>
         ))}
-      </RevealGroup>
+      </div>
     </Section>
   );
 }
@@ -230,22 +233,26 @@ export function FinalCta() {
     <section
       aria-labelledby="cta-title"
       className="bg-noise relative isolate overflow-hidden py-24 sm:py-32"
+      data-cine-state="cta"
+      data-cine-pin=""
     >
       <div aria-hidden className="bg-ambient absolute inset-0 -z-10" />
       <Container className="text-center">
-        <Reveal>
-          <h2 id="cta-title" className="t-h2 mx-auto max-w-3xl text-balance">
+        <div data-cine-head>
+          <h2 id="cta-title" data-cine-title className="t-h2 mx-auto max-w-3xl text-balance">
             Understand the Models Defining Tomorrow.
           </h2>
-          <p className="t-lead mx-auto mt-5 max-w-xl text-balance">
+          <p data-cine-lead className="t-lead mx-auto mt-5 max-w-xl text-balance">
             Explore the technology, performance, and capabilities behind modern AI.
           </p>
-          <div className="mt-9">
-            <ButtonLink href="/models" size="lg" arrow>
-              Start Exploring
-            </ButtonLink>
+          <div data-cine-action className="mt-9">
+            <Magnetic>
+              <ButtonLink href="/models" size="lg" arrow>
+                Start Exploring
+              </ButtonLink>
+            </Magnetic>
           </div>
-        </Reveal>
+        </div>
       </Container>
     </section>
   );
