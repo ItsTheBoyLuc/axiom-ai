@@ -66,6 +66,7 @@ export async function startEngine(
   canvas: HTMLCanvasElement | null,
   opts: EngineOptions,
 ): Promise<Controller> {
+  const yieldToMain = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
   const mobile = window.innerWidth <= startConfig.mobileMaxWidth;
   const coarse = window.matchMedia('(pointer: coarse)').matches;
   const pins = opts.level === 'full' && !mobile;
@@ -102,6 +103,7 @@ export async function startEngine(
     });
   }
 
+  await yieldToMain();
   // ------------------------------------------------------------------- background
   const startedLate = performance.now() > startConfig.introMaxStartMs || window.scrollY > 200;
   const playIntro = opts.intro && !startedLate;
@@ -127,10 +129,12 @@ export async function startEngine(
   }
 
   // --------------------------------------------------------------------- scenes
-  const ctx = gsap.context(() => {
-    const sections = q<HTMLElement>(root, '[data-cine-state]');
-
-    sections.forEach((sec) => {
+  // Built section by section, each in its own task: one long task would block the main thread (and
+  // the page's responsiveness) for as long as the whole build takes on a slow CPU.
+  const ctx = gsap.context(() => {}, root);
+  for (const sec of q<HTMLElement>(root, '[data-cine-state]')) {
+    await yieldToMain();
+    ctx.add(() => {
       const name = sec.dataset.cineState ?? '';
       const head = sec.querySelector<HTMLElement>('[data-cine-head]');
       if (head) buildHead(sec, head, name);
@@ -138,7 +142,9 @@ export async function startEngine(
       if (cards) buildCards([...cards.children] as HTMLElement[]);
       q<HTMLElement>(sec, '[data-cine-block]').forEach((b) => buildCards([b], 0, true));
     });
-
+  }
+  await yieldToMain();
+  ctx.add(() => {
     // Hero exit: the headline block recedes (scale up, blur, fade) while the page scrolls on and the
     // background regroups into the next formation. Not pinned: the hero is a flex-centred block and
     // a pin spacer would change its layout.
@@ -171,130 +177,126 @@ export async function startEngine(
         },
       });
     }
+  });
 
-    function buildHead(sec: HTMLElement, head: HTMLElement, name: string) {
-      if (name === 'hero') return; // the hero has its own sequence (intro and exit)
-      const eyebrow = head.querySelector<HTMLElement>('[data-cine-eyebrow]');
-      const title = head.querySelector<HTMLElement>('[data-cine-title]');
-      const lead = head.querySelector<HTMLElement>('[data-cine-lead]');
-      const action = head.querySelector<HTMLElement>('[data-cine-action]');
-      const stats = q<HTMLElement>(head, '[data-cine-stat]');
-      const pinPx = scene.pin[name] ?? scene.pinDefault;
-      const pin = pins && sec.hasAttribute('data-cine-pin');
+  function buildHead(sec: HTMLElement, head: HTMLElement, name: string) {
+    if (name === 'hero') return; // the hero has its own sequence (intro and exit)
+    const eyebrow = head.querySelector<HTMLElement>('[data-cine-eyebrow]');
+    const title = head.querySelector<HTMLElement>('[data-cine-title]');
+    const lead = head.querySelector<HTMLElement>('[data-cine-lead]');
+    const action = head.querySelector<HTMLElement>('[data-cine-action]');
+    const stats = q<HTMLElement>(head, '[data-cine-stat]');
+    const pinPx = scene.pin[name] ?? scene.pinDefault;
+    const pin = pins && sec.hasAttribute('data-cine-pin');
 
-      const tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: pin
-          ? {
-              trigger: head,
-              start: `center ${scene.pinCenter}%`,
-              end: `+=${pinPx}`,
-              pin: true,
-              pinSpacing: true,
-              scrub: scene.scrub,
-              anticipatePin: 1,
-            }
-          : { trigger: head, start: scene.textStart, end: scene.textEnd, scrub: scene.scrub },
-      });
-      let at = 0;
-      if (eyebrow) {
-        tl.fromTo(
-          eyebrow,
-          { opacity: 0, y: scene.eyebrow.y },
-          { opacity: 1, y: 0, duration: 1 },
-          at,
-        );
-        at += 0.6;
-      }
-      if (title) {
-        const s = splitWords(title);
-        splits.push(s);
-        tl.fromTo(
-          s.parts,
-          { opacity: 0, y: scene.title.y, filter: `blur(${scene.title.blur}px)` },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1, stagger: scene.title.stagger },
-          at,
-        );
-        at += 1 + scene.title.stagger * Math.max(0, s.parts.length - 1) - 0.3;
-      }
-      if (lead) {
-        const s = splitSentences(lead);
-        splits.push(s);
-        const leadStagger = s.kind === 'words' ? scene.lead.wordStagger : scene.lead.stagger;
-        tl.fromTo(
-          s.parts,
-          { opacity: 0, y: scene.lead.y, filter: `blur(${scene.lead.blur}px)` },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, stagger: leadStagger },
-          at,
-        );
-        at += 1.2 + leadStagger * Math.max(0, s.parts.length - 1) - 0.2;
-      }
-      if (stats.length) {
-        tl.fromTo(
-          stats,
-          { opacity: 0, y: 36, scale: 0.94 },
-          { opacity: 1, y: 0, scale: 1, duration: 1.2, stagger: 0.45 },
-          at,
-        );
-        stats.forEach((st, i) => {
-          const el = st.querySelector<HTMLElement>('[data-cine-count]');
-          if (!el) return;
-          const value = Number(el.dataset.cineCount ?? '0');
-          counters.push({ el, value });
-          const o = { v: 0 };
-          el.textContent = fmt(0);
-          tl.to(
-            o,
-            {
-              v: value,
-              duration: 1.8,
-              ease: scene.counterEase,
-              onUpdate: () => (el.textContent = fmt(o.v)),
-            },
-            at + i * 0.45,
-          );
-        });
-        at += 1.2 + 0.45 * (stats.length - 1);
-      }
-      if (action) {
-        tl.fromTo(
-          action,
-          { opacity: 0, y: 16 },
-          { opacity: 1, y: 0, duration: 1 },
-          Math.max(0, at - 0.4),
-        );
-      }
+    const tl = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: pin
+        ? {
+            trigger: head,
+            start: `center ${scene.pinCenter}%`,
+            end: `+=${pinPx}`,
+            pin: true,
+            pinSpacing: true,
+            scrub: scene.scrub,
+            anticipatePin: 1,
+          }
+        : { trigger: head, start: scene.textStart, end: scene.textEnd, scrub: scene.scrub },
+    });
+    let at = 0;
+    if (eyebrow) {
+      tl.fromTo(eyebrow, { opacity: 0, y: scene.eyebrow.y }, { opacity: 1, y: 0, duration: 1 }, at);
+      at += 0.6;
     }
-
-    function buildCards(items: HTMLElement[], offset = 0, vertical = false) {
-      items.forEach((el, i) => {
-        const from =
-          mobile || vertical
-            ? scene.cardFromMobile
-            : scene.cardFrom[(i + offset) % scene.cardFrom.length]!;
-        const stagger = (i % 3) * scene.cardStagger;
-        gsap.fromTo(
-          el,
-          { x: from.x, y: from.y, scale: from.scale, rotate: from.rotate, opacity: 0 },
+    if (title) {
+      const s = splitWords(title);
+      splits.push(s);
+      tl.fromTo(
+        s.parts,
+        { opacity: 0, y: scene.title.y, filter: `blur(${scene.title.blur}px)` },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1, stagger: scene.title.stagger },
+        at,
+      );
+      at += 1 + scene.title.stagger * Math.max(0, s.parts.length - 1) - 0.3;
+    }
+    if (lead) {
+      const s = splitSentences(lead);
+      splits.push(s);
+      const leadStagger = s.kind === 'words' ? scene.lead.wordStagger : scene.lead.stagger;
+      tl.fromTo(
+        s.parts,
+        { opacity: 0, y: scene.lead.y, filter: `blur(${scene.lead.blur}px)` },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, stagger: leadStagger },
+        at,
+      );
+      at += 1.2 + leadStagger * Math.max(0, s.parts.length - 1) - 0.2;
+    }
+    if (stats.length) {
+      tl.fromTo(
+        stats,
+        { opacity: 0, y: 36, scale: 0.94 },
+        { opacity: 1, y: 0, scale: 1, duration: 1.2, stagger: 0.45 },
+        at,
+      );
+      stats.forEach((st, i) => {
+        const el = st.querySelector<HTMLElement>('[data-cine-count]');
+        if (!el) return;
+        const value = Number(el.dataset.cineCount ?? '0');
+        counters.push({ el, value });
+        const o = { v: 0 };
+        el.textContent = fmt(0);
+        tl.to(
+          o,
           {
-            x: 0,
-            y: 0,
-            scale: 1,
-            rotate: 0,
-            opacity: 1,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: el,
-              start: `top ${98 - stagger}%`,
-              end: `top ${62 - stagger}%`,
-              scrub: scene.scrub,
-            },
+            v: value,
+            duration: 1.8,
+            ease: scene.counterEase,
+            onUpdate: () => (el.textContent = fmt(o.v)),
           },
+          at + i * 0.45,
         );
       });
+      at += 1.2 + 0.45 * (stats.length - 1);
     }
-  }, root);
+    if (action) {
+      tl.fromTo(
+        action,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 1 },
+        Math.max(0, at - 0.4),
+      );
+    }
+  }
 
+  function buildCards(items: HTMLElement[], offset = 0, vertical = false) {
+    items.forEach((el, i) => {
+      const from =
+        mobile || vertical
+          ? scene.cardFromMobile
+          : scene.cardFrom[(i + offset) % scene.cardFrom.length]!;
+      const stagger = (i % 3) * scene.cardStagger;
+      gsap.fromTo(
+        el,
+        { x: from.x, y: from.y, scale: from.scale, rotate: from.rotate, opacity: 0 },
+        {
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotate: 0,
+          opacity: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: el,
+            start: `top ${98 - stagger}%`,
+            end: `top ${62 - stagger}%`,
+            scrub: scene.scrub,
+          },
+        },
+      );
+    });
+  }
+
+  await yieldToMain();
   // ----------------------------------------------------------------- hero intro
   let introState: CineStatus['intro'] = 'skipped';
   if (playIntro) {
