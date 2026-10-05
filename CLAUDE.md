@@ -76,7 +76,7 @@ Saved verbatim from the user's instructions (2026-10-02). These override the "st
 
 ### Autopilot rules
 
-Run all remaining phases autonomously and in order (3b, 4, 5, 6, 7, 8, 9, 10) without waiting for my approval between phases; I review only the final result.
+Run all remaining phases autonomously and in order (3b, 4, 5, 6, 7, 8, 9, 11, 10 — **plan change 2026-10-05: Phase 11 (cinematic scroll experience) comes before the final audit; Phase 10 was already built before the change, so the order now is Phase 11 -> sync-up -> final audit**) without waiting for my approval between phases; I review only the final result.
 Loop per phase: brief plan -> build as specified in docs/PROMPT.md §14 -> run ALL gates -> fix -> commit (Conventional Commits) -> push -> CI green (fix if red) -> update docs/PROGRESS.md and DECISIONS.md -> next phase.
 Gates: prettier, typecheck, lint, unit + integration tests, Playwright (incl. axe, both themes), production build, npm audit, BOM check, and screenshots at 390/768/1440 of the touched routes (actually view them and fix what you see).
 Stop ONLY if: (a) a gate still fails after a real fix attempt, (b) a decision needs me (credentials, legal, cost, breaking change), or (c) a usage limit. Before stopping, update PROGRESS.md with exactly where you are and the next step, and commit.

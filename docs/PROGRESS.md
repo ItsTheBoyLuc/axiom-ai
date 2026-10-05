@@ -17,6 +17,7 @@ Living status of the build. `CLAUDE.md` holds the rules (including Autopilot mod
 | 7     | News and global search (`/news`, `/search`, palette)            | Done 2026-10-03 (see below)                                                                 |
 | 8     | Admin, auth core, data sync                                     | Done 2026-10-03 (see below)                                                                 |
 | 9     | Accounts and personalization                                    | Done 2026-10-05 (see below)                                                                 |
+| 11    | Cinematic scroll experience (deliberate plan change)            | In progress (see Phase 11 status below)                                                     |
 | 10    | Production readiness                                            | Done 2026-10-05 (see below)                                                                 |
 
 ## Phase 3b status
@@ -95,3 +96,9 @@ See `docs/SECURITY.md` (known limitations: email verification, password reset, M
 | `/compare?models=a,b` | 99 / 0.8 s / 0 ms / 0.004      | 75 / 2.0 s / 930 ms / 0.07                                          | 80 / 4.3 s                               |
 
 Accessibility 100 and best practices 100 on all four; SEO 100 except `/compare?models=...` (91: the metadata of that noindex page streams into the body). Real unthrottled LCP measured with a PerformanceObserver on an emulated Pixel 7 was 0.4 to 1.1 s. **Honest reading:** under applied throttling every page is at or within rounding of the 2.5 s LCP budget (home is exactly 2.5 s); Lighthouse's simulated mobile mode, which also models all script work as a dependency of the paint, still reports 3.7 to 5.1 s, so mobile LCP on a slow phone is borderline, not comfortably passing. The remaining cost is about 250 to 470 kB of JavaScript (framework, Motion, Recharts on `/` and `/compare`) and TBT on `/compare` (930 ms throttled). INP was not measured (no field data; Lighthouse does not report it). Before this phase LCP was 4.1 to 5.7 s: the page was invisible until hydration (fixed), and `/models` shipped Zod to the browser (removed).
+
+## Phase 11 status (cinematic scroll experience)
+
+**Plan change (2026-10-05):** order is now Phase 11 -> sync-up -> final audit. Phase 10 was already done and is only re-checked in the sync-up step. Step log (one line per step, commit and push after each):
+
+- Step 0: plan change recorded in CLAUDE.md, PROGRESS.md and DECISIONS.md.

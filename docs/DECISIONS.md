@@ -201,3 +201,9 @@ Format: date - decision - reason. Locked choices from the master prompt (section
 - **Docker in CI:** a job builds the three images, boots the Compose stack as in production, seeds, checks non-root, read-only, the app role cannot create tables and the CSP header, then takes a backup and runs the restore test.
 - **Backups:** `scripts/ops/` (`pg_dump` custom format, verified and checksummed, retention; restore test into a scratch database; destructive restore with `--yes`). Run end to end on 2026-10-05.
 - **Not done:** email verification, password reset, MFA, GitHub sign-in, an absolute session lifetime, image vulnerability scanning in CI (all in `docs/SECURITY.md` under known limitations).
+
+## 2026-10-05 - Phase 11: plan change, cinematic scroll experience
+
+- **The marketing and editorial routes are intentionally a cinematic scroll experience; this overrides the "avoid excessive movement" guidance of docs/PROMPT.md section 4 and section 6 for those routes only** (`/`, `/about`, `/releases`, provider profiles). Data-heavy routes (`/models`, `/compare`, `/benchmarks`, `/admin`, `/settings`, `/account`, `/news`, `/search`) stay calm: existing reveals, hovers and chart transitions only, and they load no scroll library.
+- **Order of work:** Phase 11 -> sync-up -> final audit (Phase 10 had already been built, see its entry above).
+- It also **overrides the Phase 10 decision** that the first page load is not animated, on those routes: the hero headline builds word by word and the network fades in after first paint. The headline stays in the server HTML and visible at first paint, so the LCP element is unchanged; animations start after first paint (idle callback after load) and may not delay it. Where a later entry in this file replaces a Phase 10 test or behaviour, it says so.
