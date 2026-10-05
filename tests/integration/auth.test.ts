@@ -4,7 +4,13 @@ import { createOrRotateAdmin } from '../../server/auth/admin-user';
 import { authorize, userFromRequest } from '../../server/auth/authorize';
 import { cookieConfig } from '../../server/auth/cookie';
 import { hashToken } from '../../server/auth/crypto';
-import { handleMe, handleSignIn, handleSignOut, type AuthDeps } from '../../server/auth/handlers';
+import {
+  handleMe,
+  handleSession,
+  handleSignIn,
+  handleSignOut,
+  type AuthDeps,
+} from '../../server/auth/handlers';
 import { hashPassword } from '../../server/auth/password';
 import { createMemoryLimiter } from '../../server/auth/rate-limit';
 import { SIGNIN_ACCOUNT_RULE, SIGNIN_IP_RULE, signIn } from '../../server/auth/service';
@@ -455,5 +461,84 @@ describe('createOrRotateAdmin', () => {
       createOrRotateAdmin(db, { email: 'root@x.test', password: 'root-root-root-root' }),
     ).rejects.toThrow(/contains-email/);
     expect(await db.user.count()).toBe(0);
+  });
+});
+
+describe('session rotation and cookie lifetime', () => {
+  it('signing in again retires the session the browser presented (no stale session survives)', async () => {
+    await makeUser('rot@x.test');
+    const first = tokenFrom(
+      await handleSignIn(
+        post('/api/v1/auth/sign-in', { email: 'rot@x.test', password: PASSWORD }),
+        deps,
+      ),
+    )!;
+    const second = tokenFrom(
+      await handleSignIn(
+        post(
+          '/api/v1/auth/sign-in',
+          { email: 'rot@x.test', password: PASSWORD },
+          withCookie(first),
+        ),
+        deps,
+      ),
+    )!;
+    expect(second).not.toBe(first);
+    expect(await findSession(db, first)).toBeNull();
+    expect(await findSession(db, second)).not.toBeNull();
+    expect(await db.session.count()).toBe(1);
+  });
+
+  it('a failed sign-in leaves the existing session alone', async () => {
+    await makeUser('keep@x.test');
+    const first = tokenFrom(
+      await handleSignIn(
+        post('/api/v1/auth/sign-in', { email: 'keep@x.test', password: PASSWORD }),
+        deps,
+      ),
+    )!;
+    const bad = await handleSignIn(
+      post(
+        '/api/v1/auth/sign-in',
+        { email: 'keep@x.test', password: 'wrong wrong wrong' },
+        withCookie(first),
+      ),
+      deps,
+    );
+    expect(bad.status).toBe(401);
+    expect(await findSession(db, first)).not.toBeNull();
+  });
+
+  it('never accepts a session token chosen by the client: an unknown cookie is simply anonymous', async () => {
+    const res = await handleSession(
+      new Request('http://localhost:3000/api/v1/auth/session', {
+        headers: withCookie('attacker-chosen-token-attacker-chosen-token'),
+      }),
+      deps,
+    );
+    expect((await res.json()).data.user).toBeNull();
+    expect(res.headers.get('set-cookie')).toBeNull();
+  });
+
+  it('re-issues the cookie when the session slides, so the browser keeps it as long as the server does', async () => {
+    const user = await makeUser('slide@x.test');
+    const start = new Date('2026-10-01T00:00:00Z');
+    const { token } = await createSession(db, user.id, start);
+    const later = new Date(start.getTime() + (SESSION_REFRESH_AFTER_SECONDS + 60) * 1000);
+    const slid = await handleSession(
+      new Request('http://localhost:3000/api/v1/auth/session', { headers: withCookie(token) }),
+      { ...deps, now: () => later },
+    );
+    const set = slid.headers.get('set-cookie')!;
+    expect(set).toContain(`${cookie.name}=${token}`);
+    expect(new Date(/Expires=([^;]+)/.exec(set)![1]!).getTime()).toBeGreaterThan(
+      later.getTime() + (SESSION_TTL_SECONDS - 120) * 1000,
+    );
+    // A fresh session is not re-issued on every request.
+    const again = await handleSession(
+      new Request('http://localhost:3000/api/v1/auth/session', { headers: withCookie(token) }),
+      { ...deps, now: () => new Date(later.getTime() + 1000) },
+    );
+    expect(again.headers.get('set-cookie')).toBeNull();
   });
 });

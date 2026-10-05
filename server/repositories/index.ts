@@ -6,6 +6,7 @@ import type {
   ReleaseRepository,
   ResearchRepository,
   SearchRepository,
+  SourcesRepository,
 } from './catalog';
 import type { ModelRepository } from './model-repository';
 import {
@@ -17,6 +18,7 @@ import {
   createPrismaSearchRepository,
 } from './prisma/catalog-repositories';
 import { createPrismaModelRepository } from './prisma/model-repository';
+import { createPrismaSourcesRepository } from './prisma/sources-repository';
 
 export type Repositories = {
   models: ModelRepository;
@@ -26,6 +28,7 @@ export type Repositories = {
   news: NewsRepository;
   research: ResearchRepository;
   search: SearchRepository;
+  sources: SourcesRepository;
 };
 
 /** Wires every repository to one database client (tests pass their own client). */
@@ -39,6 +42,7 @@ export function createRepositories(db: Db): Repositories {
     news: createPrismaNewsRepository(db),
     research: createPrismaResearchRepository(db),
     search: createPrismaSearchRepository(db, models),
+    sources: createPrismaSourcesRepository(db),
   };
 }
 

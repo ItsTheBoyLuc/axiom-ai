@@ -660,8 +660,11 @@ describe('deleting the account', () => {
     expect(await findSession(db, a.token)).toBeNull();
 
     const audit = await db.auditLog.findFirstOrThrow({ where: { action: 'user.delete-self' } });
-    expect(audit).toMatchObject({ entityId: a.user.id, actorId: null });
-    expect(audit.before).toMatchObject({ email: 'gone@x.test' });
+    expect(audit).toMatchObject({ entityId: a.user.id, actorId: null, ip: null });
+    expect(audit.before).toEqual({ role: 'USER' });
+    // Nothing that identifies the person survives anywhere in the audit log.
+    const everything = JSON.stringify(await db.auditLog.findMany());
+    expect(everything).not.toContain('gone@x.test');
   });
 
   it('the last administrator cannot delete themselves', async () => {

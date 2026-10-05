@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import {
   CAPABILITIES,
   CATEGORIES,
@@ -44,14 +43,17 @@ function list<T extends string>(raw: string | undefined, allowed: readonly T[]):
   return [...set];
 }
 
-const slug = z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/);
-const intParam = (min: number, max: number, fallback: number) =>
-  z
-    .string()
-    .regex(/^\d{1,6}$/)
-    .transform(Number)
-    .pipe(z.number().int().min(min).max(max))
-    .catch(fallback);
+// Plain checks rather than Zod: this module runs in the browser on /models and /compare, and
+// Zod would add ~90 kB (gzipped) to those pages for two one-line validations.
+const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const isSlug = (s: string) => SLUG.test(s);
+
+/** An integer in [min, max] from a URL value, or the fallback for anything else. */
+function intParam(raw: string, min: number, max: number, fallback: number): number {
+  if (!/^\d{1,6}$/.test(raw)) return fallback;
+  const n = Number(raw);
+  return n >= min && n <= max ? n : fallback;
+}
 
 /**
  * Parses URL search params into a validated ModelQuery. Never throws: invalid or unknown
@@ -68,7 +70,7 @@ export function parseModelQuery(params: RawParams): ModelQuery {
           providerRaw
             .split(',')
             .map((s) => s.trim())
-            .filter((s) => slug.safeParse(s).success),
+            .filter(isSlug),
         ),
       ]
     : [];
@@ -79,7 +81,7 @@ export function parseModelQuery(params: RawParams): ModelQuery {
     : defaultQuery.sort;
 
   const benchRaw = get(params, 'benchmark');
-  const benchmark = benchRaw && slug.safeParse(benchRaw).success ? benchRaw : null;
+  const benchmark = benchRaw && isSlug(benchRaw) ? benchRaw : null;
 
   return {
     q,
@@ -91,9 +93,12 @@ export function parseModelQuery(params: RawParams): ModelQuery {
     // A benchmark sort without a benchmark is meaningless: fall back to the default.
     sort: sort === 'benchmark' && !benchmark ? defaultQuery.sort : sort,
     benchmark,
-    page: intParam(1, 10_000, 1).parse(get(params, 'page') ?? '1'),
-    pageSize: intParam(3, MAX_PAGE_SIZE, DEFAULT_PAGE_SIZE).parse(
+    page: intParam(get(params, 'page') ?? '1', 1, 10_000, 1),
+    pageSize: intParam(
       get(params, 'pageSize') ?? String(DEFAULT_PAGE_SIZE),
+      3,
+      MAX_PAGE_SIZE,
+      DEFAULT_PAGE_SIZE,
     ),
   };
 }

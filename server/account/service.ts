@@ -1,4 +1,4 @@
-import type { PrismaClient } from '../../prisma/generated/client';
+import { Prisma, type PrismaClient } from '../../prisma/generated/client';
 import {
   DEFAULT_PREFERENCES,
   MAX_SAVED_COMPARISONS,
@@ -317,14 +317,16 @@ export async function changePassword(
 
 /**
  * Deletes the caller's account after re-checking the password. Sessions, saved items,
- * preferences and history go with it (ON DELETE CASCADE); audit rows stay, with the actor
- * cleared. The last administrator cannot delete themselves (that would lock the admin out).
+ * preferences and history go with it (ON DELETE CASCADE). Audit rows stay as a record that
+ * something happened, but are scrubbed of personal data first: the email in earlier entries about
+ * this account and every stored IP address of this person are removed, and the deletion itself is
+ * logged without an email or an address. The last administrator cannot delete themselves (that
+ * would lock the admin out).
  */
 export async function deleteOwnAccount(
   db: PrismaClient,
   user: { id: string; email: string; role: string },
   password: string,
-  ip: string | null,
 ): Promise<void> {
   const row = await db.user.findUnique({ where: { id: user.id }, select: { passwordHash: true } });
   if (!row?.passwordHash || !(await verifyPassword(row.passwordHash, password))) {
@@ -334,14 +336,19 @@ export async function deleteOwnAccount(
     if (user.role === 'ADMIN' && (await tx.user.count({ where: { role: 'ADMIN' } })) <= 1) {
       throw new ApiError(409, 'CONFLICT', 'The last administrator cannot delete their account.');
     }
+    await tx.auditLog.updateMany({
+      where: { entityType: 'users', entityId: user.id },
+      data: { before: Prisma.DbNull, after: Prisma.DbNull, ip: null },
+    });
+    await tx.auditLog.updateMany({ where: { actorId: user.id }, data: { ip: null } });
     await tx.user.delete({ where: { id: user.id } });
     await recordAudit(tx, {
       actorId: null,
       action: 'user.delete-self',
       entityType: 'users',
       entityId: user.id,
-      before: { email: user.email, role: user.role },
-      ip,
+      before: { role: user.role },
+      ip: null,
     });
   });
 }

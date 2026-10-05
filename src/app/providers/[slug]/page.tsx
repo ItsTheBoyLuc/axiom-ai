@@ -16,15 +16,13 @@ import { Container } from '@/components/ui/section';
 import { jsonLd } from '@/lib/json-ld';
 import { getRepositories } from '../../../../server/repositories';
 
-/** Static pages, refreshed hourly (data changes arrive via the sync workers in Phase 8). */
-export const revalidate = 3600;
+/**
+ * Rendered per request: the CSP nonce (src/proxy.ts) cannot be applied to pages cached as static
+ * HTML. The data behind it is cached in Redis (server/cache), so a request is still cheap.
+ */
+export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ slug: string }> };
-
-/** Nothing is prerendered at build time (no database then); each profile renders on first request. */
-export function generateStaticParams() {
-  return [];
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;

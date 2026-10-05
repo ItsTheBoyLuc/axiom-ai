@@ -123,7 +123,7 @@ export async function changePasswordRoute(ctx: MeCtx): Promise<GuardResult> {
 export async function deleteAccountRoute(ctx: MeCtx): Promise<GuardResult> {
   await limited(ctx, 'acctdel');
   const { password } = await readJson(ctx.request, deleteAccountSchema);
-  await deleteOwnAccount(ctx.deps.db, ctx.user, password, ctx.ip);
+  await deleteOwnAccount(ctx.deps.db, ctx.user, password);
   return new Response(JSON.stringify({ data: { ok: true } }), {
     status: 200,
     headers: {

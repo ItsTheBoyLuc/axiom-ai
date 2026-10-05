@@ -7,22 +7,35 @@ import { EmptyState, ResultsShell } from '@/components/models/directory/results-
 import { ModelsUrlProvider } from '@/components/models/directory/url-state';
 import { DemoBadge } from '@/components/ui/badges';
 import { Container } from '@/components/ui/section';
-import { parseModelQuery } from '@/lib/models/query';
+import { parseModelQuery, toSearchParams } from '@/lib/models/query';
 import { getModelRepository } from '../../../../server/repositories/model-repository';
 
-export const metadata: Metadata = {
-  title: 'AI models',
-  description:
-    'Browse, search and filter AI models by provider, category, capability, deployment and pricing.',
-  // Demo data must not be indexed. Remove when the directory serves verified data (Phase 3).
-  robots: { index: false, follow: true },
-};
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-export default async function ModelsPage({
+const DESCRIPTION =
+  'Browse, search and filter AI models by provider, category, capability, deployment and pricing.';
+
+/**
+ * The plain directory is the page worth indexing. Every filtered, searched, sorted or paginated
+ * variant is one of unboundedly many URLs, so it stays out of search results and points at the
+ * canonical one. (Demo fixtures never reach production: SEED_DEMO is for tests only.)
+ */
+export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
+  const q = parseModelQuery(await searchParams);
+  const plain = toSearchParams(q).size === 0;
+  return {
+    title: 'AI models',
+    description: DESCRIPTION,
+    alternates: { canonical: '/models' },
+    robots: plain ? undefined : { index: false, follow: true },
+  };
+}
+
+export default async function ModelsPage({ searchParams }: { searchParams: SearchParams }) {
   const query = parseModelQuery(await searchParams);
   const repo = getModelRepository();
   const [result, benchmarks] = await Promise.all([repo.list(query), repo.benchmarks()]);

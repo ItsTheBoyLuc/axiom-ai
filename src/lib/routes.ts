@@ -1,4 +1,4 @@
-/** Single source for navigation so navbar, footer, palette and stub pages stay in sync. */
+/** Single source for navigation so navbar, footer and palette stay in sync. */
 export type NavItem = { label: string; href: string };
 
 export const primaryNav: NavItem[] = [
@@ -40,17 +40,3 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
     ],
   },
 ];
-
-/**
- * Routes whose real page is not built yet. They render an honest "not built yet" page
- * (see app/[slug]/page.tsx) instead of a 404. Remove a slug when its phase ships.
- */
-export const pendingRoutes: Record<string, { title: string; phase: string }> = {
-  about: { title: 'About', phase: 'Phase 10' },
-  methodology: { title: 'Data methodology', phase: 'Phase 10' },
-  sources: { title: 'Sources', phase: 'Phase 10' },
-  contact: { title: 'Contact', phase: 'Phase 10' },
-  privacy: { title: 'Privacy', phase: 'Phase 10' },
-  terms: { title: 'Terms', phase: 'Phase 10' },
-  cookies: { title: 'Cookies', phase: 'Phase 10' },
-};

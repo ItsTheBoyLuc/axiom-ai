@@ -17,3 +17,6 @@ next-env.d.ts
 # E2E credentials and sessions generated per run (random passwords); never commit
 .e2e-credentials.local
 .e2e-auth/
+
+# Postgres dumps (docs/DEPLOYMENT.md)
+/backups/

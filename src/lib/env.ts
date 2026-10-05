@@ -9,7 +9,8 @@ const schema = z.object({
   APP_URL: z.url().default('http://localhost:3000'),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   REDIS_URL: z.string().min(1, 'REDIS_URL is required'),
-  AUTH_SECRET: z.string().optional(),
+  /** Shown on /contact and in the privacy policy. Hidden when unset. */
+  CONTACT_EMAIL: z.preprocess((v) => (v === '' ? undefined : v), z.email().optional()),
   WORKER_HEALTH_PORT: z.coerce.number().int().positive().default(3001),
 });
 

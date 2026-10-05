@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { ComparisonTray } from '@/components/comparison/comparison-tray';
+import { CspNonce } from '@/components/layout/csp-nonce';
 import { Footer } from '@/components/layout/footer';
 import { Navbar } from '@/components/layout/navbar';
 import { PaletteProvider } from '@/components/layout/command-palette';
@@ -10,9 +12,6 @@ import { MotionProvider } from '@/components/layout/motion-provider';
 import { SessionProvider } from '@/components/account/session-provider';
 import { ThemeProvider, themeInitScript } from '@/components/layout/theme-provider';
 import '../styles/globals.css';
-
-/** Static pages re-check the database (footer timestamp) at most every 5 minutes. */
-export const revalidate = 300;
 
 const siteUrl = process.env.APP_URL ?? 'http://localhost:3000';
 
@@ -32,7 +31,13 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+/**
+ * Every page is rendered per request: the Content-Security-Policy carries a fresh nonce (set in
+ * src/proxy.ts), which Next.js can only apply while rendering. Reading the request headers here
+ * is what opts the whole tree into dynamic rendering. Data reads stay cached in Redis.
+ */
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     <html
       lang="en"
@@ -42,9 +47,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         {/* Applies the saved theme before first paint: no flash. */}
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
       </head>
       <body className="font-sans antialiased">
+        <CspNonce nonce={nonce} />
         <ThemeProvider>
           <SessionProvider>
             <MotionProvider>

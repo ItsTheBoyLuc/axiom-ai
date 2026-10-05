@@ -13,7 +13,13 @@ export const SESSION_REFRESH_AFTER_SECONDS = 24 * 60 * 60;
 
 export type Role = 'USER' | 'ADMIN';
 export type SessionUser = { id: string; email: string; name: string | null; role: Role };
-export type ActiveSession = { id: string; expires: Date; user: SessionUser };
+export type ActiveSession = {
+  id: string;
+  expires: Date;
+  user: SessionUser;
+  /** True when this call extended the session: the browser's cookie must be re-issued too. */
+  refreshed: boolean;
+};
 
 type SessionDb = Pick<Db, 'session'>;
 
@@ -52,12 +58,14 @@ export async function findSession(
     return null;
   }
   let expires = row.expires;
+  let refreshed = false;
   const age = SESSION_TTL_SECONDS * 1000 - (row.expires.getTime() - now.getTime());
   if (age > SESSION_REFRESH_AFTER_SECONDS * 1000) {
     expires = new Date(now.getTime() + SESSION_TTL_SECONDS * 1000);
     await db.session.update({ where: { id: row.id }, data: { expires } }).catch(() => undefined);
+    refreshed = true;
   }
-  return { id: row.id, expires, user: { ...row.user, role: row.user.role as Role } };
+  return { id: row.id, expires, refreshed, user: { ...row.user, role: row.user.role as Role } };
 }
 
 export async function deleteSession(db: SessionDb, token: string | undefined): Promise<void> {

@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { endpoints } from '../../server/api/endpoints';
 import { createHandler, type Runtime } from '../../server/api/runtime';
+import { createMemoryLimiter } from '../../server/auth/rate-limit';
 import { createRepositories } from '../../server/repositories';
 import { newDb, seedDemo } from './helpers';
 
@@ -429,5 +430,42 @@ describe('GET /api/v1/health', () => {
     expect([200, 503]).toContain(res.status);
     expect(res.headers.get('cache-control')).toBe('no-store');
     expect(endpoints.health.response.safeParse(body).success).toBe(true);
+  });
+});
+
+describe('public API rate limiting', () => {
+  const limited = (): Runtime => ({ repos, cache: null, limiter: createMemoryLimiter() });
+
+  it('answers 429 with Retry-After once a client address exceeds its budget, per address', async () => {
+    vi.stubEnv('API_RATE_LIMIT_PER_MINUTE', '3');
+    try {
+      const rt = limited();
+      const from = (ip: string) => ({ headers: { 'x-forwarded-for': ip }, rt });
+      for (let i = 0; i < 3; i++) {
+        const ok = await call('stats', '/stats', from('198.51.100.1'));
+        expect(ok.status).toBe(200);
+        expect(ok.headers.get('RateLimit-Limit')).toBe('3');
+        expect(ok.headers.get('RateLimit-Remaining')).toBe(String(2 - i));
+      }
+      const blocked = await call('stats', '/stats', from('198.51.100.1'));
+      expect(blocked.status).toBe(429);
+      expect(Number(blocked.headers.get('Retry-After'))).toBeGreaterThan(0);
+      expect((await blocked.json()).error.code).toBe('RATE_LIMITED');
+      expect(blocked.headers.get('Cache-Control')).toBe('no-store');
+      // Another address has its own budget.
+      expect((await call('stats', '/stats', from('198.51.100.2'))).status).toBe(200);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it('can be switched off with API_RATE_LIMIT_PER_MINUTE=0', async () => {
+    vi.stubEnv('API_RATE_LIMIT_PER_MINUTE', '0');
+    try {
+      const rt = limited();
+      for (let i = 0; i < 5; i++) expect((await call('stats', '/stats', { rt })).status).toBe(200);
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });

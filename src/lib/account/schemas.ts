@@ -1,3 +1,4 @@
+import '../zod-browser';
 import { z } from 'zod';
 import { MAX_PASSWORD_LENGTH, normalizeEmail } from '@/lib/auth/credentials';
 import { MAX_COMPARE } from '@/lib/comparison';

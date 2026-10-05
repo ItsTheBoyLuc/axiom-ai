@@ -1,3 +1,4 @@
+import type { VerificationStatus } from '../../src/lib/verification';
 import type {
   BenchmarkResultRow,
   BenchmarkResultsQuery,
@@ -46,4 +47,28 @@ export interface ResearchRepository {
 
 export interface SearchRepository {
   search(q: string, types: readonly SearchType[], limit: number): Promise<SearchResults>;
+}
+
+// ------------------------------------------------------------------- sources
+
+/** Records backed by one source host (e.g. `openai.com`), split by verification status. */
+export type SourceHost = {
+  host: string;
+  records: number;
+  byStatus: Partial<Record<VerificationStatus, number>>;
+};
+
+/** What the public Sources and Methodology pages show: where the data comes from, in aggregate. */
+export type SourcesSummary = {
+  /** Every sourced record across the factual tables. */
+  totalRecords: number;
+  /** Records with a source URL, by host, largest first. */
+  hosts: SourceHost[];
+  /** Records without a source URL (only legal for NOT_PUBLICLY_DISCLOSED / UNVERIFIED). */
+  withoutSource: number;
+  byStatus: Record<VerificationStatus, number>;
+};
+
+export interface SourcesRepository {
+  summary(): Promise<SourcesSummary>;
 }

@@ -1,4 +1,3 @@
-import { revalidatePath } from 'next/cache';
 import { getEnv } from '../../src/lib/env';
 import { getCache } from '../cache/cache';
 import { cookieConfig } from '../auth/cookie';
@@ -19,10 +18,8 @@ export function adminDeps(): AdminDeps {
     workerStatus,
     invalidate: async (tags) => {
       await getCache()?.invalidateTags(tags);
-      // Profile pages are statically regenerated (revalidate = 3600): an admin change must show up
-      // now, not within the hour. Every profile is marked stale and rebuilt on its next request.
-      revalidatePath('/models/[slug]', 'page');
-      revalidatePath('/providers/[slug]', 'page');
+      // Pages render per request (CSP nonce), so dropping the Redis cache tags is all it takes
+      // for an admin change to show up everywhere at once.
     },
   };
 }

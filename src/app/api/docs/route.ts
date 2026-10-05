@@ -8,6 +8,9 @@ export function GET() {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'public, max-age=300',
       'X-Content-Type-Options': 'nosniff',
+      // Static page with one inline <style> and nothing else: no scripts, no external loads.
+      'Content-Security-Policy':
+        "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
     },
   });
 }

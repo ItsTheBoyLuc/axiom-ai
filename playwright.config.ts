@@ -30,6 +30,9 @@ export default defineConfig({
       // The original (development) URL, so prepare-db can derive and safeguard test databases.
       DB_BASE_URL: process.env.DB_BASE_URL ?? process.env.DATABASE_URL ?? '',
       ENABLE_DESIGN_PAGE: 'true',
+      // Every spec shares one client address; the limiter itself is covered by integration tests.
+      API_RATE_LIMIT_PER_MINUTE: '0',
+      CONTACT_EMAIL: 'contact@axiom.test',
       APP_URL: `http://localhost:${PORT}`,
       DATABASE_URL: E2E_DATABASE_URL,
     },

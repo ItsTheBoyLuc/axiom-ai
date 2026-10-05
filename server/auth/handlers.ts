@@ -10,7 +10,7 @@ import { clearSessionCookie, readCookie, sessionSetCookie, type CookieConfig } f
 import { clientIp, type RateLimiter } from './rate-limit';
 import { signIn } from './service';
 import { signUp } from './signup';
-import { deleteSession } from './sessions';
+import { deleteSession, findSession } from './sessions';
 
 export type AuthDeps = {
   db: PrismaClient;
@@ -30,6 +30,16 @@ const json = (status: number, body: unknown, headers: Record<string, string> = {
       ...headers,
     },
   });
+
+/**
+ * Session rotation: a browser that already holds a session cookie loses that session the moment it
+ * signs in or up again. Tokens are only ever minted by the server, so fixation is not possible,
+ * but this also stops a stale or planted session surviving a new sign-in.
+ */
+async function retirePresentedSession(request: Request, deps: AuthDeps) {
+  const old = readCookie(request.headers.get('cookie'), deps.cookie.name);
+  if (old) await deleteSession(deps.db, old).catch(() => undefined);
+}
 
 function requireSameOrigin(request: Request, deps: AuthDeps) {
   const verdict = checkSameOrigin(request, deps.allowedOrigins);
@@ -63,6 +73,7 @@ export async function handleSignIn(request: Request, deps: AuthDeps): Promise<Re
       }
       return errorResponse(401, 'INVALID_CREDENTIALS', 'The email or password is incorrect.');
     }
+    await retirePresentedSession(request, deps);
     const fallback = result.user.role === 'ADMIN' ? '/admin' : '/';
     return json(
       200,
@@ -120,6 +131,7 @@ export async function handleSignUp(request: Request, deps: AuthDeps): Promise<Re
         },
       );
     }
+    await retirePresentedSession(request, deps);
     return json(
       201,
       { data: { user: result.user, next: safeNextPath(input.next, '/account') } },
@@ -140,13 +152,23 @@ export async function handleSession(request: Request, deps: AuthDeps): Promise<R
     if (!readCookie(request.headers.get('cookie'), deps.cookie.name)) {
       return json(200, { data: { user: null, preferences: null, savedModels: null } });
     }
-    const user = await userFromRequest(deps.db, deps.cookie, request, deps.now?.());
-    if (!user) return json(200, { data: { user: null, preferences: null, savedModels: null } });
+    const token = readCookie(request.headers.get('cookie'), deps.cookie.name);
+    const session = await findSession(deps.db, token, deps.now?.());
+    if (!session) return json(200, { data: { user: null, preferences: null, savedModels: null } });
+    const { user } = session;
     const [preferences, savedModels] = await Promise.all([
       getPreferences(deps.db, user.id),
       savedSlugs(deps.db, user.id),
     ]);
-    return json(200, { data: { user, preferences, savedModels } });
+    // A sliding session must slide in the browser too, or the cookie would still expire 7 days
+    // after sign-in no matter how active the person is.
+    return json(
+      200,
+      { data: { user, preferences, savedModels } },
+      session.refreshed && token
+        ? { 'Set-Cookie': sessionSetCookie(deps.cookie, token, session.expires) }
+        : {},
+    );
   } catch (err) {
     return toErrorResponse(err);
   }
