@@ -135,7 +135,9 @@ test.describe('scroll effects (GSAP)', () => {
         return m[1] ? v[5]! : v[3]!;
       });
     const top = await scaleAt();
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }),
+    );
     await expect.poll(scaleAt, { timeout: 15_000 }).toBeGreaterThan(top);
     // An entry far below the fold is visible once it has been scrolled to.
     const last = entries(page).last();

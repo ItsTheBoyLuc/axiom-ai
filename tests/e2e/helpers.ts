@@ -4,17 +4,26 @@ export async function setTheme(page: Page, theme: 'dark' | 'light') {
   await page.addInitScript((t) => localStorage.setItem('axiom-theme', t), theme);
 }
 
-/** Scrolls through the page so every whileInView reveal fires before screenshots/scans. */
+/**
+ * Scrolls through the page so every whileInView reveal fires before screenshots/scans, then waits
+ * until nothing is still moving. The scroll-linked scenes of the cinematic pages reverse over a
+ * 0.7 s scrub when the page returns to the top, so a fixed sleep left only a few hundred ms of
+ * margin: one stalled frame and a headline was sampled by axe part way back to hidden (seen once
+ * in about 800 scans as a `color-contrast` failure on the home page's stats title).
+ */
 export async function revealAll(page: Page) {
   await page.evaluate(async () => {
     const h = document.body.scrollHeight;
+    // `instant`: the site sets `scroll-behavior: smooth` for anchors, which would turn these into
+    // native smooth scrolls that are still running when the page is scanned.
     for (let y = 0; y < h; y += 500) {
-      window.scrollTo(0, y);
+      window.scrollTo({ top: y, behavior: 'instant' });
       await new Promise((r) => setTimeout(r, 60));
     }
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   });
-  await page.waitForTimeout(900);
+  await page.waitForFunction(() => window.scrollY === 0);
+  await animationsSettled(page);
 }
 
 /**
@@ -87,7 +96,9 @@ export async function animationsSettled(page: Page, timeoutMs = 5_000) {
           (a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity,
         );
     const signature = () => {
-      const parts: string[] = [];
+      // The scroll position counts too: axe samples the background by on-screen position, and
+      // scroll-linked scenes follow it.
+      const parts: string[] = [`y${window.scrollY}`];
       let i = 0;
       for (const el of document.querySelectorAll('body *')) {
         i++;

@@ -90,7 +90,12 @@ export async function startEngine(
   ScrollTrigger.config({ ignoreMobileResize: true });
 
   const splits: Split[] = [];
-  const counters: { el: HTMLElement; value: number }[] = [];
+  const counters: { el: HTMLElement; value: number; o: { v: number } }[] = [];
+  // The counter text is written by a tween callback, and GSAP skips callbacks when it re-applies
+  // progress itself (after ScrollTrigger.refresh(), or when a scrub is cut short). The values still
+  // advance, so the text is re-derived from them after a refresh and when a scrub completes;
+  // otherwise a refresh that lands mid-scrub leaves a counter frozen part-way (seen as "2" for "3").
+  const syncCounters = () => counters.forEach((c) => (c.el.textContent = fmt(c.o.v)));
   const cleanups: (() => void)[] = [];
 
   // ---------------------------------------------------------------- smooth scrolling
@@ -210,6 +215,7 @@ export async function startEngine(
             pinSpacing: true,
             scrub: scene.scrub,
             anticipatePin: 1,
+            onScrubComplete: syncCounters,
           }
         : {
             id: ARRIVE,
@@ -217,6 +223,7 @@ export async function startEngine(
             start: scene.textStart,
             end: scene.textEnd,
             scrub: scene.scrub,
+            onScrubComplete: syncCounters,
           },
     });
     let at = 0;
@@ -258,8 +265,8 @@ export async function startEngine(
         const el = st.querySelector<HTMLElement>('[data-cine-count]');
         if (!el) return;
         const value = Number(el.dataset.cineCount ?? '0');
-        counters.push({ el, value });
         const o = { v: 0 };
+        counters.push({ el, value, o });
         el.textContent = fmt(0);
         tl.to(
           o,
@@ -540,7 +547,10 @@ export async function startEngine(
     background?.measure();
     settleHash();
   };
-  ScrollTrigger.addEventListener('refresh', () => background?.measure());
+  ScrollTrigger.addEventListener('refresh', () => {
+    background?.measure();
+    syncCounters();
+  });
   void document.fonts?.ready.then(refresh);
   const settle = window.setTimeout(refresh, 600);
   cleanups.push(() => window.clearTimeout(settle));

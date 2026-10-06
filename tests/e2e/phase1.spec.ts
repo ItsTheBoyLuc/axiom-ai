@@ -1,28 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
-import { gotoReady } from './helpers';
+import { gotoReady, revealAll, setTheme } from './helpers';
 
 const SHOTS = 'test-results/screenshots';
 const widths = [390, 768, 1440] as const;
 const themes = ['dark', 'light'] as const;
-
-async function setTheme(page: Page, theme: 'dark' | 'light') {
-  await page.addInitScript((t) => localStorage.setItem('axiom-theme', t), theme);
-}
-
-/** Scrolls through the page so every whileInView reveal fires before screenshots/scans. */
-async function revealAll(page: Page) {
-  await page.evaluate(async () => {
-    const h = document.body.scrollHeight;
-    for (let y = 0; y < h; y += 500) {
-      window.scrollTo(0, y);
-      await new Promise((r) => setTimeout(r, 60));
-    }
-    window.scrollTo(0, 0);
-  });
-  await page.waitForTimeout(900);
-}
 
 test.describe('screenshots', () => {
   mkdirSync(SHOTS, { recursive: true });

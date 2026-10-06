@@ -227,12 +227,35 @@ test.describe('cinematic home: the page moves and builds with scroll', () => {
     await page.waitForTimeout(500);
     const early = await counters.first().innerText();
     await scrollTo(page, top + 700);
-    await page.waitForTimeout(800);
-    const late = await counters.evaluateAll((els) =>
-      els.map((e) => (e as HTMLElement).innerText.replace(/,/g, '')),
-    );
+    // The scrub smooths over 0.7 s, so wait for the values instead of sleeping a fixed time.
+    const read = () =>
+      counters.evaluateAll((els) => els.map((e) => (e as HTMLElement).innerText.replace(/,/g, '')));
+    await expect.poll(read, { timeout: 10_000 }).toEqual(finals);
     expect(Number(early.replace(/,/g, ''))).toBeLessThanOrEqual(Number(finals[0]));
-    expect(late).toEqual(finals);
+  });
+
+  test('counters still end on the real values when the visitor jumps in right after the engine starts, on a slow CPU', async ({
+    page,
+  }) => {
+    // GSAP skips tween callbacks when ScrollTrigger re-applies progress itself; a refresh (the
+    // engine refreshes shortly after it starts and again when fonts settle) landing mid-scrub left
+    // a counter frozen part-way ("2" for "3") for good. Found on CI; reproduced here at 3 in 10.
+    await gotoReady(page, '/');
+    await waitEngine(page);
+    const client = await page.context().newCDPSession(page);
+    await client.send('Emulation.setCPUThrottlingRate', { rate: 6 });
+    const counters = page.locator('[data-cine-count]');
+    const finals = await counters.evaluateAll((els) =>
+      els.map((e) => (e as HTMLElement).dataset.cineCount),
+    );
+    const top = await page
+      .locator('[data-cine-state="stats"]')
+      .evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    await scrollTo(page, top + 700);
+    const read = () =>
+      counters.evaluateAll((els) => els.map((e) => (e as HTMLElement).innerText.replace(/,/g, '')));
+    await expect.poll(read, { timeout: 10_000 }).toEqual(finals);
+    await client.send('Emulation.setCPUThrottlingRate', { rate: 1 });
   });
 
   test('the hero canvas is alive with motion on: it differs between t=0 and t=1.5 s', async ({
