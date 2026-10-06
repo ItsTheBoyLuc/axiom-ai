@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { gotoReady, setTheme } from './helpers';
+import { animationsSettled, gotoReady, setTheme } from './helpers';
 
 /**
  * Phase 11: the cinematic scroll experience on `/`. These tests prove the effects exist and move
@@ -558,5 +558,45 @@ test.describe('filmstrip', () => {
         await page.screenshot({ path: `${dir}/${w}-${String(pct).padStart(3, '0')}.png` });
       }
     });
+  }
+});
+
+test.describe('light level: what is on screen when the page opens is already built', () => {
+  // A scrubbed scene whose start has passed at load would sit half built (faint, blurred) until the
+  // visitor scrolls. Whatever intersects the viewport at rest must be fully opaque and sharp;
+  // whatever is still below the fold may be hidden (opacity 0) but never half way.
+  for (const [width, height] of [
+    [1280, 720],
+    [1440, 900],
+    [768, 1024],
+    [390, 844],
+  ] as const) {
+    for (const path of ['/about', '/releases']) {
+      test(`${path} at ${width}x${height}: no half-built text at rest`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await gotoReady(page, path);
+        await waitEngine(page);
+        await animationsSettled(page);
+        const halfBuilt = await page.evaluate(() => {
+          const out: string[] = [];
+          const sel =
+            '[data-cine-block], [data-cine-head] *, [data-cine-cards] > *, [data-cine-title] *';
+          for (const el of document.querySelectorAll<HTMLElement>(sel)) {
+            const cs = getComputedStyle(el);
+            const o = Number(cs.opacity);
+            const r = el.getBoundingClientRect();
+            const inView = r.bottom > 0 && r.top < window.innerHeight && r.width > 0;
+            const blurred = cs.filter !== 'none' && !/blur\(0(px)?\)/.test(cs.filter);
+            if (inView && (o < 0.99 || blurred) && o > 0)
+              out.push(
+                `${el.tagName}.${el.className.toString().slice(0, 24)} op=${o} f=${cs.filter}`,
+              );
+            else if (!inView && o > 0 && o < 0.99) out.push(`below fold op=${o}`);
+          }
+          return out;
+        });
+        expect(halfBuilt).toEqual([]);
+      });
+    }
   }
 });

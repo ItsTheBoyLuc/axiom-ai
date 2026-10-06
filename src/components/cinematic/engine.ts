@@ -64,6 +64,9 @@ declare global {
 
 export type Controller = { destroy: () => void };
 
+/** Scrubbed "arrival" scenes (text and cards that build while they scroll into view) carry this id. */
+const ARRIVE = 'arrive';
+
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 const q = <T extends Element>(root: ParentNode, sel: string) => [...root.querySelectorAll<T>(sel)];
 
@@ -208,7 +211,13 @@ export async function startEngine(
             scrub: scene.scrub,
             anticipatePin: 1,
           }
-        : { trigger: head, start: scene.textStart, end: scene.textEnd, scrub: scene.scrub },
+        : {
+            id: ARRIVE,
+            trigger: head,
+            start: scene.textStart,
+            end: scene.textEnd,
+            scrub: scene.scrub,
+          },
     });
     let at = 0;
     if (eyebrow) {
@@ -293,6 +302,7 @@ export async function startEngine(
           opacity: 1,
           ease: 'none',
           scrollTrigger: {
+            id: ARRIVE,
             trigger: el,
             start: `top ${scene.cardStartPct - stagger}%`,
             end: `top ${scene.cardEndPct - stagger}%`,
@@ -509,9 +519,24 @@ export async function startEngine(
   document.addEventListener('click', onAnchorClick, true);
   cleanups.push(() => document.removeEventListener('click', onAnchorClick, true));
 
+  // Content that is already on screen when the page opens has nothing left to arrive from: a scene
+  // whose start has passed would otherwise sit half built (faint, blurred, failing contrast) until
+  // the visitor scrolls. Snap those to their arrived state and stop scrubbing them; scenes still
+  // below the fold stay hidden until they arrive. Only while the visitor has not scrolled yet.
+  const startY = window.scrollY;
+  const arriveInView = () => {
+    if (Math.abs(window.scrollY - startY) > 2) return;
+    for (const t of ScrollTrigger.getAll()) {
+      if (t.vars.id !== ARRIVE || !t.animation || t.progress <= 0 || t.progress >= 1) continue;
+      t.animation.progress(1);
+      t.kill(false);
+    }
+  };
+
   // Layout changes (fonts, images, sections streaming in) move every trigger; keep them honest.
   const refresh = () => {
     ScrollTrigger.refresh();
+    arriveInView();
     background?.measure();
     settleHash();
   };
@@ -520,6 +545,7 @@ export async function startEngine(
   const settle = window.setTimeout(refresh, 600);
   cleanups.push(() => window.clearTimeout(settle));
   ScrollTrigger.refresh();
+  arriveInView();
   settleHash();
 
   return {
