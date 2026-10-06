@@ -67,6 +67,7 @@ openssl rand -base64 33   # run twice: POSTGRES_PASSWORD and APP_DB_PASSWORD
 | `TUNNEL_TOKEN`              | Cloudflare Tunnel token (see section 4)                                                                              |
 | `API_RATE_LIMIT_PER_MINUTE` | Optional; default 240 per address                                                                                    |
 | `GITHUB_TOKEN`              | Optional; raises the GitHub API limit of the sync adapter                                                            |
+| `ENABLE_DEBUG_OVERLAY`      | Leave **unset** in production. `true` allows the `?debug=scroll` overlay on `/` (scroll and frame statistics)        |
 
 `NEXT_PUBLIC_SOCIAL_*` are read at build time; set them before `docker compose build`.
 

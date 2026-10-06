@@ -6,12 +6,13 @@
 - Optional accounts: saved models and comparisons, preferred providers, a personalised start page. Everything works without an account.
 - Admin area with CRUD, audit log, and a data-sync pipeline (RSS/Atom, GitHub releases, Hugging Face) that stages imports for approval and can never silently lower the trust of verified data.
 - Public read API with OpenAPI, rate limits and caching.
+- A scroll-driven interface on the home, About, Releases and provider pages (fixed canvas background, text that builds as you scroll, pinned headings on desktop). A motion setting (System default / Full motion / Reduced, in the footer and in Settings) switches it off completely; with it off nothing is pinned or smooth-scrolled and no animation library is loaded. Every value is in `docs/MOTION.md`, measurements in `docs/PERFORMANCE.md`.
 
 Quality rules live in `CLAUDE.md` (working rules, data integrity). The full specification is `docs/PROMPT.md`.
 
 ## Stack
 
-Next.js (App Router, React, TypeScript strict) · Tailwind with CSS-variable tokens · Radix UI, cmdk, Lucide · Motion (GSAP and Lenis only on the hero and `/releases`) · Recharts behind `components/charts` · PostgreSQL 16 + Prisma 7 · Redis (cache, rate limits, BullMQ) · a separate `worker` service · custom DB sessions with Argon2id (see `docs/DECISIONS.md` for why not Auth.js) · Vitest, Testing Library, Playwright with axe · Docker multi-stage (non-root) + Compose · GitHub Actions.
+Next.js (App Router, React, TypeScript strict) · Tailwind with CSS-variable tokens · Radix UI, cmdk, Lucide · Motion (GSAP + ScrollTrigger and Lenis only on the cinematic routes `/`, `/about`, `/releases` and provider profiles, loaded after `load` and never under reduced motion; canvas 2D background) · Recharts behind `components/charts` · PostgreSQL 16 + Prisma 7 · Redis (cache, rate limits, BullMQ) · a separate `worker` service · custom DB sessions with Argon2id (see `docs/DECISIONS.md` for why not Auth.js) · Vitest, Testing Library, Playwright with axe · Docker multi-stage (non-root) + Compose · GitHub Actions.
 
 ## Requirements
 
@@ -104,7 +105,7 @@ prisma/            schema, migrations, seed pipeline and data
 scripts/           admin-create, API doc generator, ops/ (backup and restore)
 docker/            Dockerfile (web, worker, migrate targets), initdb (least-privilege role)
 tests/             unit, integration, e2e
-docs/              PROMPT, DECISIONS, PROGRESS, DATA_STATUS, MOTION, SECURITY, API, DEPLOYMENT
+docs/              PROMPT, DECISIONS, PROGRESS, DATA_STATUS, MOTION, PERFORMANCE, SECURITY, API, DEPLOYMENT
 ```
 
 ## Documentation
@@ -118,6 +119,7 @@ docs/              PROMPT, DECISIONS, PROGRESS, DATA_STATUS, MOTION, SECURITY, A
 | `docs/DECISIONS.md`   | Every non-obvious decision and deviation, with reasons                                                |
 | `docs/PROGRESS.md`    | Build log per phase, with the gates that passed                                                       |
 | `docs/MOTION.md`      | All motion values, for tuning                                                                         |
+| `docs/PERFORMANCE.md` | Lighthouse and frame statistics before and after the scroll experience                                |
 | `docs/PROMPT.md`      | The full specification                                                                                |
 
 The running app also serves its API reference at `/api/docs` and the OpenAPI document at `/api/docs/openapi.json`.
