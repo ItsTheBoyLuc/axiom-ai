@@ -43,7 +43,7 @@ Lighthouse and Core Web Vitals numbers, measured before (2026-10-05) and after (
 
 ## AFTER Phase 11 (final build, 2026-10-06)
 
-Same method as the baseline (median of 3, production build, real catalogue), measured on the final code of the sync-up (code of commit `7916db1`: cinematic engine, canvas background, pinned scenes, motion setting, arrive-at-load fix, dependency patch bumps) in the rebuilt Docker images. Each cell is **baseline of 2026-10-05 / final of 2026-10-06**.
+Same method as the baseline (median of 3, production build, real catalogue), measured on the final code of the sync-up (code of commit `7916db1`: cinematic engine, canvas background, pinned scenes, motion setting, arrive-at-load fix, dependency patch bumps) in the rebuilt Docker images. Each cell is **baseline of 2026-10-05 / final of 2026-10-06**. (A later engine commit, `9efc29c`, only re-syncs the stats counters after a refresh: one small callback, not re-measured.)
 
 **Read the applied-throttling table together with the A/B below it.** The host was slower on 2026-10-06 than on 2026-10-05: routes that Phase 11 does not touch (`/models`, the profile, `/compare`) also got worse in applied-throttling mode (TBT +22 to +65%) even though their code did not change. Cross-day numbers therefore overstate any regression; the same-session A/B is the valid comparison.
 
