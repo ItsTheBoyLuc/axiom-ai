@@ -155,6 +155,8 @@ The engine builds its scenes one section per task (`yieldToMain`) so no single l
 | `heroExit`                                    | y -90 px, scale 1.06, blur 8 px, opacity to 0                                                           | Hero headline block recedes while scrolling on (not pinned)                      |
 | `counterEase`                                 | `power1.out`                                                                                            | Stats count up over the pinned scene                                             |
 
+**Arrived at load (behaviour, not a tunable).** A scrubbed text or card scene whose start has already passed when the page opens (content in the first viewport that is not the hero) snaps to its arrived state and stops being scrubbed; scenes still below the fold stay hidden until they arrive. Without this, content at rest in the lower part of the first screen sat part way through its build (faint, blurred, failing contrast) until the visitor scrolled. It runs after the first layout refresh and again after fonts settle, only while the visitor has not scrolled. Tested at four viewport sizes in `tests/e2e/cinematic.spec.ts` ("no half-built text at rest").
+
 ### The background layer (`backgroundConfig`)
 
 | Constant                                            | Value                                                                       | Meaning                                                                                                                  |
